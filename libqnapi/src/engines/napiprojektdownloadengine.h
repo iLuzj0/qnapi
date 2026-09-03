@@ -48,6 +48,13 @@ class NapiProjektDownloadEngine : public SubtitleDownloadEngine {
   QSharedPointer<const P7ZipDecoder> p7zipDecoder;
 
   QString checksum(QString filename, bool limit10M);
+
+  // Preferred path: the API returns the subtitles as plain text and is not
+  // behind the Cloudflare rate limiter that guards dl.php.
+  Maybe<QByteArray> fetchSubtitlesViaApi(QString lang, QString checksum) const;
+
+  // Legacy path, kept as a fallback when the API cannot be reached. Returns a
+  // password-protected 7z archive.
   Maybe<QString> downloadByLangAndChecksum(QString lang,
                                            QString checksum) const;
   QString npFDigest(const QString& input) const;

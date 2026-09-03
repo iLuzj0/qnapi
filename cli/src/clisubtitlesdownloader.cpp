@@ -97,14 +97,15 @@ bool findSubtitles(const Console& c, const QNapiConfig& config, QNapi& napi) {
 
   bool found = findSubtitlesOnce(c, config, napi);
 
-  for (int attempt = 1; !found && attempt <= QNapi::maxSearchRetries;
+  for (int attempt = 1; !found && attempt <= QNapi::maxSearchRetries &&
+                        napi.lastSearchFailedTransiently();
        ++attempt) {
     c.printLineOrdinary(
-        tr("Nothing found - the service may be throttling us, retrying in %1 "
-           "s (%2/%3)...")
+        tr("Search failed (%4) - retrying in %1 s (%2/%3)...")
             .arg(QNapi::searchRetryDelayMsecs / 1000)
             .arg(attempt)
-            .arg(QNapi::maxSearchRetries));
+            .arg(QNapi::maxSearchRetries)
+            .arg(napi.error().split(QLatin1Char('\n')).first()));
 
     QThread::msleep(QNapi::searchRetryDelayMsecs);
     napi.clearSubtitlesList();

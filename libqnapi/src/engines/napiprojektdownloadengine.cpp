@@ -19,8 +19,10 @@
 #include <cmath>
 
 #include <QCryptographicHash>
+#include <QDomDocument>
 #include <QNetworkReply>
 #include <QNetworkRequest>
+#include <QUrlQuery>
 #include <QProcess>
 #include <QUrl>
 
@@ -43,6 +45,7 @@ const QString napiZipPassword = "iBlm8NTigvru0Jr0";
 const QString napiDownloadUrlTpl =
     "http://www.napiprojekt.pl/unit_napisy/dl.php"
     "?l=%1&f=%2&t=%3&v=other&kolejka=false&nick=%4&pass=%5&napios=%6";
+const QString napiApiUrl = "http://napiprojekt.pl/api/api-napiprojekt3.php";
 const QString napiCheckUserUrlTpl =
     "http://www.napiprojekt.pl/users_check.php?nick=%1&pswd=%2";
 const QString napiUploadUrlTpl =
@@ -86,20 +89,105 @@ QString NapiProjektDownloadEngine::checksum(QString filename) {
 }
 
 bool NapiProjektDownloadEngine::lookForSubtitles(QString lang) {
-  throttleRequests();
+  if (checkSum.isEmpty()) return false;
 
-  Maybe<QString> tmpPackedFileOpt = downloadByLangAndChecksum(lang, checkSum);
+  // The API is not rate-limited, so no artificial delay is needed here.
+  throttleRequests(0);
 
-  if (!tmpPackedFileOpt) {
-    return false;
+  QString tmpFile;
+
+  const Maybe<QByteArray> subtitlesOpt = fetchSubtitlesViaApi(lang, checkSum);
+
+  if (subtitlesOpt) {
+    const QByteArray &subtitles = subtitlesOpt.value();
+    if (subtitles.isEmpty()) return false;
+
+    tmpFile = generateTmpPath();
+    QFile file(tmpFile);
+    if (file.exists()) file.remove();
+    if (!file.open(QIODevice::WriteOnly)) return false;
+    const qint64 written = file.write(subtitles);
+    file.close();
+    if (written != subtitles.size()) return false;
+  } else {
+    // the API could not be reached at all - fall back to the old endpoint
+    const Maybe<QString> tmpPackedFileOpt =
+        downloadByLangAndChecksum(lang, checkSum);
+    if (!tmpPackedFileOpt) return false;
+    tmpFile = tmpPackedFileOpt.value();
   }
 
-  QString tmpPackedFile = tmpPackedFileOpt.value();
-
-  subtitlesList << SubtitleInfo(lang, meta().name(), tmpPackedFile,
+  subtitlesList << SubtitleInfo(lang, meta().name(), tmpFile,
                                 QFileInfo(movie).completeBaseName(), "", "txt",
                                 SUBTITLE_UNKNOWN);
   return true;
+}
+
+// Returns the subtitles as plain text. An empty (but present) result means
+// "this hash is not in the database"; nothing() means the request itself
+// failed and the caller may fall back to the legacy endpoint.
+Maybe<QByteArray> NapiProjektDownloadEngine::fetchSubtitlesViaApi(
+    QString lang, QString checksum) const {
+  if (checksum.isEmpty()) return nothing();
+
+  // NapiProjekt refuses some clients on this endpoint. Once refused, stop
+  // asking: a rejected request still counts against the rate limit that
+  // guards the legacy endpoint we fall back to.
+  static bool apiUnavailable = false;
+  if (apiUnavailable) return nothing();
+
+  QUrlQuery params;
+  params.addQueryItem("downloaded_subtitles_id", checksum);
+  params.addQueryItem("mode", "1");
+  params.addQueryItem("client", "QNapi");
+  params.addQueryItem("client_ver", "0");
+  params.addQueryItem("downloaded_subtitles_lang", npLangWrapper(lang));
+  params.addQueryItem("downloaded_subtitles_txt", "1");
+
+  QNetworkRequest request((QUrl(napiApiUrl)));
+  request.setHeader(QNetworkRequest::ContentTypeHeader,
+                    "application/x-www-form-urlencoded");
+
+  SyncHTTP http;
+  QNetworkReply *reply = http.syncPost(request, params.query().toUtf8());
+
+  if (reply->error() != QNetworkReply::NoError) {
+    engineErrorMsg = http.timedOut()
+                         ? QObject::tr("NapiProjekt did not respond in time.")
+                         : QObject::tr("Network error while contacting "
+                                       "NapiProjekt: %1")
+                               .arg(reply->errorString());
+    return nothing();
+  }
+
+  const QByteArray response = reply->readAll();
+
+  QDomDocument doc;
+  if (!doc.setContent(response)) return nothing();
+
+  const QDomElement root = doc.documentElement();
+
+  // The API refuses some clients outright ("odmowa dostepu"). That is not the
+  // same as "this hash has no subtitles" - report it as unavailable so the
+  // caller falls back to the legacy endpoint instead of reporting a miss.
+  const QDomNodeList statusNodes = root.elementsByTagName("status");
+  if (!statusNodes.isEmpty() &&
+      statusNodes.at(0).toElement().text().compare(
+          "success", Qt::CaseInsensitive) != 0) {
+    apiUnavailable = true;
+    return nothing();
+  }
+
+  const QDomNodeList contentNodes = root.elementsByTagName("content");
+
+  if (contentNodes.isEmpty()) {
+    // a well-formed answer with no subtitles for this hash
+    return just(QByteArray());
+  }
+
+  const QByteArray encoded = contentNodes.at(0).toElement().text().toUtf8();
+
+  return just(QByteArray::fromBase64(encoded));
 }
 
 QList<SubtitleInfo> NapiProjektDownloadEngine::listSubtitles() {
@@ -141,6 +229,17 @@ Maybe<QString> NapiProjektDownloadEngine::downloadByLangAndChecksum(
 
   QByteArray buffer = reply->readAll();
 
+  // Cloudflare answers 429 with "error code: 1015" when it rate-limits us;
+  // that is not the same as "these subtitles do not exist"
+  const int httpStatus =
+      reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+
+  if (httpStatus == 429 || buffer.contains("error code: 1015")) {
+    engineErrorMsg = QObject::tr(
+        "NapiProjekt is rate-limiting requests; try again in a few seconds.");
+    return nothing();
+  }
+
   if (buffer.indexOf("NPc") == 0) return nothing();
 
   QString tmpPackedFile = generateTmpPath();
@@ -166,12 +265,24 @@ bool NapiProjektDownloadEngine::unpack(QUuid id) {
 
   if (QFile::exists(subtitlesTmp)) QFile::remove(subtitlesTmp);
 
-  QString archivePath = ms.value().sourceLocation;
+  const QString downloadedPath = ms.value().sourceLocation;
 
-  bool unpacked = p7zipDecoder->unpackSecureArchiveFiles(
-      archivePath, napiZipPassword, tmpPath);
+  // The API hands back plain text; the legacy endpoint hands back a
+  // password-protected 7z. Tell them apart by the archive's magic bytes so
+  // both paths keep working.
+  QFile downloaded(downloadedPath);
+  if (!downloaded.open(QIODevice::ReadOnly)) return false;
+  const QByteArray magic = downloaded.read(2);
+  downloaded.close();
 
-  return unpacked && QFile::exists(subtitlesTmp);
+  if (magic == QByteArray("7z")) {
+    const bool unpacked = p7zipDecoder->unpackSecureArchiveFiles(
+        downloadedPath, napiZipPassword, tmpPath);
+    return unpacked && QFile::exists(subtitlesTmp);
+  }
+
+  return QFile::copy(downloadedPath, subtitlesTmp) &&
+         QFile::exists(subtitlesTmp);
 }
 
 void NapiProjektDownloadEngine::cleanup() {

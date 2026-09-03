@@ -66,6 +66,7 @@ void QNapi::clearSubtitlesList() {
 
 void QNapi::checksum() {
   checksumErrors.clear();
+  searchFailedTransiently = false;
 
   foreach (QSharedPointer<SubtitleDownloadEngine> e, enginesList) {
     e->clearErrorMessage();
@@ -102,6 +103,10 @@ bool QNapi::lookForSubtitles(QString lang, QString engine) {
     // itself failed", which otherwise look identical to the user
     QStringList reasons = checksumErrors + engineErrors;
     reasons.removeDuplicates();
+
+    // accumulate over the whole per-file search (3 engines x 2
+    // languages); reset once per file in checksum()
+    if (!reasons.isEmpty()) searchFailedTransiently = true;
 
     errorMsg = reasons.isEmpty() ? QObject::tr("No subtitles found!")
                                  : reasons.join("\n");

@@ -75,7 +75,9 @@ class SubtitleDownloadEngine {
   // file as not found, while retrying the same files one by one worked. Space
   // outgoing searches out across all engines and both frontends.
   static const int minRequestIntervalMsecs = 1500;
-  void throttleRequests() const;
+
+  // engines that are not rate-limited pass 0 and are not delayed
+  void throttleRequests(int intervalMsecs = minRequestIntervalMsecs) const;
 
   Maybe<SubtitleInfo> resolveById(QUuid id);
   void updateSubtitleInfo(const SubtitleInfo& si);

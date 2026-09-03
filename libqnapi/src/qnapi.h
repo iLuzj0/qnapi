@@ -32,6 +32,9 @@ class QNapi {
   // so a whole-season batch reported most files as missing while running the
   // same files again found them. Retrying after a pause is exactly what a user
   // does by hand; do it automatically instead.
+  // NapiProjekt sits behind a rate limiter that lets roughly one request
+  // through every ten seconds, so a shorter wait just burns requests. Only
+  // worth doing when the search failed transiently.
   static const int maxSearchRetries = 2;
   static const int searchRetryDelayMsecs = 5000;
 
@@ -63,6 +66,9 @@ class QNapi {
 
   void cleanup();
   QString error();
+  // true when the last search failed because of a network problem or a
+  // rate limit rather than because the subtitles simply do not exist
+  bool lastSearchFailedTransiently() const { return searchFailedTransiently; }
 
   QStringList listLoadedEngines() const;
 
@@ -73,6 +79,7 @@ class QNapi {
   QString errorMsg;
   QString currentSubtitleLanguage;
   QStringList checksumErrors;
+  bool searchFailedTransiently = false;
   QList<QSharedPointer<SubtitleDownloadEngine>> enginesList;
   QList<SubtitleInfo> subtitlesList;
   QSharedPointer<SubtitleDownloadEngine> currentEngine;

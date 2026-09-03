@@ -38,7 +38,7 @@ void SubtitleDownloadEngine::clearSubtitlesList() {
   subtitlesList.clear();
 }
 
-void SubtitleDownloadEngine::throttleRequests() const {
+void SubtitleDownloadEngine::throttleRequests(int intervalMsecs) const {
   static QMutex mutex;
   static QElapsedTimer sinceLastRequest;
 
@@ -46,8 +46,8 @@ void SubtitleDownloadEngine::throttleRequests() const {
 
   if (sinceLastRequest.isValid()) {
     const qint64 elapsed = sinceLastRequest.elapsed();
-    if (elapsed >= 0 && elapsed < minRequestIntervalMsecs) {
-      QThread::msleep(minRequestIntervalMsecs - elapsed);
+    if (elapsed >= 0 && elapsed < intervalMsecs) {
+      QThread::msleep(intervalMsecs - elapsed);
     }
   }
 

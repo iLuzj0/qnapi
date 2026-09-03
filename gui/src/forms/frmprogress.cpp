@@ -295,6 +295,8 @@ void GetThread::run() {
     for (int attempt = 0; attempt <= QNapi::maxSearchRetries && !found;
          ++attempt) {
       if (attempt > 0) {
+        if (!napi.lastSearchFailedTransiently()) break;
+
         emit actionChange(
             tr("Nothing found, retrying in %1 s (%2/%3)...")
                 .arg(QNapi::searchRetryDelayMsecs / 1000)
