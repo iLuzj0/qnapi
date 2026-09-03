@@ -29,6 +29,14 @@ enum DownloadPolicy {
   DP_NEVER_SHOW_LIST = 2
 };
 
+// Media servers (Jellyfin, Plex, Emby) expect the subtitle language in the
+// file name, e.g. Movie.pol.srt. Which code to append, if any.
+enum LanguageSuffix {
+  LS_NONE = 0,
+  LS_TWO_LETTER = 1,
+  LS_THREE_LETTER = 2
+};
+
 class GeneralConfig {
  private:
   QString uiLanguage_;
@@ -42,6 +50,7 @@ class GeneralConfig {
   DownloadPolicy downloadPolicy_;
   bool changePermissionsEnabled_;
   QString changePermissionsTo_;
+  LanguageSuffix languageSuffix_;
 
  public:
   GeneralConfig() {}
@@ -51,7 +60,8 @@ class GeneralConfig {
                 const bool& quietBatch, const SearchPolicy& searchPolicy,
                 const DownloadPolicy& downloadPolicy,
                 const bool& changePermissionsEnabled,
-                const QString& changePermissionsTo)
+                const QString& changePermissionsTo,
+                const LanguageSuffix& languageSuffix = LS_NONE)
       : uiLanguage_(uiLanguage),
         p7zipPath_(p7zipPath),
         tmpPath_(tmpPath),
@@ -62,7 +72,8 @@ class GeneralConfig {
         searchPolicy_(searchPolicy),
         downloadPolicy_(downloadPolicy),
         changePermissionsEnabled_(changePermissionsEnabled),
-        changePermissionsTo_(changePermissionsTo) {}
+        changePermissionsTo_(changePermissionsTo),
+        languageSuffix_(languageSuffix) {}
 
   QString uiLanguage() const { return uiLanguage_; }
   QString p7zipPath() const { return p7zipPath_; }
@@ -75,75 +86,83 @@ class GeneralConfig {
   DownloadPolicy downloadPolicy() const { return downloadPolicy_; }
   bool changePermissionsEnabled() const { return changePermissionsEnabled_; }
   QString changePermissionsTo() const { return changePermissionsTo_; }
+  LanguageSuffix languageSuffix() const { return languageSuffix_; }
 
   const GeneralConfig setUiLanguage(const QString& uiLanguage) const {
     return GeneralConfig(uiLanguage, p7zipPath_, tmpPath_, language_,
                          backupLanguage_, noBackup_, quietBatch_, searchPolicy_,
                          downloadPolicy_, changePermissionsEnabled_,
-                         changePermissionsTo_);
+                         changePermissionsTo_, languageSuffix_);
   }
   const GeneralConfig setP7zipPath(const QString& p7zipPath) const {
     return GeneralConfig(uiLanguage_, p7zipPath, tmpPath_, language_,
                          backupLanguage_, noBackup_, quietBatch_, searchPolicy_,
                          downloadPolicy_, changePermissionsEnabled_,
-                         changePermissionsTo_);
+                         changePermissionsTo_, languageSuffix_);
   }
   const GeneralConfig setTmpPath(const QString& tmpPath) const {
     return GeneralConfig(uiLanguage_, p7zipPath_, tmpPath, language_,
                          backupLanguage_, noBackup_, quietBatch_, searchPolicy_,
                          downloadPolicy_, changePermissionsEnabled_,
-                         changePermissionsTo_);
+                         changePermissionsTo_, languageSuffix_);
   }
   const GeneralConfig setLanguage(const QString& language) const {
     return GeneralConfig(uiLanguage_, p7zipPath_, tmpPath_, language,
                          backupLanguage_, noBackup_, quietBatch_, searchPolicy_,
                          downloadPolicy_, changePermissionsEnabled_,
-                         changePermissionsTo_);
+                         changePermissionsTo_, languageSuffix_);
   }
   const GeneralConfig setBackupLanguage(const QString& backupLanguage) const {
     return GeneralConfig(uiLanguage_, p7zipPath_, tmpPath_, language_,
                          backupLanguage, noBackup_, quietBatch_, searchPolicy_,
                          downloadPolicy_, changePermissionsEnabled_,
-                         changePermissionsTo_);
+                         changePermissionsTo_, languageSuffix_);
   }
   const GeneralConfig setNoBackup(const bool& noBackup) const {
     return GeneralConfig(uiLanguage_, p7zipPath_, tmpPath_, language_,
                          backupLanguage_, noBackup, quietBatch_, searchPolicy_,
                          downloadPolicy_, changePermissionsEnabled_,
-                         changePermissionsTo_);
+                         changePermissionsTo_, languageSuffix_);
   }
   const GeneralConfig setQuietBatch(const bool& quietBatch) const {
     return GeneralConfig(uiLanguage_, p7zipPath_, tmpPath_, language_,
                          backupLanguage_, noBackup_, quietBatch, searchPolicy_,
                          downloadPolicy_, changePermissionsEnabled_,
-                         changePermissionsTo_);
+                         changePermissionsTo_, languageSuffix_);
   }
   const GeneralConfig setSearchPolicy(const SearchPolicy& searchPolicy) const {
     return GeneralConfig(uiLanguage_, p7zipPath_, tmpPath_, language_,
                          backupLanguage_, noBackup_, quietBatch_, searchPolicy,
                          downloadPolicy_, changePermissionsEnabled_,
-                         changePermissionsTo_);
+                         changePermissionsTo_, languageSuffix_);
   }
   const GeneralConfig setDownloadPolicy(
       const DownloadPolicy& downloadPolicy) const {
     return GeneralConfig(uiLanguage_, p7zipPath_, tmpPath_, language_,
                          backupLanguage_, noBackup_, quietBatch_, searchPolicy_,
                          downloadPolicy, changePermissionsEnabled_,
-                         changePermissionsTo_);
+                         changePermissionsTo_, languageSuffix_);
   }
   const GeneralConfig setChangePermissionsEnabled(
       const bool& changePermissionsEnabled) const {
     return GeneralConfig(uiLanguage_, p7zipPath_, tmpPath_, language_,
                          backupLanguage_, noBackup_, quietBatch_, searchPolicy_,
                          downloadPolicy_, changePermissionsEnabled,
-                         changePermissionsTo_);
+                         changePermissionsTo_, languageSuffix_);
   }
   const GeneralConfig setChangePermissionsTo(
       const QString& changePermissionsTo) const {
     return GeneralConfig(uiLanguage_, p7zipPath_, tmpPath_, language_,
                          backupLanguage_, noBackup_, quietBatch_, searchPolicy_,
                          downloadPolicy_, changePermissionsEnabled_,
-                         changePermissionsTo);
+                         changePermissionsTo, languageSuffix_);
+  }
+  const GeneralConfig setLanguageSuffix(
+      const LanguageSuffix& languageSuffix) const {
+    return GeneralConfig(uiLanguage_, p7zipPath_, tmpPath_, language_,
+                         backupLanguage_, noBackup_, quietBatch_, searchPolicy_,
+                         downloadPolicy_, changePermissionsEnabled_,
+                         changePermissionsTo_, languageSuffix);
   }
 
   QString toString() const;

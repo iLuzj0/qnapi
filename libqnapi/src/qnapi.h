@@ -71,6 +71,7 @@ class QNapi {
 
   QString movie;
   QString errorMsg;
+  QString currentSubtitleLanguage;
   QStringList checksumErrors;
   QList<QSharedPointer<SubtitleDownloadEngine>> enginesList;
   QList<SubtitleInfo> subtitlesList;

@@ -13,6 +13,8 @@
 *****************************************************************************/
 
 #include "subtitlematcher.h"
+#include "subtitlelanguage.h"
+
 #include <QDir>
 
 SubtitleMatcher::SubtitleMatcher(
@@ -20,29 +22,44 @@ SubtitleMatcher::SubtitleMatcher(
     QString _ppSubExtension, bool _changePermissions,
     QString _changePermissionsTo,
     const QSharedPointer<const SubtitleFormatsRegistry>&
-        subtitleFormatsRegistry)
+        subtitleFormatsRegistry,
+    LanguageSuffix _languageSuffix)
     : noBackup(_noBackup),
       isPostProcessingEnabled(_isPostProcessingEnabled),
       ppSubFormat(_ppSubFormat),
       ppSubExtension(_ppSubExtension),
       changePermissions(_changePermissions),
       changePermissionsTo(_changePermissionsTo),
-      subtitleFormatsRegistry(subtitleFormatsRegistry) {}
+      subtitleFormatsRegistry(subtitleFormatsRegistry),
+      languageSuffix(_languageSuffix) {}
+
+QString SubtitleMatcher::languageCodeFor(
+    const QString& subtitleLanguage) const {
+  if (languageSuffix == LS_NONE || subtitleLanguage.isEmpty())
+    return QString();
+
+  SubtitleLanguage lang(subtitleLanguage);
+
+  return languageSuffix == LS_THREE_LETTER ? lang.toTriLetter()
+                                           : lang.toTwoLetter();
+}
 
 bool SubtitleMatcher::matchSubtitles(QString subtitlesTmpFilePath,
-                                     QString targetMovieFilePath) const {
+                                     QString targetMovieFilePath,
+                                     QString subtitleLanguage) const {
   QFileInfo subtitlesTmpFileInfo(subtitlesTmpFilePath);
 
   if (!subtitlesTmpFileInfo.exists()) return false;
 
   QString targetExtension = selectTargetExtension(subtitlesTmpFileInfo);
+  QString languageCode = languageCodeFor(subtitleLanguage);
 
   QString targetSubtitlesFilePath =
-      constructSubtitlePath(targetMovieFilePath, targetExtension);
+      constructSubtitlePath(targetMovieFilePath, targetExtension, languageCode);
 
   if (!isWritablePath(targetSubtitlesFilePath)) return false;
 
-  removeOrCopy(targetMovieFilePath, targetSubtitlesFilePath);
+  removeOrCopy(targetMovieFilePath, targetSubtitlesFilePath, languageCode);
 
   bool result = false;
 
@@ -84,10 +101,14 @@ QString SubtitleMatcher::selectTargetExtension(
 
 QString SubtitleMatcher::constructSubtitlePath(QString targetMovieFilePath,
                                                QString targetExtension,
+                                               QString languageCode,
                                                QString baseSuffix) const {
   QFileInfo targetMovieFileInfo(targetMovieFilePath);
-  return targetMovieFileInfo.path() + QDir::separator() +
-         targetMovieFileInfo.completeBaseName() + baseSuffix + "." +
+
+  QString name = targetMovieFileInfo.completeBaseName() + baseSuffix;
+  if (!languageCode.isEmpty()) name += "." + languageCode;
+
+  return targetMovieFileInfo.path() + QDir::separator() + name + "." +
          targetExtension;
 }
 
@@ -97,12 +118,15 @@ bool SubtitleMatcher::isWritablePath(QString path) const {
 }
 
 void SubtitleMatcher::removeOrCopy(QString targetMoviefilePath,
-                                   QString targetSubtitlesFilePath) const {
+                                   QString targetSubtitlesFilePath,
+                                   QString languageCode) const {
   if (QFile::exists(targetSubtitlesFilePath)) {
     if (!noBackup) {
       QFileInfo targetSubtitlesFileInfo(targetSubtitlesFilePath);
-      QString newName = constructSubtitlePath(
-          targetMoviefilePath, targetSubtitlesFileInfo.suffix(), tr("_copy"));
+      QString newName =
+          constructSubtitlePath(targetMoviefilePath,
+                                targetSubtitlesFileInfo.suffix(), languageCode,
+                                tr("_copy"));
 
       if (QFile::exists(newName)) QFile::remove(newName);
 

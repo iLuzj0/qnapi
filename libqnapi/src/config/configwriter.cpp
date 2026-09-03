@@ -56,6 +56,7 @@ void ConfigWriter::writeGeneralConfig(const GeneralConfig& generalConfig,
   settings.setValue("qnapi/change_permissions",
                     generalConfig.changePermissionsEnabled());
   settings.setValue("qnapi/permissions", generalConfig.changePermissionsTo());
+  settings.setValue("qnapi/language_suffix", generalConfig.languageSuffix());
 }
 
 void ConfigWriter::writeEnabledEngines(

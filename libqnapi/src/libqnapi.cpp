@@ -124,7 +124,8 @@ QSharedPointer<const SubtitleMatcher> LibQNapi::subtitleMatcher(
                           config.postProcessingConfig().subExtension(),
                           config.generalConfig().changePermissionsEnabled(),
                           config.generalConfig().changePermissionsTo(),
-                          LibQNapi::subtitleFormatsRegistry()));
+                          LibQNapi::subtitleFormatsRegistry(),
+                          config.generalConfig().languageSuffix()));
 }
 
 QSharedPointer<const SubtitlePostProcessor> LibQNapi::subtitlePostProcessor(

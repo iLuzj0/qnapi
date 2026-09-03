@@ -63,6 +63,7 @@ SOURCES += src/config/configreader.cpp \
     src/parser/langargparser.cpp \
     src/parser/backuplangargparser.cpp \
     src/parser/formatargparser.cpp \
+    src/parser/langsuffixargparser.cpp \
     src/parser/extensionargparser.cpp \
     src/parser/downloadsubtitlesargparser.cpp \
     src/parser/showoptionsargparser.cpp \
@@ -120,6 +121,7 @@ HEADERS += src/config/configreader.h \
     src/parser/langargparser.h \
     src/parser/backuplangargparser.h \
     src/parser/formatargparser.h \
+    src/parser/langsuffixargparser.h \
     src/parser/extensionargparser.h \
     src/parser/downloadsubtitlesargparser.h \
     src/parser/showoptionsargparser.h \

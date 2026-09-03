@@ -28,6 +28,7 @@
 #include "parser/downloadsubtitlesargparser.h"
 #include "parser/extensionargparser.h"
 #include "parser/formatargparser.h"
+#include "parser/langsuffixargparser.h"
 #include "parser/langargparser.h"
 #include "parser/quietbatchargparser.h"
 #include "parser/runcliappargparser.h"
@@ -61,6 +62,7 @@ int main(int argc, char **argv) {
       QSharedPointer<CliArgParser>(new BackupLangArgParser()),
       QSharedPointer<CliArgParser>(new FormatArgParser()),
       QSharedPointer<CliArgParser>(new ExtensionArgParser()),
+      QSharedPointer<CliArgParser>(new LangSuffixArgParser()),
       QSharedPointer<CliArgParser>(new ShowOptionsArgParser()),
       QSharedPointer<CliArgParser>(new ScanDirectoryArgParser()),
       QSharedPointer<CliArgParser>(new DownloadSubtitlesArgParser())};

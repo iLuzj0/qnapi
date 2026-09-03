@@ -27,6 +27,7 @@ QString GeneralConfig::toString() const {
                   << "searchPolicy: " << searchPolicy() << Qt::endl
                   << "downloadPolicy: " << downloadPolicy() << Qt::endl
                   << "changePermissions: " << changePermissionsEnabled() << Qt::endl
-                  << "changePermissionsTo: " << changePermissionsTo() << Qt::endl;
+                  << "changePermissionsTo: " << changePermissionsTo() << Qt::endl
+                  << "languageSuffix: " << languageSuffix() << Qt::endl;
   return s;
 }

@@ -83,7 +83,9 @@ const GeneralConfig ConfigReader::readGeneralConfig(
           settings.value("qnapi/download_policy", DP_SHOW_LIST_IF_NEEDED)
               .toInt()),
       settings.value("qnapi/change_permissions", false).toBool(),
-      settings.value("qnapi/permissions", "644").toString());
+      settings.value("qnapi/permissions", "644").toString(),
+      static_cast<LanguageSuffix>(
+          settings.value("qnapi/language_suffix", LS_NONE).toInt()));
 
   auto cfg1 = resolveP7zipPath(cfg);
   auto cfg2 = resolveTmpPath(cfg1);

@@ -168,6 +168,8 @@ bool QNapi::download(int i) {
   currentEngine = engineByName(s.engine);
   if (!currentEngine) return false;
 
+  currentSubtitleLanguage = s.lang;
+
   currentEngine->clearErrorMessage();
   const bool ok = currentEngine->download(s.id);
   if (!ok && !currentEngine->errorMessage().isEmpty())
@@ -193,7 +195,8 @@ bool QNapi::matchSubtitles() {
     QSharedPointer<const SubtitleMatcher> matcher =
         LibQNapi::subtitleMatcher(config);
     return matcher->matchSubtitles(currentEngine->subtitlesTmp,
-                                   currentEngine->movie);
+                                   currentEngine->movie,
+                                   currentSubtitleLanguage);
   }
 
   return false;
