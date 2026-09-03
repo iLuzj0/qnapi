@@ -292,6 +292,14 @@ class DownloadWorker : public QThread {
       const QString moviePath = allPaths[i];
       const QString name = QFileInfo(moviePath).fileName();
 
+      // Announce the start too: with several files in flight the only output
+      // used to be on completion, so a slow engine looked like a hang.
+      {
+        QMutexLocker locker(&sharedMutex);
+        console.printLineOrdinary(
+            QString("[%1/%2] ").arg(i + 1).arg(totalFiles) + name + " ...");
+      }
+
       // No per-file retry here: waiting between attempts is exactly what the
       // rate limiter punishes. Stragglers are retried as a group instead.
       const int result = downloadForMovie(silent, moviePath, i + 1, totalFiles,
