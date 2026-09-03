@@ -15,7 +15,10 @@
 #include "clisubtitlesdownloader.h"
 #include "qnapi.h"
 
+#include <QAtomicInt>
 #include <QFileInfo>
+#include <QMutex>
+#include <QMutexLocker>
 #include <QThread>
 #include <iostream>
 
@@ -235,11 +238,113 @@ int downloadForMovie(const Console& c, const QString& movieFilePath, int i,
   return EC_OK;
 }
 
+// Asking the user to choose from a list of subtitles only works while files
+// are handled one at a time, so parallel mode requires a non-interactive
+// download policy.
+bool canRunInParallel(const QNapiConfig& config) {
+  return config.generalConfig().quietBatch() ||
+         config.generalConfig().downloadPolicy() == DP_NEVER_SHOW_LIST;
+}
+
+// Each worker takes files off a shared counter and processes them with its own
+// QNapi instance; nothing is shared but the counter and the console lock.
+class DownloadWorker : public QThread {
+ public:
+  DownloadWorker(const Console& console, const QNapiConfig& config,
+                 const QStringList& paths, QAtomicInt& nextIndex,
+                 QMutex& consoleMutex, QAtomicInt& criticalError)
+      : console(console),
+        config(config),
+        paths(paths),
+        nextIndex(nextIndex),
+        consoleMutex(consoleMutex),
+        criticalError(criticalError) {}
+
+ protected:
+  void run() override {
+    // the per-file steps stay silent; one summary line is printed instead, so
+    // the output of concurrent files does not interleave
+    const Console silent(true);
+    QNapi napi(config);
+
+    for (;;) {
+      if (criticalError.loadAcquire() != 0) return;
+
+      const int i = nextIndex.fetchAndAddOrdered(1);
+      if (i >= paths.size()) return;
+
+      const QString moviePath = paths[i];
+      const QString name = QFileInfo(moviePath).fileName();
+
+      const int result = downloadForMovie(silent, moviePath, i + 1,
+                                          paths.size(), config, napi);
+
+      {
+        QMutexLocker locker(&consoleMutex);
+        const QString prefix =
+            QString("[%1/%2] ").arg(i + 1).arg(paths.size());
+
+        if (result == EC_OK) {
+          console.printLineHighlihted(prefix + name);
+        } else {
+          QString reason = napi.error();
+          reason = reason.split(QLatin1Char('\n')).first();
+          if (reason.isEmpty()) reason = tr("could not download subtitles");
+          console.printLineWarning(prefix + name + " - " + reason);
+        }
+      }
+
+      if (result == EC_P7ZIP_UNAVAILABLE || result == EC_CANNOT_WRITE_TMP_DIR) {
+        criticalError.storeRelease(result);
+        return;
+      }
+    }
+  }
+
+ private:
+  const Console& console;
+  const QNapiConfig config;
+  const QStringList& paths;
+  QAtomicInt& nextIndex;
+  QMutex& consoleMutex;
+  QAtomicInt& criticalError;
+};
+
 int downloadSubtitlesFor(const Console& c, const QStringList& movieFilePaths,
                          const QNapiConfig& config) {
   int ccErr = configChecks(c, config);
   if (ccErr != 0) {
     return ccErr;
+  }
+
+  const int fileCount = movieFilePaths.size();
+  const int jobs = qBound(
+      1, qMin(config.generalConfig().jobs(), fileCount), GeneralConfig::maxJobs);
+
+  if (jobs > 1 && canRunInParallel(config)) {
+    // The services throttle requests arriving one after another but let a
+    // handful in flight through, so this is the difference between seconds
+    // and minutes for a whole season.
+    c.printLineOrdinary(
+        tr("Processing %1 files, %2 at a time...").arg(fileCount).arg(jobs));
+
+    QAtomicInt nextIndex(0);
+    QAtomicInt criticalError(0);
+    QMutex consoleMutex;
+
+    QList<DownloadWorker*> workers;
+    for (int w = 0; w < jobs; ++w) {
+      workers << new DownloadWorker(c, config, movieFilePaths, nextIndex,
+                                    consoleMutex, criticalError);
+    }
+    foreach (DownloadWorker* worker, workers) { worker->start(); }
+    foreach (DownloadWorker* worker, workers) {
+      worker->wait();
+      delete worker;
+    }
+
+    const int failed = criticalError.loadAcquire();
+    return failed != 0 ? failed : EC_OK;
   }
 
   QNapi napi(config);
