@@ -138,8 +138,8 @@ Maybe<QByteArray> NapiProjektDownloadEngine::fetchSubtitlesViaApi(
 
   QUrlQuery params;
   params.addQueryItem("downloaded_subtitles_id", checksum);
-  params.addQueryItem("mode", "1");
-  params.addQueryItem("client", "QNapi");
+  params.addQueryItem("mode", "17");
+  params.addQueryItem("client", "NapiProjekt");
   params.addQueryItem("client_ver", "0");
   params.addQueryItem("downloaded_subtitles_lang", npLangWrapper(lang));
   params.addQueryItem("downloaded_subtitles_txt", "1");
