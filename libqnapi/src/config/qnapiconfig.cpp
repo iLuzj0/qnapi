@@ -50,6 +50,9 @@ QString QNapiConfig::toString() const {
                   << "Scan config:" << Qt::endl
                   << scanConfig().toString() << Qt::endl
                   << "Last open-dialog dir:" << Qt::endl
-                  << lastOpenedDir() << Qt::endl;
+                  << lastOpenedDir() << Qt::endl
+                  << Qt::endl
+                  << "AI config:" << Qt::endl
+                  << aiConfig().toString();
   return s;
 }

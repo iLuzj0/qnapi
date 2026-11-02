@@ -25,7 +25,8 @@ void Console::printLine(const QString& line) const {
 
 void Console::print(const QString& line) const {
   if (isQuiet) return;
-  std::cout << line.toStdString();
+  // flushed, so progress updates that end in '\r' show up right away
+  std::cout << line.toStdString() << std::flush;
 }
 
 void Console::printLineHighlihted(const QString& line) const {

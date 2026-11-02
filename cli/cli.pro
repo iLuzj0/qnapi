@@ -6,10 +6,12 @@ QT += core network xml core5compat
 QT -= gui
 
 SOURCES += src/main.cpp \
+    src/cliaifallback.cpp \
     src/clisubtitlesdownloader.cpp \
     src/climain.cpp
-    
+
 HEADERS += \
+    src/cliaifallback.h \
     src/clisubtitlesdownloader.h \
     src/climain.h
 

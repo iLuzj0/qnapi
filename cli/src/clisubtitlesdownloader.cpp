@@ -13,13 +13,17 @@
 *****************************************************************************/
 
 #include "clisubtitlesdownloader.h"
+#include "cliaifallback.h"
+#include "libqnapi.h"
 #include "qnapi.h"
+#include "subtitlelanguage.h"
 
 #include <QAtomicInt>
 #include <QFileInfo>
 #include <QMutex>
 #include <QMutexLocker>
 #include <QThread>
+#include <QVector>
 #include <iostream>
 
 namespace CliSubtitlesDownloader {
@@ -40,6 +44,15 @@ enum ExitCode {
   EC_COULD_NOT_DOWNLOAD = 7,
   EC_COULD_NOT_UNARCHIVE = 8,
   EC_COULD_NOT_MATCH = 9
+};
+
+// What happened to one file, so that the AI fallback can pick up the files
+// that ended up without subtitles in the main language.
+struct FileOutcome {
+  bool processed = false;
+  int code = EC_OK;
+  // language of the saved subtitles; empty when none were saved
+  QString language;
 };
 
 int configChecks(const Console& c, const QNapiConfig& config) {
@@ -211,7 +224,7 @@ int finishSubtitles(int selIdx, const Console& c, QNapi& napi) {
 
 int downloadForMovie(const Console& c, const QString& movieFilePath, int i,
                      int total, const QNapiConfig& config, QNapi& napi,
-                     int maxRetries) {
+                     int maxRetries, QString* savedLanguage = nullptr) {
   QString movieFileName = QFileInfo(movieFilePath).fileName();
   c.printLineHighlihted(tr("Downloading subtitles for '%1' [%2/%3]")
                             .arg(movieFileName)
@@ -239,12 +252,85 @@ int downloadForMovie(const Console& c, const QString& movieFilePath, int i,
   Maybe<int> selIdx = selectSubtitles(c, config, napi);
 
   if (selIdx) {
-    return finishSubtitles(selIdx.value(), c, napi);
+    const int result = finishSubtitles(selIdx.value(), c, napi);
+    if (result == EC_OK && savedLanguage != nullptr)
+      *savedLanguage = napi.subtitleLanguage();
+    return result;
   }
 
   napi.cleanup();
 
   return EC_OK;
+}
+
+// Files with no subtitles in the main language: none found, only the backup
+// language, a download that failed, or still rate-limited. Left out are files
+// the user declined in the list and files whose directory is not writable.
+// (A later regular run replaces AI subtitles with downloaded ones.)
+QStringList filesNeedingAiFallback(const Console& c,
+                                   const QStringList& movieFilePaths,
+                                   const QVector<FileOutcome>& outcomes,
+                                   const QNapiConfig& config) {
+  const QString mainLanguage =
+      SubtitleLanguage(config.generalConfig().language()).toTwoLetter();
+  const QStringList subtitleExtensions =
+      LibQNapi::staticConfig()->subtitleExtensions();
+
+  QStringList queue;
+  for (int i = 0; i < movieFilePaths.size(); ++i) {
+    const FileOutcome& o = outcomes[i];
+    if (!o.processed) continue;
+
+    bool needed = false;
+    switch (o.code) {
+      case EC_OK:
+        // empty language: the user chose not to download anything
+        needed = !o.language.isEmpty() &&
+                 SubtitleLanguage(o.language).toTwoLetter() != mainLanguage;
+        break;
+      case EC_SUBTITLES_NOT_FOUND:
+      case EC_COULD_NOT_DOWNLOAD:
+      case EC_COULD_NOT_UNARCHIVE:
+      case EC_COULD_NOT_MATCH:
+        needed = true;
+        break;
+      default:
+        needed = false;
+    }
+    if (!needed) continue;
+
+    // never replace subtitles that are already there, human-made or not
+    // without language suffixes, a Movie.srt saved by this very run is the
+    // backup-language one and is meant to be replaced; an older one is not
+    const bool unlabelled =
+        config.generalConfig().languageSuffix() == LS_NONE && o.code != EC_OK;
+    if (CliAiFallback::hasSubtitlesInLanguage(movieFilePaths[i], mainLanguage,
+                                              subtitleExtensions, unlabelled)) {
+      c.printLineOrdinary(
+          tr("%1 - already has subtitles in the main language, no AI needed")
+              .arg(QFileInfo(movieFilePaths[i]).fileName()));
+      continue;
+    }
+
+    queue << movieFilePaths[i];
+  }
+  return queue;
+}
+
+void runAiFallbackIfEnabled(const Console& c,
+                            const QStringList& movieFilePaths,
+                            const QVector<FileOutcome>& outcomes,
+                            const QNapiConfig& config) {
+  if (!config.aiConfig().fallbackEnabled()) return;
+
+  const QStringList queue =
+      filesNeedingAiFallback(c, movieFilePaths, outcomes, config);
+  if (queue.isEmpty()) {
+    c.printLineOrdinary(tr("AI fallback: every file has subtitles already"));
+    return;
+  }
+
+  CliAiFallback::generateSubtitles(c, queue, config);
 }
 
 // Asking the user to choose from a list of subtitles only works while files
@@ -262,8 +348,8 @@ class DownloadWorker : public QThread {
   DownloadWorker(const Console& console, const QNapiConfig& config,
                  const QStringList& allPaths, const QList<int>& indices,
                  QAtomicInt& nextSlot, QMutex& sharedMutex,
-                 QList<int>& failedIndices, QAtomicInt& criticalError,
-                 int round, int totalFiles)
+                 QList<int>& failedIndices, QVector<FileOutcome>& outcomes,
+                 QAtomicInt& criticalError, int round, int totalFiles)
       : console(console),
         config(config),
         allPaths(allPaths),
@@ -271,6 +357,7 @@ class DownloadWorker : public QThread {
         nextSlot(nextSlot),
         sharedMutex(sharedMutex),
         failedIndices(failedIndices),
+        outcomes(outcomes),
         criticalError(criticalError),
         round(round),
         totalFiles(totalFiles) {}
@@ -302,12 +389,18 @@ class DownloadWorker : public QThread {
 
       // No per-file retry here: waiting between attempts is exactly what the
       // rate limiter punishes. Stragglers are retried as a group instead.
+      QString savedLanguage;
       const int result = downloadForMovie(silent, moviePath, i + 1, totalFiles,
-                                          config, napi, 0);
+                                          config, napi, 0, &savedLanguage);
 
       {
         QMutexLocker locker(&sharedMutex);
         const QString prefix = QString("[%1/%2] ").arg(i + 1).arg(totalFiles);
+
+        FileOutcome& outcome = outcomes[i];
+        outcome.processed = true;
+        outcome.code = result;
+        outcome.language = savedLanguage;
 
         if (result == EC_OK) {
           console.printLineHighlihted(prefix + name);
@@ -342,6 +435,7 @@ class DownloadWorker : public QThread {
   QAtomicInt& nextSlot;
   QMutex& sharedMutex;
   QList<int>& failedIndices;
+  QVector<FileOutcome>& outcomes;
   QAtomicInt& criticalError;
   const int round;
   const int totalFiles;
@@ -371,6 +465,7 @@ int downloadSubtitlesFor(const Console& c, const QStringList& movieFilePaths,
 
     QAtomicInt criticalError(0);
     QMutex sharedMutex;
+    QVector<FileOutcome> outcomes(fileCount);
 
     QList<int> pending;
     for (int i = 0; i < fileCount; ++i) pending << i;
@@ -395,7 +490,8 @@ int downloadSubtitlesFor(const Console& c, const QStringList& movieFilePaths,
       for (int w = 0; w < inRound; ++w) {
         workers << new DownloadWorker(c, config, movieFilePaths, pending,
                                       nextSlot, sharedMutex, failedIndices,
-                                      criticalError, round, fileCount);
+                                      outcomes, criticalError, round,
+                                      fileCount);
       }
       foreach (DownloadWorker* worker, workers) { worker->start(); }
       foreach (DownloadWorker* worker, workers) {
@@ -420,17 +516,27 @@ int downloadSubtitlesFor(const Console& c, const QStringList& movieFilePaths,
     }
 
     const int failed = criticalError.loadAcquire();
-    return failed != 0 ? failed : EC_OK;
+    if (failed != 0) return failed;
+
+    runAiFallbackIfEnabled(c, movieFilePaths, outcomes, config);
+    return EC_OK;
   }
 
   QNapi napi(config);
+  QVector<FileOutcome> outcomes(fileCount);
 
   int total = movieFilePaths.size();
   for (int i = 1; i <= total; ++i) {
     QString movieFilePath = movieFilePaths[i - 1];
 
+    QString savedLanguage;
     int result = downloadForMovie(c, movieFilePath, i, total, config, napi,
-                                  QNapi::maxSearchRetries);
+                                  QNapi::maxSearchRetries, &savedLanguage);
+
+    outcomes[i - 1].processed = true;
+    outcomes[i - 1].code = result;
+    outcomes[i - 1].language = savedLanguage;
+
     if (result == EC_P7ZIP_UNAVAILABLE || result == EC_CANNOT_WRITE_TMP_DIR) {
       if (i < total) {
         c.printLineOrdinary(
@@ -442,6 +548,7 @@ int downloadSubtitlesFor(const Console& c, const QStringList& movieFilePaths,
     }
   }
 
+  runAiFallbackIfEnabled(c, movieFilePaths, outcomes, config);
   return EC_OK;
 }
 };  // namespace CliSubtitlesDownloader

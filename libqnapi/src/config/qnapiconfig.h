@@ -15,6 +15,7 @@
 #ifndef QNAPICONFIG_H
 #define QNAPICONFIG_H
 
+#include <config/aiconfig.h>
 #include <config/engineconfig.h>
 #include <config/generalconfig.h>
 #include <config/postprocessingconfig.h>
@@ -32,6 +33,7 @@ class QNapiConfig {
   PostProcessingConfig postProcessingConfig_;
   ScanConfig scanConfig_;
   QString lastOpenedDir_;
+  AiConfig aiConfig_;
 
  public:
   QNapiConfig(){};
@@ -40,7 +42,8 @@ class QNapiConfig {
               const QList<QPair<QString, bool>>& enabledEngines,
               const QMap<QString, EngineConfig>& enginesConfig,
               const PostProcessingConfig& postProcessingConfig,
-              const ScanConfig& scanConfig, const QString& lastOpenedDir)
+              const ScanConfig& scanConfig, const QString& lastOpenedDir,
+              const AiConfig& aiConfig = AiConfig())
       : firstrun_(firstrun),
         version_(version),
         generalConfig_(generalConfig),
@@ -48,7 +51,8 @@ class QNapiConfig {
         enginesConfig_(enginesConfig),
         postProcessingConfig_(postProcessingConfig),
         scanConfig_(scanConfig),
-        lastOpenedDir_(lastOpenedDir) {}
+        lastOpenedDir_(lastOpenedDir),
+        aiConfig_(aiConfig) {}
 
   bool firstrun() const { return firstrun_; }
   QString version() const { return version_; }
@@ -60,49 +64,56 @@ class QNapiConfig {
   }
   ScanConfig scanConfig() const { return scanConfig_; }
   QString lastOpenedDir() const { return lastOpenedDir_; }
+  AiConfig aiConfig() const { return aiConfig_; }
 
   const QNapiConfig setFirstrun(const bool& firstrun) const {
     return QNapiConfig(firstrun, version_, generalConfig_, enabledEngines_,
                        enginesConfig_, postProcessingConfig_, scanConfig_,
-                       lastOpenedDir_);
+                       lastOpenedDir_, aiConfig_);
   }
   const QNapiConfig setVersion(const QString& version) const {
     return QNapiConfig(firstrun_, version, generalConfig_, enabledEngines_,
                        enginesConfig_, postProcessingConfig_, scanConfig_,
-                       lastOpenedDir_);
+                       lastOpenedDir_, aiConfig_);
   }
   const QNapiConfig setGeneralConfig(const GeneralConfig& generalConfig) const {
     return QNapiConfig(firstrun_, version_, generalConfig, enabledEngines_,
                        enginesConfig_, postProcessingConfig_, scanConfig_,
-                       lastOpenedDir_);
+                       lastOpenedDir_, aiConfig_);
   }
   const QNapiConfig setEnabledEngines(
       const QList<QPair<QString, bool>>& enabledEngines) const {
     return QNapiConfig(firstrun_, version_, generalConfig_, enabledEngines,
                        enginesConfig_, postProcessingConfig_, scanConfig_,
-                       lastOpenedDir_);
+                       lastOpenedDir_, aiConfig_);
   }
   const QNapiConfig setEnginesConfig(
       const QMap<QString, EngineConfig>& enginesConfig) const {
     return QNapiConfig(firstrun_, version_, generalConfig_, enabledEngines_,
                        enginesConfig, postProcessingConfig_, scanConfig_,
-                       lastOpenedDir_);
+                       lastOpenedDir_, aiConfig_);
   }
   const QNapiConfig setPostProcessingConfig(
       const PostProcessingConfig& postProcessingConfig) const {
     return QNapiConfig(firstrun_, version_, generalConfig_, enabledEngines_,
                        enginesConfig_, postProcessingConfig, scanConfig_,
-                       lastOpenedDir_);
+                       lastOpenedDir_, aiConfig_);
   }
   const QNapiConfig setScanConfig(const ScanConfig& scanConfig) const {
     return QNapiConfig(firstrun_, version_, generalConfig_, enabledEngines_,
                        enginesConfig_, postProcessingConfig_, scanConfig,
-                       lastOpenedDir_);
+                       lastOpenedDir_, aiConfig_);
   }
   const QNapiConfig setLastOpenedDir(const QString& lastOpenedDir) const {
     return QNapiConfig(firstrun_, version_, generalConfig_, enabledEngines_,
                        enginesConfig_, postProcessingConfig_, scanConfig_,
-                       lastOpenedDir);
+                       lastOpenedDir, aiConfig_);
+  }
+
+  const QNapiConfig setAiConfig(const AiConfig& aiConfig) const {
+    return QNapiConfig(firstrun_, version_, generalConfig_, enabledEngines_,
+                       enginesConfig_, postProcessingConfig_, scanConfig_,
+                       lastOpenedDir_, aiConfig);
   }
 
   QString toString() const;

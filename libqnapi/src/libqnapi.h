@@ -15,6 +15,11 @@
 #ifndef LIBQNAPI_H
 #define LIBQNAPI_H
 
+#include "ai/audioextractor.h"
+#include "ai/llamaserver.h"
+#include "ai/subtitletranslator.h"
+#include "ai/whispertranscriber.h"
+
 #include "config/configreader.h"
 #include "config/configwriter.h"
 #include "config/qnapiconfig.h"
@@ -76,6 +81,20 @@ class LibQNapi {
       const QNapiConfig& config);
   static QSharedPointer<const SubtitlePostProcessor> subtitlePostProcessor(
       const PostProcessingConfig& config);
+
+  // AI fallback. An empty configured path selects defaultPath; relative paths
+  // are relative to the executable's directory.
+  static QString resolveAiPath(const QString& configuredPath,
+                               const QString& defaultPath);
+  static QSharedPointer<const AudioExtractor> audioExtractor(
+      const AiConfig& config);
+  static QSharedPointer<const WhisperTranscriber> whisperTranscriber(
+      const AiConfig& config);
+  static QSharedPointer<LlamaServer> llamaServer(const AiConfig& config,
+                                                 const QString& logPath);
+  static QSharedPointer<const SubtitleTranslator> subtitleTranslator(
+      const QSharedPointer<LlamaServer>& server, const AiConfig& config,
+      const QString& sourceLanguage, const QString& targetLanguage);
 };
 
 #endif  // LIBQNAPI_H

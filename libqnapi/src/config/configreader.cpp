@@ -46,7 +46,8 @@ const QNapiConfig ConfigReader::readConfig(const QSettings& settings) const {
                      readEnginesConfig(settings),
                      readPostProcessingConfig(settings),
                      readScanConfig(settings),
-                     settings.value("qnapi/last_opened_dir", "").toString());
+                     settings.value("qnapi/last_opened_dir", "").toString(),
+                     readAiConfig(settings));
 }
 
 QVariant ConfigReader::firstValid(std::initializer_list<QVariant> list)
@@ -227,4 +228,17 @@ const GeneralConfig ConfigReader::resolveTmpPath(
   } else {
     return config.setTmpPath(QDir::tempPath());
   }
+}
+
+
+const AiConfig ConfigReader::readAiConfig(const QSettings& settings) const {
+  return AiConfig(
+      settings.value("ai/fallback", false).toBool(),
+      settings.value("ai/ffmpeg_path", "").toString(),
+      settings.value("ai/whisper_path", "").toString(),
+      settings.value("ai/whisper_model", "").toString(),
+      settings.value("ai/llama_server_path", "").toString(),
+      settings.value("ai/llm_model", "").toString(),
+      settings.value("ai/source_language", "en").toString(),
+      settings.value("ai/chunk_size", AiConfig::defaultChunkSize).toInt());
 }

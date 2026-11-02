@@ -22,6 +22,13 @@ RCC_DIR = tmp
 OBJECTS_DIR = tmp
 
 SOURCES += src/config/configreader.cpp \
+    src/ai/audioextractor.cpp \
+    src/ai/childprocess.cpp \
+    src/ai/llamaserver.cpp \
+    src/ai/srtcues.cpp \
+    src/ai/subtitletranslator.cpp \
+    src/ai/whispertranscriber.cpp \
+    src/config/aiconfig.cpp \
     src/config/configwriter.cpp \
     src/config/engineconfig.cpp \
     src/config/generalconfig.cpp \
@@ -64,6 +71,7 @@ SOURCES += src/config/configreader.cpp \
     src/parser/backuplangargparser.cpp \
     src/parser/formatargparser.cpp \
     src/parser/langsuffixargparser.cpp \
+    src/parser/aifallbackargparser.cpp \
     src/parser/jobsargparser.cpp \
     src/parser/extensionargparser.cpp \
     src/parser/downloadsubtitlesargparser.cpp \
@@ -74,6 +82,14 @@ SOURCES += src/config/configreader.cpp \
 
 
 HEADERS += src/config/configreader.h \
+    src/ai/aierror.h \
+    src/ai/audioextractor.h \
+    src/ai/childprocess.h \
+    src/ai/llamaserver.h \
+    src/ai/srtcues.h \
+    src/ai/subtitletranslator.h \
+    src/ai/whispertranscriber.h \
+    src/config/aiconfig.h \
     src/config/configwriter.h \
     src/config/engineconfig.h \
     src/config/generalconfig.h \
@@ -123,6 +139,7 @@ HEADERS += src/config/configreader.h \
     src/parser/backuplangargparser.h \
     src/parser/formatargparser.h \
     src/parser/langsuffixargparser.h \
+    src/parser/aifallbackargparser.h \
     src/parser/jobsargparser.h \
     src/parser/extensionargparser.h \
     src/parser/downloadsubtitlesargparser.h \

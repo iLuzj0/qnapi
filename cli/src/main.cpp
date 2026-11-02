@@ -16,6 +16,7 @@
 #include "Maybe.h"
 #include "climain.h"
 #include "libqnapi.h"
+#include "parser/aifallbackargparser.h"
 #include "parser/backuplangargparser.h"
 #include "parser/cliargparser.h"
 #include "parser/cliargparsersexecutor.h"
@@ -61,6 +62,7 @@ int main(int argc, char **argv) {
       QSharedPointer<CliArgParser>(new ExtensionArgParser()),
       QSharedPointer<CliArgParser>(new LangSuffixArgParser()),
       QSharedPointer<CliArgParser>(new JobsArgParser()),
+      QSharedPointer<CliArgParser>(new AiFallbackArgParser()),
       QSharedPointer<CliArgParser>(new DownloadSubtitlesArgParser())};
 
   QStringList tailArgs =

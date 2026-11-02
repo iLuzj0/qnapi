@@ -44,6 +44,7 @@ class ConfigWriter {
       const PostProcessingConfig& postProcessingConfig,
       QSettings& settings) const;
   void writeScanConfig(const ScanConfig& scanConfig, QSettings& settings) const;
+  void writeAiConfig(const AiConfig& aiConfig, QSettings& settings) const;
 
   QString qnapiVersion;
 };

@@ -51,6 +51,7 @@ class ConfigReader {
   const PostProcessingConfig readPostProcessingConfig(
       const QSettings& settings) const;
   const ScanConfig readScanConfig(const QSettings& settings) const;
+  const AiConfig readAiConfig(const QSettings& settings) const;
 
   const GeneralConfig resolveP7zipPath(const GeneralConfig& config) const;
   const GeneralConfig resolveTmpPath(const GeneralConfig& config) const;

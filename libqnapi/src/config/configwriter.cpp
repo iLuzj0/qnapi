@@ -38,6 +38,7 @@ void ConfigWriter::writeConfig(const QNapiConfig& config,
   writeEnginesConfig(config.enginesConfig(), settings);
   writePostProcessingConfig(config.postProcessingConfig(), settings);
   writeScanConfig(config.scanConfig(), settings);
+  writeAiConfig(config.aiConfig(), settings);
   settings.setValue("qnapi/last_opened_dir", config.lastOpenedDir());
   settings.sync();
 }
@@ -117,4 +118,16 @@ void ConfigWriter::writeScanConfig(const ScanConfig& scanConfig,
                     scanConfig.skipIfSubtitlesExist());
   settings.setValue("scan/filters", scanConfig.filters());
   settings.setValue("scan/skip_filters", scanConfig.skipFilters());
+}
+
+void ConfigWriter::writeAiConfig(const AiConfig& aiConfig,
+                                 QSettings& settings) const {
+  settings.setValue("ai/fallback", aiConfig.fallbackEnabled());
+  settings.setValue("ai/ffmpeg_path", aiConfig.ffmpegPath());
+  settings.setValue("ai/whisper_path", aiConfig.whisperPath());
+  settings.setValue("ai/whisper_model", aiConfig.whisperModel());
+  settings.setValue("ai/llama_server_path", aiConfig.llamaServerPath());
+  settings.setValue("ai/llm_model", aiConfig.llmModel());
+  settings.setValue("ai/source_language", aiConfig.sourceLanguage());
+  settings.setValue("ai/chunk_size", aiConfig.chunkSize());
 }

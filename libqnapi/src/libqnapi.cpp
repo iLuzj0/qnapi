@@ -133,3 +133,38 @@ QSharedPointer<const SubtitlePostProcessor> LibQNapi::subtitlePostProcessor(
   return QSharedPointer<const SubtitlePostProcessor>(
       new SubtitlePostProcessor(config, LibQNapi::subtitleConverter(config)));
 }
+
+QString LibQNapi::resolveAiPath(const QString& configuredPath,
+                                const QString& defaultPath) {
+  const QString path = configuredPath.isEmpty() ? defaultPath : configuredPath;
+  if (QFileInfo(path).isAbsolute()) return QDir::cleanPath(path);
+  return QDir::cleanPath(appExecutableDir + "/" + path);
+}
+
+QSharedPointer<const AudioExtractor> LibQNapi::audioExtractor(
+    const AiConfig& config) {
+  return QSharedPointer<const AudioExtractor>(new AudioExtractor(
+      resolveAiPath(config.ffmpegPath(), AiConfig::defaultFfmpegPath())));
+}
+
+QSharedPointer<const WhisperTranscriber> LibQNapi::whisperTranscriber(
+    const AiConfig& config) {
+  return QSharedPointer<const WhisperTranscriber>(new WhisperTranscriber(
+      resolveAiPath(config.whisperPath(), AiConfig::defaultWhisperPath()),
+      resolveAiPath(config.whisperModel(), AiConfig::defaultWhisperModel())));
+}
+
+QSharedPointer<LlamaServer> LibQNapi::llamaServer(const AiConfig& config,
+                                                  const QString& logPath) {
+  return QSharedPointer<LlamaServer>(new LlamaServer(
+      resolveAiPath(config.llamaServerPath(),
+                    AiConfig::defaultLlamaServerPath()),
+      resolveAiPath(config.llmModel(), AiConfig::defaultLlmModel()), logPath));
+}
+
+QSharedPointer<const SubtitleTranslator> LibQNapi::subtitleTranslator(
+    const QSharedPointer<LlamaServer>& server, const AiConfig& config,
+    const QString& sourceLanguage, const QString& targetLanguage) {
+  return QSharedPointer<const SubtitleTranslator>(new SubtitleTranslator(
+      server, sourceLanguage, targetLanguage, config.chunkSize()));
+}

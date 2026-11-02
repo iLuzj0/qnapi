@@ -113,6 +113,8 @@ void sigHandler(int sig) {
   QStringList filters;
   filters << "QNapi-*-rc";
   filters << "QNapi.*.tmp";
+  // audio and subtitles of the AI fallback (child processes die with us)
+  filters << "QNapi.ai-*";
 
   QFileInfoList files = tmpDir.entryInfoList(filters);
 

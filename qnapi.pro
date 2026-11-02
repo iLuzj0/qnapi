@@ -97,7 +97,19 @@ win32 {
     QMAKE_EXTRA_TARGETS += deploywin platform
 
     INSTALLS += p7zip doc libmediainfodlls platform
+
+    # Tools for qnapic --ai-fallback: whisper-cli, llama-server (built with
+    # Visual Studio 2022 + CUDA from deps/whisper.cpp and deps/llama.cpp),
+    # ffmpeg and their DLLs. Skip with CONFIG+=no_ai or QNAPI_SKIP_AI=1.
+    # The models are downloaded separately: scripts/download-ai-models.ps1
+    !no_ai {
+        aitools.path = $${INSTALL_PREFIX}
+        aitools.extra = cmd /c $$shell_quote($$shell_path($${PWD}/scripts/build-ai-tools.bat)) $$shell_quote($$shell_path($${INSTALL_PREFIX}))
+        INSTALLS += aitools
+    }
 }
+
+no_ai:message(will skip building the AI fallback tools)
 
 doxygen.commands = rm -fr doc/doxygen/* && doxygen Doxyfile && echo "Doxygen documentation generated in doc/doxygen/index.html"
 QMAKE_EXTRA_TARGETS += doxygen

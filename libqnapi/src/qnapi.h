@@ -72,6 +72,9 @@ class QNapi {
 
   QStringList listLoadedEngines() const;
 
+  // language of the subtitles chosen by the last download(), e.g. "pl"
+  QString subtitleLanguage() const { return currentSubtitleLanguage; }
+
  private:
   QSharedPointer<SubtitleDownloadEngine> engineByName(QString name) const;
 
