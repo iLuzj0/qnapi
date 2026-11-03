@@ -13,10 +13,12 @@
 *****************************************************************************/
 
 #include "subtitleconverter.h"
+
 #include <QFile>
 #include <QTextCodec>
 #include <QTextStream>
 #include <cmath>
+
 #include "libqnapi.h"
 #include "movieinfo/movieinfoprovider.h"
 #include "utils/encodingutils.h"
@@ -193,8 +195,8 @@ QStringList SubtitleConverter::readFile(const QString &filename,
     const QByteArray rawContent = inputFile.readAll();
     inputFile.close();
 
-    QString content = codec ? codec->toUnicode(rawContent)
-                            : QString::fromUtf8(rawContent);
+    QString content =
+        codec ? codec->toUnicode(rawContent) : QString::fromUtf8(rawContent);
 
     // mirror QIODevice::Text + QTextStream::readLine() semantics
     content.replace(QLatin1String("\r\n"), QLatin1String("\n"));
@@ -218,7 +220,9 @@ bool SubtitleConverter::writeFile(const QString &filename, QString encoding,
   if (outputFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
     QTextCodec *codec = QTextCodec::codecForName(qPrintable(encoding));
     QString content;
-    foreach (QString line, lines) { content += line + QLatin1Char('\n'); }
+    foreach (QString line, lines) {
+      content += line + QLatin1Char('\n');
+    }
     outputFile.write(codec ? codec->fromUnicode(content) : content.toUtf8());
     outputFile.close();
     return true;

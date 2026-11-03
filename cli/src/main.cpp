@@ -12,6 +12,10 @@
 **
 *****************************************************************************/
 
+#include <QCoreApplication>
+#include <QSharedPointer>
+#include <QTranslator>
+
 #include "Either.h"
 #include "Maybe.h"
 #include "climain.h"
@@ -25,18 +29,14 @@
 #include "parser/extensionargparser.h"
 #include "parser/formatargparser.h"
 #include "parser/jobsargparser.h"
-#include "parser/langsuffixargparser.h"
 #include "parser/langargparser.h"
+#include "parser/langsuffixargparser.h"
 #include "parser/quietbatchargparser.h"
 #include "parser/showhelpargparser.h"
 #include "parser/showhelplanguagesargparser.h"
 #include "parser/showlistargparser.h"
 #include "qnapicommand.h"
 #include "utils/console.h"
-
-#include <QCoreApplication>
-#include <QSharedPointer>
-#include <QTranslator>
 
 int main(int argc, char **argv) {
   LibQNapi::init(argv[0]);

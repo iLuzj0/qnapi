@@ -127,7 +127,6 @@ class AiSubtitleGenerator {
   static QString sourceLanguageName(const QString& sourceLanguage);
 
  public:
-
  private:
   const QNapiConfig config;
 };

@@ -12,15 +12,15 @@
 **
 *****************************************************************************/
 
-#include "libqnapi.h"
-
 #include "frmlistsubtitles.h"
-#include "subdatawidget.h"
 
 #include <QGuiApplication>
-#include <QScreen>
 #include <QMessageBox>
+#include <QScreen>
 #include <QtWidgets/QHeaderView>
+
+#include "libqnapi.h"
+#include "subdatawidget.h"
 
 frmListSubtitles::frmListSubtitles(QWidget *parent, Qt::WindowFlags f)
     : QDialog(parent, f),
@@ -28,7 +28,8 @@ frmListSubtitles::frmListSubtitles(QWidget *parent, Qt::WindowFlags f)
   ui.setupUi(this);
 
   QRect position = frameGeometry();
-  position.moveCenter(QGuiApplication::primaryScreen()->availableGeometry().center());
+  position.moveCenter(
+      QGuiApplication::primaryScreen()->availableGeometry().center());
   move(position.topLeft());
 }
 

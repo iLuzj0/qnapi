@@ -12,12 +12,13 @@
 **
 *****************************************************************************/
 
+#include "frmnapisy24config.h"
+
 #include <QDesktopServices>
 #include <QGuiApplication>
 #include <QScreen>
 
 #include "engines/napisy24downloadengine.h"
-#include "frmnapisy24config.h"
 
 frmNapisy24Config::frmNapisy24Config(const EngineConfig &config,
                                      QWidget *parent, Qt::WindowFlags f)
@@ -33,7 +34,8 @@ frmNapisy24Config::frmNapisy24Config(const EngineConfig &config,
   connect(ui.pbRegister, SIGNAL(clicked()), this, SLOT(pbRegisterClicked()));
 
   QRect position = frameGeometry();
-  position.moveCenter(QGuiApplication::primaryScreen()->availableGeometry().center());
+  position.moveCenter(
+      QGuiApplication::primaryScreen()->availableGeometry().center());
   move(position.topLeft());
 }
 

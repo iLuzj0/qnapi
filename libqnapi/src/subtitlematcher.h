@@ -15,11 +15,11 @@
 #ifndef SUBTITLE_MATCHER_H
 #define SUBTITLE_MATCHER_H
 
-#include "config/generalconfig.h"
-#include "subconvert/subtitleformatsregistry.h"
-
 #include <QFileInfo>
 #include <QSharedPointer>
+
+#include "config/generalconfig.h"
+#include "subconvert/subtitleformatsregistry.h"
 
 class SubtitleMatcher : public QObject {
   Q_OBJECT
@@ -33,8 +33,7 @@ class SubtitleMatcher : public QObject {
 
   // subtitleLanguage is the language actually downloaded; when the language
   // suffix is enabled it becomes part of the file name, e.g. Movie.pol.srt
-  bool matchSubtitles(QString subtitlesTmpFilePath,
-                      QString targetMovieFilePath,
+  bool matchSubtitles(QString subtitlesTmpFilePath, QString targetMovieFilePath,
                       QString subtitleLanguage = QString()) const;
 
  private:

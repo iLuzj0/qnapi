@@ -12,8 +12,9 @@
 **
 *****************************************************************************/
 
-#include <QRegExp>
 #include "subrip.h"
+
+#include <QRegExp>
 
 bool SubRipSubtitleFormat::detect(const QStringList &lines) const {
   QStringList lines2 = lines;
@@ -54,11 +55,14 @@ SubFile SubRipSubtitleFormat::decode(const QStringList &lines) const {
   // being closed.
   auto flushNumsAsText = [&numsBuff, &tokensBuff]() {
     if (numsBuff.isEmpty()) return;
-    QStringList numLines = numsBuff.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
+    QStringList numLines =
+        numsBuff.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
     numsBuff.clear();
     if (numLines.isEmpty()) return;
     numLines.removeLast();
-    foreach (const QString &n, numLines) { tokensBuff += n + QLatin1Char('\n'); }
+    foreach (const QString &n, numLines) {
+      tokensBuff += n + QLatin1Char('\n');
+    }
   };
 
   foreach (QString line, lines) {

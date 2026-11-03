@@ -18,7 +18,8 @@
 QString ScanConfig::toString() const {
   QString s;
   QTextStream(&s) << "lastDir: " << lastDir() << Qt::endl
-                  << "skipIfSubtitlesExist: " << skipIfSubtitlesExist() << Qt::endl
+                  << "skipIfSubtitlesExist: " << skipIfSubtitlesExist()
+                  << Qt::endl
                   << "filters: " << filters().join("; ") << Qt::endl
                   << "skipFilters: " << skipFilters() << Qt::endl;
   return s;

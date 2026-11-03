@@ -15,21 +15,19 @@
 #ifndef __FRMPROGRESS__H__
 #define __FRMPROGRESS__H__
 
+#include <Maybe.h>
+
 #include <QMutex>
 #include <QSemaphore>
 
-#include "ui_frmprogress.h"
-
-#include "frmsummary.h"
-
 #include "config/qnapiconfig.h"
-
-#include <Maybe.h>
 #include "frmlistsubtitles.h"
+#include "frmsummary.h"
 #include "qnapi.h"
 #include "qnapiopendialog.h"
 #include "qnapithread.h"
 #include "subtitleinfo.h"
+#include "ui_frmprogress.h"
 
 class GetThread : public QNapiThread {
   Q_OBJECT

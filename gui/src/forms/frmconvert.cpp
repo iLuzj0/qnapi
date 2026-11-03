@@ -13,18 +13,19 @@
 *****************************************************************************/
 
 #include "frmconvert.h"
-#include "libqnapi.h"
-#include "movieinfo/movieinfoprovider.h"
-#include "qnapiopendialog.h"
 
 #include <QDesktopServices>
-#include <QGuiApplication>
-#include <QScreen>
 #include <QDir>
 #include <QFileDialog>
 #include <QFileInfo>
+#include <QGuiApplication>
 #include <QMessageBox>
+#include <QScreen>
 #include <QSharedPointer>
+
+#include "libqnapi.h"
+#include "movieinfo/movieinfoprovider.h"
+#include "qnapiopendialog.h"
 
 frmConvert::frmConvert(QWidget *parent, Qt::WindowFlags f)
     : QDialog(parent, f),
@@ -39,7 +40,8 @@ frmConvert::frmConvert(QWidget *parent, Qt::WindowFlags f)
   setAttribute(Qt::WA_QuitOnClose, false);
 
   QRect position = frameGeometry();
-  position.moveCenter(QGuiApplication::primaryScreen()->availableGeometry().center());
+  position.moveCenter(
+      QGuiApplication::primaryScreen()->availableGeometry().center());
   move(position.topLeft());
 
   ui.lbDetectedFormatValue->setText("");

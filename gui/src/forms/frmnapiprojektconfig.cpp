@@ -12,12 +12,13 @@
 **
 *****************************************************************************/
 
+#include "frmnapiprojektconfig.h"
+
 #include <QDesktopServices>
 #include <QGuiApplication>
 #include <QScreen>
 
 #include "engines/napiprojektdownloadengine.h"
-#include "frmnapiprojektconfig.h"
 
 frmNapiProjektConfig::frmNapiProjektConfig(const EngineConfig &config,
                                            QWidget *parent, Qt::WindowFlags f)
@@ -34,7 +35,8 @@ frmNapiProjektConfig::frmNapiProjektConfig(const EngineConfig &config,
   connect(ui.pbRegister, SIGNAL(clicked()), this, SLOT(pbRegisterClicked()));
 
   QRect position = frameGeometry();
-  position.moveCenter(QGuiApplication::primaryScreen()->availableGeometry().center());
+  position.moveCenter(
+      QGuiApplication::primaryScreen()->availableGeometry().center());
   move(position.topLeft());
 }
 

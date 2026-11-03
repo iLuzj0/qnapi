@@ -12,15 +12,15 @@
 **
 *****************************************************************************/
 
-#include <algorithm>
 #include "qnapi.h"
+
+#include <QtAlgorithms>
+#include <algorithm>
+
+#include "config/configreader.h"
 #include "libqnapi.h"
 #include "subtitlematcher.h"
 #include "subtitlepostprocessor.h"
-
-#include "config/configreader.h"
-
-#include <QtAlgorithms>
 
 QNapi::QNapi(const QNapiConfig& config, const Maybe<QString>& specificEngine)
     : enginesRegistry(LibQNapi::subtitleDownloadEngineRegistry()),
@@ -133,9 +133,9 @@ QList<SubtitleInfo> QNapi::listSubtitles() {
   };
 
   std::stable_sort(subtitlesList.begin(), subtitlesList.end(),
-              [&](const SubtitleInfo& si1, const SubtitleInfo& si2) {
-                return langRank(si1.lang) < langRank(si2.lang);
-              });
+                   [&](const SubtitleInfo& si1, const SubtitleInfo& si2) {
+                     return langRank(si1.lang) < langRank(si2.lang);
+                   });
 
   return subtitlesList;
 }

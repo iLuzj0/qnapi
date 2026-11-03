@@ -20,6 +20,7 @@
 #include <config/generalconfig.h>
 #include <config/postprocessingconfig.h>
 #include <config/scanconfig.h>
+
 #include <QMap>
 #include <QString>
 

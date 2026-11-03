@@ -101,8 +101,9 @@ bool Napisy24DownloadEngine::lookForSubtitles(QString lang) {
   if (reply->error() != QNetworkReply::NoError) {
     engineErrorMsg = http.timedOut()
                          ? QObject::tr("Napisy24 did not respond in time.")
-                         : QObject::tr("Network error while contacting "
-                                       "Napisy24: %1")
+                         : QObject::tr(
+                               "Network error while contacting "
+                               "Napisy24: %1")
                                .arg(reply->errorString());
     return false;
   }

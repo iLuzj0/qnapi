@@ -15,22 +15,21 @@
 #ifndef __FRMOPTIONS__H__
 #define __FRMOPTIONS__H__
 
-#include "subtitlelanguage.h"
-#include "ui_frmoptions.h"
+#include <QDir>
+#include <QFileDialog>
+#include <QFileInfo>
+#include <QGuiApplication>
+#include <QList>
+#include <QMessageBox>
+#include <QScreen>
+#include <QSharedPointer>
+#include <QTextCodec>
 
 #include "config/qnapiconfig.h"
 #include "engines/subtitledownloadenginesregistry.h"
 #include "subconvert/subtitleformatsregistry.h"
-
-#include <QGuiApplication>
-#include <QScreen>
-#include <QDir>
-#include <QFileDialog>
-#include <QFileInfo>
-#include <QList>
-#include <QMessageBox>
-#include <QSharedPointer>
-#include <QTextCodec>
+#include "subtitlelanguage.h"
+#include "ui_frmoptions.h"
 
 class frmOptions : public QDialog {
   Q_OBJECT

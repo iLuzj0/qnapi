@@ -16,6 +16,7 @@
 #define JOBSARGPARSER_H
 
 #include <QCoreApplication>
+
 #include "parser/cliargparser.h"
 #include "tr.h"
 

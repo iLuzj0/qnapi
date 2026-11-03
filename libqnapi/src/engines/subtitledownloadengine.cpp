@@ -13,13 +13,15 @@
 *****************************************************************************/
 
 #include "engines/subtitledownloadengine.h"
-#include <QRandomGenerator>
+
 #include <QDir>
 #include <QElapsedTimer>
-#include <QMutex>
-#include <QThread>
 #include <QFlags>
 #include <QLoggingCategory>
+#include <QMutex>
+#include <QRandomGenerator>
+#include <QThread>
+
 #include "subconvert/subtitleformatsregistry.h"
 
 SubtitleDownloadEngine::SubtitleDownloadEngine(const QString& tmpPath)
@@ -66,9 +68,9 @@ bool SubtitleDownloadEngine::openMovieFile(QFile& file) const {
     }
   }
 
-  engineErrorMsg = QObject::tr("Could not open the video file '%1': %2")
-                       .arg(QFileInfo(file.fileName()).fileName(),
-                            file.errorString());
+  engineErrorMsg =
+      QObject::tr("Could not open the video file '%1': %2")
+          .arg(QFileInfo(file.fileName()).fileName(), file.errorString());
   return false;
 }
 

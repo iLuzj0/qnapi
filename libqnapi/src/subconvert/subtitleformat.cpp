@@ -12,9 +12,10 @@
 **
 *****************************************************************************/
 
-#include <QRegExp>
 #include "subtitleformat.h"
+
 #include <QMap>
+#include <QRegExp>
 
 QVector<SubToken> SubtitleFormat::decodeTokenStream(QString tokenStream) const {
   QVector<SubToken> tokens;

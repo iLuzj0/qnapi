@@ -18,7 +18,8 @@
 QString PostProcessingConfig::toString() const {
   QString s;
   QTextStream(&s) << "enabled: " << enabled() << Qt::endl
-                  << "encodingChangeMethod: " << encodingChangeMethod() << Qt::endl
+                  << "encodingChangeMethod: " << encodingChangeMethod()
+                  << Qt::endl
                   << "encodingFrom: " << encodingFrom() << Qt::endl
                   << "encodingAutoDetectFrom: " << encodingAutoDetectFrom()
                   << Qt::endl
@@ -28,6 +29,7 @@ QString PostProcessingConfig::toString() const {
                   << "subExtension: " << subExtension() << Qt::endl
                   << "skipConvertAds: " << skipConvertAds() << Qt::endl
                   << "removeLines: " << removeLines() << Qt::endl
-                  << "removeLinesWords: " << removeLinesWords().join("; ") << Qt::endl;
+                  << "removeLinesWords: " << removeLinesWords().join("; ")
+                  << Qt::endl;
   return s;
 }

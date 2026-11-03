@@ -12,10 +12,10 @@
 **
 *****************************************************************************/
 
-#include <QRegExp>
 #include "p7zipdecoder.h"
 
 #include <QProcess>
+#include <QRegExp>
 
 P7ZipDecoder::P7ZipDecoder(const QString& p7zipPath, int operationTimeoutMsecs)
     : p7zipPath(p7zipPath), operationTimeoutMsecs(operationTimeoutMsecs) {}
@@ -77,8 +77,8 @@ bool P7ZipDecoder::runP7Zip(const QStringList& args) const {
 
   // waitForFinished() only reports that the process ended; 7-Zip signals
   // failure through its exit code (0 = ok, 1 = non-fatal warning)
-  const bool succeeded = p7zip.exitStatus() == QProcess::NormalExit &&
-                         p7zip.exitCode() <= 1;
+  const bool succeeded =
+      p7zip.exitStatus() == QProcess::NormalExit && p7zip.exitCode() <= 1;
 
   p7zip.close();
 

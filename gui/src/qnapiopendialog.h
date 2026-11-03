@@ -15,17 +15,17 @@
 #ifndef __QNAPIOPENDIALOG__H__
 #define __QNAPIOPENDIALOG__H__
 
-#include "config/staticconfig.h"
-
-#include <QGuiApplication>
-#include <QScreen>
 #include <QDir>
 #include <QFileDialog>
 #include <QFileInfo>
+#include <QGuiApplication>
+#include <QScreen>
 #include <QSharedPointer>
 #include <QString>
 #include <QStringList>
 #include <QUrl>
+
+#include "config/staticconfig.h"
 
 class QNapiOpenDialog : public QFileDialog {
   Q_OBJECT

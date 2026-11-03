@@ -12,11 +12,12 @@
 **
 *****************************************************************************/
 
-#include <QRegExp>
 #include "opensubtitlesdownloadengine.h"
-#include "subtitlelanguage.h"
 
 #include <QDir>
+#include <QRegExp>
+
+#include "subtitlelanguage.h"
 
 namespace OpenSubtitlesDownloadEngineConst {
 const QString openSubtitlesXmlRpcUrl = "http://api.opensubtitles.org/xml-rpc";
@@ -258,11 +259,10 @@ bool OpenSubtitlesDownloadEngine::login() {
        << userAgent;
 
   if (!rpc.request("LogIn", args)) {
-    engineErrorMsg =
-        rpc.timedOut()
-            ? QObject::tr("OpenSubtitles did not respond in time.")
-            : QObject::tr("Could not reach OpenSubtitles (%1).")
-                  .arg(rpc.getError().toString());
+    engineErrorMsg = rpc.timedOut()
+                         ? QObject::tr("OpenSubtitles did not respond in time.")
+                         : QObject::tr("Could not reach OpenSubtitles (%1).")
+                               .arg(rpc.getError().toString());
     return false;
   }
 

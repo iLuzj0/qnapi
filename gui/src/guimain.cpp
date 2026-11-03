@@ -13,14 +13,17 @@
 *****************************************************************************/
 
 #include "guimain.h"
+
 #include <signal.h>
-#include <QRegularExpression>
+
 #include <QDir>
 #include <QFileInfo>
 #include <QLibraryInfo>
 #include <QMessageBox>
 #include <QProcess>
+#include <QRegularExpression>
 #include <iostream>
+
 #include "config/qnapiconfig.h"
 #include "libqnapi.h"
 #include "qnapicommand.h"

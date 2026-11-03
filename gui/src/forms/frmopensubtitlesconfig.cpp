@@ -12,12 +12,13 @@
 **
 *****************************************************************************/
 
+#include "frmopensubtitlesconfig.h"
+
 #include <QDesktopServices>
 #include <QGuiApplication>
 #include <QScreen>
 
 #include "engines/opensubtitlesdownloadengine.h"
-#include "frmopensubtitlesconfig.h"
 
 frmOpenSubtitlesConfig::frmOpenSubtitlesConfig(const EngineConfig &config,
                                                QWidget *parent,
@@ -35,7 +36,8 @@ frmOpenSubtitlesConfig::frmOpenSubtitlesConfig(const EngineConfig &config,
   connect(ui.pbRegister, SIGNAL(clicked()), this, SLOT(pbRegisterClicked()));
 
   QRect position = frameGeometry();
-  position.moveCenter(QGuiApplication::primaryScreen()->availableGeometry().center());
+  position.moveCenter(
+      QGuiApplication::primaryScreen()->availableGeometry().center());
   move(position.topLeft());
 }
 

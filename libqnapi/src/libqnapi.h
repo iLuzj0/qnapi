@@ -15,32 +15,26 @@
 #ifndef LIBQNAPI_H
 #define LIBQNAPI_H
 
+#include <QSharedPointer>
+#include <QString>
+
 #include "ai/aisubtitlegenerator.h"
 #include "ai/audioextractor.h"
 #include "ai/llamaserver.h"
 #include "ai/subtitletranslator.h"
 #include "ai/whispertranscriber.h"
-
+#include "batchdownloader.h"
 #include "config/configreader.h"
 #include "config/configwriter.h"
 #include "config/qnapiconfig.h"
 #include "config/staticconfig.h"
-
 #include "engines/subtitledownloadenginesregistry.h"
-
 #include "movieinfo/movieinfoprovider.h"
-
 #include "subconvert/subtitleconverter.h"
 #include "subconvert/subtitleformatsregistry.h"
-
-#include "utils/p7zipdecoder.h"
-
-#include "batchdownloader.h"
 #include "subtitlematcher.h"
 #include "subtitlepostprocessor.h"
-
-#include <QSharedPointer>
-#include <QString>
+#include "utils/p7zipdecoder.h"
 
 class LibQNapi {
  public:

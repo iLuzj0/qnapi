@@ -13,13 +13,13 @@
 *****************************************************************************/
 
 #include "frmsummary.h"
-#include "libqnapi.h"
-
-#include "subdatawidget.h"
 
 #include <QGuiApplication>
-#include <QScreen>
 #include <QListWidget>
+#include <QScreen>
+
+#include "libqnapi.h"
+#include "subdatawidget.h"
 
 frmSummary::frmSummary(QWidget *parent, Qt::WindowFlags f)
     : QDialog(parent, f),
@@ -29,7 +29,8 @@ frmSummary::frmSummary(QWidget *parent, Qt::WindowFlags f)
   setAttribute(Qt::WA_QuitOnClose, false);
 
   QRect position = frameGeometry();
-  position.moveCenter(QGuiApplication::primaryScreen()->availableGeometry().center());
+  position.moveCenter(
+      QGuiApplication::primaryScreen()->availableGeometry().center());
   move(position.topLeft());
 }
 

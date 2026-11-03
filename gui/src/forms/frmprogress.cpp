@@ -13,22 +13,23 @@
 *****************************************************************************/
 
 #include "frmprogress.h"
+
 #include <QCloseEvent>
-#include <QGuiApplication>
-#include <QScreen>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
-#include <QMessageBox>
-#include <QSystemTrayIcon>
-#include "libqnapi.h"
-
-#include <QMutexLocker>
-#include <QThread>
+#include <QGuiApplication>
 #include <QMap>
+#include <QMessageBox>
+#include <QMutexLocker>
+#include <QScreen>
+#include <QSystemTrayIcon>
+#include <QThread>
+
 #include "batchdownloader.h"
-#include "subtitlelanguage.h"
+#include "libqnapi.h"
 #include "qnapiapp.h"
+#include "subtitlelanguage.h"
 
 frmProgress::frmProgress(QWidget *parent, Qt::WindowFlags f)
     : QWidget(parent, f) {
@@ -55,7 +56,8 @@ frmProgress::frmProgress(QWidget *parent, Qt::WindowFlags f)
   connect(&getThread, SIGNAL(aiPhaseStarted()), this, SLOT(startAiPhase()));
 
   QRect position = frameGeometry();
-  position.moveCenter(QGuiApplication::primaryScreen()->availableGeometry().center());
+  position.moveCenter(
+      QGuiApplication::primaryScreen()->availableGeometry().center());
   move(position.topLeft());
 }
 
@@ -109,7 +111,8 @@ bool frmProgress::download(const QNapiConfig &config) {
 
   if (!isVisible()) {
     QRect position = frameGeometry();
-    position.moveCenter(QGuiApplication::primaryScreen()->availableGeometry().center());
+    position.moveCenter(
+        QGuiApplication::primaryScreen()->availableGeometry().center());
     move(position.topLeft());
     show();
   }
@@ -136,7 +139,7 @@ void frmProgress::updateProgress(int current, int all, float stageProgress) {
   if (stageProgress >= 0) lastStageProgress = stageProgress;
 
   QString windowTitle =
-      aiPhase ? tr("QNapi - generating subtitles with AI...")
+      aiPhase         ? tr("QNapi - generating subtitles with AI...")
       : (lastAll > 1) ? QString(tr("QNapi - downloading subtitles (%1/%2)"))
                             .arg(lastCurrent + 1)
                             .arg(lastAll)
@@ -280,8 +283,7 @@ class GuiBatchListener : public BatchDownloadListener {
     if (parallel) {
       emit t.fileNameChange(QString());
       emit t.actionChange(
-          GetThread::tr("Processing %n file(s), %1 at a time...", "",
-                        fileCount)
+          GetThread::tr("Processing %n file(s), %1 at a time...", "", fileCount)
               .arg(jobs));
     }
     emit t.progressChange(offset, t.queueSize(), 0.0f);
@@ -305,7 +307,8 @@ class GuiBatchListener : public BatchDownloadListener {
     float stage = 0.0f;
     switch (step) {
       case DownloadStep::CheckingPermissions:
-        action = GetThread::tr("Checking permissions of the video directory...");
+        action =
+            GetThread::tr("Checking permissions of the video directory...");
         stage = 0.1f;
         break;
       case DownloadStep::Checksum:
@@ -408,11 +411,10 @@ class GuiBatchListener : public BatchDownloadListener {
     }
     const int total = t.queueSize();
     emit t.fileNameChange(files);
-    emit t.actionChange(
-        GetThread::tr("%1 of %2 files done, %3 in progress")
-            .arg(offset + done)
-            .arg(total)
-            .arg(inFlight.size()));
+    emit t.actionChange(GetThread::tr("%1 of %2 files done, %3 in progress")
+                            .arg(offset + done)
+                            .arg(total)
+                            .arg(inFlight.size()));
     // the window shows "current + 1"; a finished file is a whole step
     emit t.progressChange(qMax(0, offset + done - 1), total,
                           offset + done > 0 ? 1.0f : 0.0f);
@@ -484,9 +486,8 @@ class GuiAiListener : public AiGenerationListener {
 
   void translationStarted(int index) override {
     emit t.fileNameChange(name(index));
-    emit t.actionChange(GetThread::tr("Translating (%1/%2)...")
-                            .arg(index + 1)
-                            .arg(count));
+    emit t.actionChange(
+        GetThread::tr("Translating (%1/%2)...").arg(index + 1).arg(count));
     emit t.progressChange(count + index, 2 * count, 0.0f);
   }
 
@@ -592,8 +593,8 @@ void GetThread::run() {
                     "\n\n" + missing.join("\n") + "\n\n" +
                     tr("Check the paths on the AI subtitles tab in Settings.");
       } else if (!listener.failure.isEmpty()) {
-        aiWarning = tr("The translation model could not be started:") +
-                    "\n\n" + listener.failure;
+        aiWarning = tr("The translation model could not be started:") + "\n\n" +
+                    listener.failure;
       }
     }
   }

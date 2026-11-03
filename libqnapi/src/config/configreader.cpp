@@ -13,12 +13,14 @@
 *****************************************************************************/
 
 #include "configreader.h"
-#include <QRegularExpression>
+
 #include <QCoreApplication>
 #include <QDir>
 #include <QFileInfo>
 #include <QLocale>
 #include <QProcess>
+#include <QRegularExpression>
+
 #include "subtitlelanguage.h"
 
 ConfigReader::ConfigReader(
@@ -109,8 +111,7 @@ const QList<QPair<QString, bool>> ConfigReader::readEnabledEngines(
   } else {
     QList<QPair<QString, bool>> enabledEngines;
     foreach (QString engineEnableStr, enabledEnginesStr) {
-      QStringList engineParts =
-          engineEnableStr.split(":", Qt::SkipEmptyParts);
+      QStringList engineParts = engineEnableStr.split(":", Qt::SkipEmptyParts);
       if (engineParts.size() != 2) {
         return defaultEnabledEngines;
       }
@@ -178,8 +179,9 @@ const GeneralConfig ConfigReader::resolveP7zipPath(
     p7zipPath = QFileInfo(appExecutableDir + "/7za.exe").absoluteFilePath();
 #else
 
-    QString pathEnv =
-        QProcess::systemEnvironment().filter(QRegularExpression("^PATH=(.*)$")).value(0);
+    QString pathEnv = QProcess::systemEnvironment()
+                          .filter(QRegularExpression("^PATH=(.*)$"))
+                          .value(0);
     QStringList sysPaths = pathEnv.mid(5).split(":");
     sysPaths.removeAll("");
     sysPaths.append(".");
@@ -232,15 +234,13 @@ const GeneralConfig ConfigReader::resolveTmpPath(
   }
 }
 
-
 const AiConfig ConfigReader::readAiConfig(const QSettings& settings) const {
   return AiConfig()
       .setFallbackEnabled(settings.value("ai/fallback", false).toBool())
       .setFfmpegPath(settings.value("ai/ffmpeg_path", "").toString())
       .setWhisperPath(settings.value("ai/whisper_path", "").toString())
       .setWhisperModel(settings.value("ai/whisper_model", "").toString())
-      .setLlamaServerPath(
-          settings.value("ai/llama_server_path", "").toString())
+      .setLlamaServerPath(settings.value("ai/llama_server_path", "").toString())
       .setLlmModel(settings.value("ai/llm_model", "").toString())
       .setSourceLanguage(settings.value("ai/source_language", "en").toString())
       .setChunkSize(

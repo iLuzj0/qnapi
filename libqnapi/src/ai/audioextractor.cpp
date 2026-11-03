@@ -41,10 +41,9 @@ Either<AiError, QString> AudioExtractor::extract(
   return run(moviePath, wavPath, "0:a:0", cancelled);
 }
 
-Either<AiError, QString> AudioExtractor::run(const QString& moviePath,
-                                             const QString& wavPath,
-                                             const QString& streamSpec,
-                                             const AiCancelCheck& cancelled) const {
+Either<AiError, QString> AudioExtractor::run(
+    const QString& moviePath, const QString& wavPath, const QString& streamSpec,
+    const AiCancelCheck& cancelled) const {
   QFile::remove(wavPath);
 
   const QStringList args = {

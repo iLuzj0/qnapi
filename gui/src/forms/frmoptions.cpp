@@ -14,20 +14,17 @@
 
 #include "frmoptions.h"
 
-#include "config/qnapiconfig.h"
+#include <QLocale>
+#include <algorithm>
 
+#include "config/qnapiconfig.h"
 #include "engines/napiprojektdownloadengine.h"
 #include "engines/napisy24downloadengine.h"
 #include "engines/opensubtitlesdownloadengine.h"
-
 #include "forms/frmnapiprojektconfig.h"
 #include "forms/frmnapisy24config.h"
 #include "forms/frmopensubtitlesconfig.h"
-
 #include "libqnapi.h"
-
-#include <algorithm>
-#include <QLocale>
 
 #ifdef Q_OS_MAC
 #include "utils/infoplistdockicon.h"
@@ -76,9 +73,8 @@ frmOptions::frmOptions(QWidget *parent, Qt::WindowFlags f)
   ui.cbAiSourceLang->addItem(tr("Detect automatically"), QVariant("auto"));
   foreach (QString lang, SubtitleLanguage("").listLanguages()) {
     tlcode = SubtitleLanguage(lang).toTwoLetter();
-    ui.cbAiSourceLang->addItem(
-        QIcon(QString(":/languages/%1.png").arg(tlcode)), lang,
-        QVariant(tlcode));
+    ui.cbAiSourceLang->addItem(QIcon(QString(":/languages/%1.png").arg(tlcode)),
+                               lang, QVariant(tlcode));
   }
 
   ui.leAiFfmpeg->setPlaceholderText(AiConfig::defaultFfmpegPath());
@@ -110,12 +106,14 @@ frmOptions::frmOptions(QWidget *parent, Qt::WindowFlags f)
   connect(ui.pbAiGuidelinesDefault, &QPushButton::clicked, this, [this]() {
     ui.teAiGuidelines->setPlainText(currentDefaultGuidelines());
   });
-  connect(ui.cbAiSourceLang,
-          static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-          this, &frmOptions::aiLanguagesChanged);
-  connect(ui.cbLang,
-          static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-          this, &frmOptions::aiLanguagesChanged);
+  connect(
+      ui.cbAiSourceLang,
+      static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+      this, &frmOptions::aiLanguagesChanged);
+  connect(
+      ui.cbLang,
+      static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+      this, &frmOptions::aiLanguagesChanged);
 
   setAttribute(Qt::WA_QuitOnClose, false);
 
@@ -157,7 +155,8 @@ frmOptions::frmOptions(QWidget *parent, Qt::WindowFlags f)
   }
 
   QRect position = frameGeometry();
-  position.moveCenter(QGuiApplication::primaryScreen()->availableGeometry().center());
+  position.moveCenter(
+      QGuiApplication::primaryScreen()->availableGeometry().center());
   move(position.topLeft());
 }
 
@@ -433,11 +432,10 @@ void frmOptions::writeConfig() {
           .setSubExtension(targetSubExt)
           .setSkipConvertAds(ui.cbSkipConvertAds->isChecked());
 
-  auto updatedConfig =
-      config.setGeneralConfig(updatedGeneralConfig)
-          .setEnabledEngines(updatedEnabledEngines)
-          .setPostProcessingConfig(updatedPostProcessingConfig)
-          .setAiConfig(aiConfigFromForm(config.aiConfig()));
+  auto updatedConfig = config.setGeneralConfig(updatedGeneralConfig)
+                           .setEnabledEngines(updatedEnabledEngines)
+                           .setPostProcessingConfig(updatedPostProcessingConfig)
+                           .setAiConfig(aiConfigFromForm(config.aiConfig()));
 
   LibQNapi::writeConfig(updatedConfig);
 }
@@ -552,9 +550,10 @@ void frmOptions::readConfig(const QNapiConfig &config) {
   ui.leAiWhisperModel->setText(ai.whisperModel());
   ui.leAiLlamaServer->setText(ai.llamaServerPath());
   ui.leAiLlmModel->setText(ai.llmModel());
-  const QString source = ai.sourceLanguage().toLower() == "auto"
-                             ? QString("auto")
-                             : SubtitleLanguage(ai.sourceLanguage()).toTwoLetter();
+  const QString source =
+      ai.sourceLanguage().toLower() == "auto"
+          ? QString("auto")
+          : SubtitleLanguage(ai.sourceLanguage()).toTwoLetter();
   ui.cbAiSourceLang->setCurrentIndex(
       qMax(0, ui.cbAiSourceLang->findData(source)));
   ui.leAiLlamaArgs->setText(ai.llamaServerArgs());
@@ -615,8 +614,7 @@ void frmOptions::updateAiStatus() {
     lines << QDir::toNativeSeparators(path);
   }
   ui.lbAiStatus->setText(tr("Not found:") + "\n" + lines.join("\n"));
-  ui.lbAiStatus->setStyleSheet(ui.cbAiEnabled->isChecked() ? "color:red;"
-                                                           : "");
+  ui.lbAiStatus->setStyleSheet(ui.cbAiEnabled->isChecked() ? "color:red;" : "");
 }
 
 void frmOptions::restoreDefaults() {

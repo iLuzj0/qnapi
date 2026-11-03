@@ -118,7 +118,8 @@ bool QNapiOpenDialog::placeWindow() {
   }
 
   QRect position = frameGeometry();
-  position.moveCenter(QGuiApplication::primaryScreen()->availableGeometry().center());
+  position.moveCenter(
+      QGuiApplication::primaryScreen()->availableGeometry().center());
   move(position.topLeft());
 
   return true;

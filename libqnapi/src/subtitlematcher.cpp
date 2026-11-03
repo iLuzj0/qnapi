@@ -13,9 +13,10 @@
 *****************************************************************************/
 
 #include "subtitlematcher.h"
-#include "subtitlelanguage.h"
 
 #include <QDir>
+
+#include "subtitlelanguage.h"
 
 SubtitleMatcher::SubtitleMatcher(
     bool _noBackup, bool _isPostProcessingEnabled, QString _ppSubFormat,
@@ -35,8 +36,7 @@ SubtitleMatcher::SubtitleMatcher(
 
 QString SubtitleMatcher::languageCodeFor(
     const QString& subtitleLanguage) const {
-  if (languageSuffix == LS_NONE || subtitleLanguage.isEmpty())
-    return QString();
+  if (languageSuffix == LS_NONE || subtitleLanguage.isEmpty()) return QString();
 
   SubtitleLanguage lang(subtitleLanguage);
 
@@ -123,10 +123,9 @@ void SubtitleMatcher::removeOrCopy(QString targetMoviefilePath,
   if (QFile::exists(targetSubtitlesFilePath)) {
     if (!noBackup) {
       QFileInfo targetSubtitlesFileInfo(targetSubtitlesFilePath);
-      QString newName =
-          constructSubtitlePath(targetMoviefilePath,
-                                targetSubtitlesFileInfo.suffix(), languageCode,
-                                tr("_copy"));
+      QString newName = constructSubtitlePath(targetMoviefilePath,
+                                              targetSubtitlesFileInfo.suffix(),
+                                              languageCode, tr("_copy"));
 
       if (QFile::exists(newName)) QFile::remove(newName);
 

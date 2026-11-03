@@ -26,8 +26,10 @@ QString GeneralConfig::toString() const {
                   << "quietBatch: " << quietBatch() << Qt::endl
                   << "searchPolicy: " << searchPolicy() << Qt::endl
                   << "downloadPolicy: " << downloadPolicy() << Qt::endl
-                  << "changePermissions: " << changePermissionsEnabled() << Qt::endl
-                  << "changePermissionsTo: " << changePermissionsTo() << Qt::endl
+                  << "changePermissions: " << changePermissionsEnabled()
+                  << Qt::endl
+                  << "changePermissionsTo: " << changePermissionsTo()
+                  << Qt::endl
                   << "languageSuffix: " << languageSuffix() << Qt::endl
                   << "jobs: " << jobs() << Qt::endl;
   return s;

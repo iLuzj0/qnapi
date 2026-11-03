@@ -13,18 +13,18 @@
 *****************************************************************************/
 
 #include "napiprojektdownloadengine.h"
-#include "subtitlelanguage.h"
-#include "utils/synchttp.h"
-
-#include <cmath>
 
 #include <QCryptographicHash>
 #include <QDomDocument>
 #include <QNetworkReply>
 #include <QNetworkRequest>
-#include <QUrlQuery>
 #include <QProcess>
 #include <QUrl>
+#include <QUrlQuery>
+#include <cmath>
+
+#include "subtitlelanguage.h"
+#include "utils/synchttp.h"
 
 #ifdef Q_OS_WIN  // for SetFileAttributes
 #include <qt_windows.h>
@@ -158,8 +158,9 @@ Maybe<QByteArray> NapiProjektDownloadEngine::fetchSubtitlesViaApi(
   if (reply->error() != QNetworkReply::NoError) {
     engineErrorMsg = http.timedOut()
                          ? QObject::tr("NapiProjekt did not respond in time.")
-                         : QObject::tr("Network error while contacting "
-                                       "NapiProjekt: %1")
+                         : QObject::tr(
+                               "Network error while contacting "
+                               "NapiProjekt: %1")
                                .arg(reply->errorString());
     return nothing();
   }
@@ -175,9 +176,8 @@ Maybe<QByteArray> NapiProjektDownloadEngine::fetchSubtitlesViaApi(
   // same as "this hash has no subtitles" - report it as unavailable so the
   // caller falls back to the legacy endpoint instead of reporting a miss.
   const QDomNodeList statusNodes = root.elementsByTagName("status");
-  if (!statusNodes.isEmpty() &&
-      statusNodes.at(0).toElement().text().compare(
-          "success", Qt::CaseInsensitive) != 0) {
+  if (!statusNodes.isEmpty() && statusNodes.at(0).toElement().text().compare(
+                                    "success", Qt::CaseInsensitive) != 0) {
     apiUnavailable = true;
     return nothing();
   }
@@ -225,8 +225,9 @@ Maybe<QString> NapiProjektDownloadEngine::downloadByLangAndChecksum(
     // say so, otherwise a retry looks like a lottery to the user
     engineErrorMsg = http.timedOut()
                          ? QObject::tr("NapiProjekt did not respond in time.")
-                         : QObject::tr("Network error while contacting "
-                                       "NapiProjekt: %1")
+                         : QObject::tr(
+                               "Network error while contacting "
+                               "NapiProjekt: %1")
                                .arg(reply->errorString());
     return nothing();
   }

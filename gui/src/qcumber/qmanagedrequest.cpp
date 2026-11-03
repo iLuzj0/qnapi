@@ -13,8 +13,9 @@
 **
 ****************************************************************************/
 
-#include <QRegularExpression>
 #include "qmanagedrequest.h"
+
+#include <QRegularExpression>
 
 /*!
     \file qmanagedrequest.cpp

@@ -31,11 +31,7 @@ enum DownloadPolicy {
 
 // Media servers (Jellyfin, Plex, Emby) expect the subtitle language in the
 // file name, e.g. Movie.pol.srt. Which code to append, if any.
-enum LanguageSuffix {
-  LS_NONE = 0,
-  LS_TWO_LETTER = 1,
-  LS_THREE_LETTER = 2
-};
+enum LanguageSuffix { LS_NONE = 0, LS_TWO_LETTER = 1, LS_THREE_LETTER = 2 };
 
 class GeneralConfig {
  public:

@@ -12,8 +12,9 @@
 **
 *****************************************************************************/
 
-#include <QRegExp>
 #include "mpl2.h"
+
+#include <QRegExp>
 
 bool MPL2SubtitleFormat::detect(const QStringList &lines) const {
   foreach (QString line, lines) {

@@ -12,8 +12,9 @@
 **
 *****************************************************************************/
 
-#include <QRegExp>
 #include "tmplayer.h"
+
+#include <QRegExp>
 
 bool TMPlayerSubtitleFormat::detect(const QStringList &lines) const {
   foreach (QString line, lines) {
@@ -55,9 +56,9 @@ SubFile TMPlayerSubtitleFormat::decode(const QStringList &lines) const {
     if (i < sf.entries.size() - 1) {
       // TMPlayer files may repeat a timestamp on consecutive lines; clamp so
       // that an entry never ends before it starts
-      sf.entries[i].frameStop = std::max(
-          sf.entries[i].frameStart,
-          std::min(plus5s, sf.entries[i + 1].frameStart - 1));
+      sf.entries[i].frameStop =
+          std::max(sf.entries[i].frameStart,
+                   std::min(plus5s, sf.entries[i + 1].frameStart - 1));
     }
   }
 
