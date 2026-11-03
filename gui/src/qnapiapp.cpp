@@ -47,6 +47,12 @@ QNapiApp::QNapiApp(int &argc, char **argv, const QString &appName)
   napisy24SubMenu = 0;
   trayIconMenu = 0;
   trayIcon = 0;
+
+  // these were left uninitialised, so any later null-check on them read
+  // indeterminate memory
+  osCreateUserAction = 0;
+  napisy24GetAction = 0;
+  napisy24CreateUserAction = 0;
 }
 
 QNapiApp::~QNapiApp() {
@@ -69,11 +75,13 @@ QNapiApp::~QNapiApp() {
   if (aboutAction) delete aboutAction;
   if (quitAction) delete quitAction;
 
+  // the tray icon keeps a bare pointer to its context menu, so it has to go
+  // first or its destructor touches freed memory
+  if (trayIcon) delete trayIcon;
+  if (trayIconMenu) delete trayIconMenu;
   if (napiSubMenu) delete napiSubMenu;
   if (osSubMenu) delete osSubMenu;
   if (napisy24SubMenu) delete napisy24SubMenu;
-  if (trayIconMenu) delete trayIconMenu;
-  if (trayIcon) delete trayIcon;
 }
 
 frmProgress *QNapiApp::progress() {

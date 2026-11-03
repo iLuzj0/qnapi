@@ -68,6 +68,7 @@ class QCUMBER_EXPORT QInterProcessChannel : public QThread {
   QString uniqPrefix, pipeName, globalMutexStr, blockerMutexStr;
   QString sMsg;
   bool serverMode;
+  bool closed;
 };
 
 #endif  // _QINTER_PROCESS_CHANNEL_H_

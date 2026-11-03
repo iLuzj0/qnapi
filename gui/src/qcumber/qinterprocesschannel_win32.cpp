@@ -40,6 +40,7 @@ QInterProcessChannel::QInterProcessChannel(QObject* p) : QThread(p) {
       QString("\\\\.\\pipe\\%1%2").arg(uniqPrefix).arg("_uniquePipeName");
   globalMutexStr = uniqPrefix + QString("_globalMutexId");
   blockerMutexStr = uniqPrefix + QString("_blockerMutexId");
+  closed = false;
   init();
 }
 
@@ -143,9 +144,21 @@ void QInterProcessChannel::sendMessage(const QByteArray& msg) {
     \brief Closes the communication channel
 */
 void QInterProcessChannel::close() {
+  if (closed) return;
+  closed = true;
+
   if (serverMode) {
     // if we want to quit pipe server thread, we have to send --quit message
     sendMessage(QString("--quit"));
+
+    // ...and then actually wait for the thread to leave run(). This object is
+    // a QThread owned by the application, so returning while it still runs
+    // means Qt deletes a running thread during shutdown - which corrupted the
+    // heap and killed the process on exit.
+    if (isRunning() && !wait(5000)) {
+      terminate();
+      wait(1000);
+    }
   }
 }
 
@@ -187,6 +200,13 @@ void QInterProcessChannel::run() {
     }
 
     QStringList argv = QManagedRequest::splitArguments(QString(buffer));
+
+    // a malformed or empty message must not take the server thread down
+    if (argv.isEmpty()) {
+      CloseHandle(hPipe);
+      continue;
+    }
+
     const QString cmd = argv.at(0);
 
     // if server instance is going to suspend thread...
