@@ -333,7 +333,7 @@ void GetThread::run() {
 
     if (!found) {
       ++napiFail;
-      subStatusList << SubtitleInfo::fromFailed(queue[i]);
+      subStatusList << SubtitleInfo::fromFailed(queue[i], napi.error());
       continue;
     }
 
@@ -364,7 +364,7 @@ void GetThread::run() {
       ABORT_POINT
 
       ++napiFail;
-      subStatusList << SubtitleInfo::fromFailed(queue[i]);
+      subStatusList << SubtitleInfo::fromFailed(queue[i], napi.error());
       continue;
     }
 
@@ -375,7 +375,7 @@ void GetThread::run() {
 
     if (!napi.unpack(selIdx)) {
       ++napiFail;
-      subStatusList << SubtitleInfo::fromFailed(queue[i]);
+      subStatusList << SubtitleInfo::fromFailed(queue[i], napi.error());
       continue;
     }
 

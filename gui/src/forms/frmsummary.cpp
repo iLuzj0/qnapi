@@ -58,7 +58,16 @@ void frmSummary::setSummaryList(QList<SubtitleInfo> list) {
       subData->setSubData(succIcon, s.name, QIcon(lang_path), engineIcon);
     } else {
       ++badCount;
-      subData->setSubData(failIcon, s.name);
+      // s.comment carries the reason the download failed, if one is known
+      QString failText = s.name;
+      if (!s.comment.isEmpty()) {
+        QString reason = s.comment;
+        reason.replace(QLatin1Char('\n'), QLatin1String(" "));
+        if (reason.length() > 90) reason = reason.left(87) + "...";
+        failText += " - " + reason;
+        listItem->setToolTip(s.comment);
+      }
+      subData->setSubData(failIcon, failText);
     }
 
     ui.lwSummary->setItemWidget(listItem, subData);

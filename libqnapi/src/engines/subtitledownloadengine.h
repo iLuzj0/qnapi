@@ -40,6 +40,11 @@ class SubtitleDownloadEngine {
 
   virtual void clearSubtitlesList();
   virtual QString checksum(QString filename = "") = 0;
+
+  // human-readable reason for the last failure, empty when there is none;
+  // lets the UI say *why* nothing was downloaded instead of just "not found"
+  QString errorMessage() const { return engineErrorMsg; }
+  void clearErrorMessage() { engineErrorMsg.clear(); }
   virtual bool lookForSubtitles(QString lang) = 0;
   virtual QList<SubtitleInfo> listSubtitles() = 0;
   virtual bool download(QUuid id) = 0;
@@ -48,6 +53,7 @@ class SubtitleDownloadEngine {
 
  protected:
   QString tmpPath;
+  mutable QString engineErrorMsg;
 
   QList<SubtitleInfo> subtitlesList;
   QString movie;

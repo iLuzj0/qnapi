@@ -93,7 +93,14 @@ bool Napisy24DownloadEngine::lookForSubtitles(QString lang) {
                 "application/x-www-form-urlencoded");
 
   QNetworkReply *reply = http.syncPost(req, data);
-  if (reply->error() != QNetworkReply::NoError) return false;
+  if (reply->error() != QNetworkReply::NoError) {
+    engineErrorMsg = http.timedOut()
+                         ? QObject::tr("Napisy24 did not respond in time.")
+                         : QObject::tr("Network error while contacting "
+                                       "Napisy24: %1")
+                               .arg(reply->errorString());
+    return false;
+  }
 
   QByteArray respData = reply->readAll();
   if (!respData.startsWith("OK-2")) return false;

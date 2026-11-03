@@ -126,7 +126,16 @@ Maybe<QString> NapiProjektDownloadEngine::downloadByLangAndChecksum(
   SyncHTTP http;
   QNetworkReply *reply = http.syncGet(QNetworkRequest(url));
 
-  if (reply->error() != QNetworkReply::NoError) return nothing();
+  if (reply->error() != QNetworkReply::NoError) {
+    // a transient network problem is not the same as "no subtitles exist" -
+    // say so, otherwise a retry looks like a lottery to the user
+    engineErrorMsg = http.timedOut()
+                         ? QObject::tr("NapiProjekt did not respond in time.")
+                         : QObject::tr("Network error while contacting "
+                                       "NapiProjekt: %1")
+                               .arg(reply->errorString());
+    return nothing();
+  }
 
   QByteArray buffer = reply->readAll();
 

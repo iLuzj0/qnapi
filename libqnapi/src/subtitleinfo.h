@@ -59,7 +59,8 @@ class SubtitleInfo {
 
   bool operator<(const SubtitleInfo &other) const;
 
-  static SubtitleInfo fromFailed(const QString &name);
+  static SubtitleInfo fromFailed(const QString &name,
+                                 const QString &reason = QString());
 };
 
 Q_DECLARE_METATYPE(SubtitleInfo);

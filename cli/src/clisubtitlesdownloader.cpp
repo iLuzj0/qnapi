@@ -148,12 +148,14 @@ int finishSubtitles(int selIdx, const Console& c, QNapi& napi) {
   c.printLineOrdinary(tr("Downloading subtitles..."));
   if (!napi.download(selIdx)) {
     c.printLineError(tr("Unable to download subtitles!"));
+    if (!napi.error().isEmpty()) c.printLineError(napi.error());
     return EC_COULD_NOT_DOWNLOAD;
   }
 
   c.printLineOrdinary(tr("Unpacking subtitles..."));
   if (!napi.unpack(selIdx)) {
     c.printLineError(tr("Failed to unpack subtitles!"));
+    if (!napi.error().isEmpty()) c.printLineError(napi.error());
     return EC_COULD_NOT_UNARCHIVE;
   }
 
@@ -194,6 +196,7 @@ int downloadForMovie(const Console& c, const QString& movieFilePath, int i,
 
   if (!found) {
     c.printLineWarning(tr("Subtitles not found!"));
+    if (!napi.error().isEmpty()) c.printLineWarning(napi.error());
     return EC_SUBTITLES_NOT_FOUND;
   }
 

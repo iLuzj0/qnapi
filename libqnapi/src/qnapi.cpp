@@ -72,22 +72,33 @@ void QNapi::checksum() {
 
 bool QNapi::lookForSubtitles(QString lang, QString engine) {
   bool result = false;
+  QStringList engineErrors;
 
   if (engine.isEmpty()) {
     foreach (QSharedPointer<SubtitleDownloadEngine> e, enginesList) {
+      e->clearErrorMessage();
       e->setMoviePath(movie);
       result = e->lookForSubtitles(lang) || result;
+      if (!e->errorMessage().isEmpty()) engineErrors << e->errorMessage();
     }
   } else {
     QSharedPointer<SubtitleDownloadEngine> e = engineByName(engine);
     if (e) {
+      e->clearErrorMessage();
       e->setMoviePath(movie);
       result = e->lookForSubtitles(lang);
+      if (!e->errorMessage().isEmpty()) engineErrors << e->errorMessage();
     }
   }
 
   if (!result) {
-    errorMsg = QObject::tr("No subtitles found!");
+    // distinguish "the search worked and found nothing" from "the search
+    // itself failed", which otherwise look identical to the user
+    QStringList reasons = engineErrors;
+    reasons.removeDuplicates();
+
+    errorMsg = reasons.isEmpty() ? QObject::tr("No subtitles found!")
+                                 : reasons.join("\n");
   }
 
   return result;
@@ -145,14 +156,30 @@ bool QNapi::needToShowList() {
 int QNapi::bestIdx() { return theBestIdx; }
 
 bool QNapi::download(int i) {
+  if (i < 0 || i >= subtitlesList.size()) return false;
+
   SubtitleInfo s = subtitlesList[i];
   currentEngine = engineByName(s.engine);
   if (!currentEngine) return false;
-  return currentEngine->download(s.id);
+
+  currentEngine->clearErrorMessage();
+  const bool ok = currentEngine->download(s.id);
+  if (!ok && !currentEngine->errorMessage().isEmpty())
+    errorMsg = currentEngine->errorMessage();
+
+  return ok;
 }
 
 bool QNapi::unpack(int i) {
-  return currentEngine ? currentEngine->unpack(subtitlesList[i].id) : false;
+  if (!currentEngine) return false;
+  if (i < 0 || i >= subtitlesList.size()) return false;
+
+  currentEngine->clearErrorMessage();
+  const bool ok = currentEngine->unpack(subtitlesList[i].id);
+  if (!ok && !currentEngine->errorMessage().isEmpty())
+    errorMsg = currentEngine->errorMessage();
+
+  return ok;
 }
 
 bool QNapi::matchSubtitles() {
