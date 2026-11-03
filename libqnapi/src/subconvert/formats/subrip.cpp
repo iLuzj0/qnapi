@@ -49,8 +49,21 @@ SubFile SubRipSubtitleFormat::decode(const QStringList &lines) const {
   QString tokensBuff = "", numsBuff;
   SrtTimestamps tss;
 
+  // Only the all-digit line directly preceding a timestamp is an entry
+  // number; any earlier buffered digits were subtitle text of the entry
+  // being closed.
+  auto flushNumsAsText = [&numsBuff, &tokensBuff]() {
+    if (numsBuff.isEmpty()) return;
+    QStringList numLines = numsBuff.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
+    numsBuff.clear();
+    if (numLines.isEmpty()) return;
+    numLines.removeLast();
+    foreach (const QString &n, numLines) { tokensBuff += n + QLatin1Char('\n'); }
+  };
+
   foreach (QString line, lines) {
     if (r1.exactMatch(line)) {
+      flushNumsAsText();
       if (!tokensBuff.isEmpty()) addEntry(sf.entries, tokensBuff, tss);
       tss.h1 = r1.cap(2).toInt();
       tss.m1 = r1.cap(3).toInt();
@@ -60,8 +73,8 @@ SubFile SubRipSubtitleFormat::decode(const QStringList &lines) const {
       tss.m2 = r1.cap(7).toInt();
       tss.s2 = r1.cap(8).toInt();
       tss.ms2 = r1.cap(9).toInt();
-      numsBuff.clear();
     } else if (r2.exactMatch(line)) {
+      flushNumsAsText();
       if (!tokensBuff.isEmpty()) addEntry(sf.entries, tokensBuff, tss);
       tss.h1 = r2.cap(1).toInt();
       tss.m1 = r2.cap(2).toInt();
@@ -71,7 +84,6 @@ SubFile SubRipSubtitleFormat::decode(const QStringList &lines) const {
       tss.m2 = r2.cap(6).toInt();
       tss.s2 = r2.cap(7).toInt();
       tss.ms2 = r2.cap(8).toInt();
-      numsBuff.clear();
     } else if (rNumLine.exactMatch(line)) {
       numsBuff += line + "\n";
     } else if (!line.trimmed().isEmpty()) {
@@ -81,6 +93,13 @@ SubFile SubRipSubtitleFormat::decode(const QStringList &lines) const {
       }
       tokensBuff += line + "\n";
     }
+  }
+
+  // at end of file there is no following timestamp, so any buffered digits
+  // are subtitle text
+  if (!numsBuff.isEmpty()) {
+    tokensBuff += numsBuff;
+    numsBuff.clear();
   }
 
   if (!tokensBuff.isEmpty()) addEntry(sf.entries, tokensBuff, tss);
