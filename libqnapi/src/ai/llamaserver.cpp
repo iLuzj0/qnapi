@@ -56,7 +56,7 @@ QString LlamaServer::logTail() const {
   return ChildProcess::tail(f.readAll(), 4);
 }
 
-Either<AiError, QString> LlamaServer::start() {
+Either<AiError, QString> LlamaServer::start(const AiCancelCheck& cancelled) {
   if (isRunning()) return baseUrl;
   stop();
 
@@ -98,6 +98,10 @@ Either<AiError, QString> LlamaServer::start() {
   // /health answers 503 while the model is loading and 200 once it is ready
   QDeadlineTimer deadline(startTimeoutMsecs);
   while (!deadline.hasExpired()) {
+    if (cancelled && cancelled()) {
+      stop();
+      return AiError::cancellation();
+    }
     if (process->waitForFinished(500)) {
       const QString details = logTail();
       delete process;

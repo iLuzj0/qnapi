@@ -19,12 +19,20 @@
 #include <QString>
 #include <QStringList>
 
+#include "ai/aierror.h"
+
 namespace ChildProcess {
 
 // Makes a started process die together with QNapi. Without it an interrupted
 // run (Ctrl+C ends qnapic through exit()) would leave llama-server holding
 // several GB of VRAM. Windows only; elsewhere this does nothing.
 void bindToParentLifetime(QProcess& process);
+
+enum class WaitResult { Finished, TimedOut, Cancelled };
+
+// Waits for the process to finish, killing it on timeout or cancellation.
+WaitResult waitForFinished(QProcess& process, int timeoutMsecs,
+                           const AiCancelCheck& cancelled);
 
 // Last lines of a process's merged output, for error messages.
 QString tail(const QByteArray& output, int lines = 5);

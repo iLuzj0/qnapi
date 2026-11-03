@@ -211,7 +211,8 @@ bool WhisperTranscriber::isAvailable() const {
 
 Either<AiError, SrtCueList> WhisperTranscriber::transcribe(
     const QString& wavPath, const QString& language,
-    const std::function<void(int)>& progress) const {
+    const std::function<void(int)>& progress,
+    const AiCancelCheck& cancelled) const {
   // whisper-cli appends ".json" to the -of base name
   const QString outBase = wavPath + ".whisper";
   const QString jsonPath = outBase + ".json";
@@ -246,6 +247,12 @@ Either<AiError, SrtCueList> WhisperTranscriber::transcribe(
 
   while (!p.waitForFinished(250)) {
     if (p.state() == QProcess::NotRunning) break;
+    if (cancelled && cancelled()) {
+      p.kill();
+      p.waitForFinished();
+      QFile::remove(jsonPath);
+      return AiError::cancellation();
+    }
     if (deadline.hasExpired()) {
       p.kill();
       p.waitForFinished();

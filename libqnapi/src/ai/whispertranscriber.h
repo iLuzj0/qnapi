@@ -41,7 +41,8 @@ class WhisperTranscriber {
   // progress is called with 0..100 as whisper reports it.
   Either<AiError, SrtCueList> transcribe(
       const QString& wavPath, const QString& language,
-      const std::function<void(int)>& progress = nullptr) const;
+      const std::function<void(int)>& progress = nullptr,
+      const AiCancelCheck& cancelled = nullptr) const;
 
  private:
   QString whisper;

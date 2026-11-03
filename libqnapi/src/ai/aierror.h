@@ -16,14 +16,29 @@
 #define AIERROR_H
 
 #include <QMetaType>
+#include <QObject>
 #include <QString>
+#include <functional>
 
 // Left side of the Either<AiError, T> results returned by the AI helpers.
 // Either keeps its value in a QVariant keyed by type, so the error needs a
 // type of its own rather than a bare QString.
 struct AiError {
   QString message;
+  // stopped on request rather than failed
+  bool cancelled = false;
+
+  static AiError cancellation() {
+    AiError e;
+    e.message = QObject::tr("cancelled");
+    e.cancelled = true;
+    return e;
+  }
 };
+
+// Polled by long-running AI steps; returning true stops the step and kills
+// the child process it waits for.
+typedef std::function<bool()> AiCancelCheck;
 
 Q_DECLARE_METATYPE(AiError)
 

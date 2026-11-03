@@ -53,7 +53,8 @@ class SubtitleTranslator {
   // movie file's name. progress is called with (cues done, cues total).
   Either<AiError, SrtCueList> translate(
       const SrtCueList& source, const QString& title,
-      const std::function<void(int, int)>& progress = nullptr) const;
+      const std::function<void(int, int)>& progress = nullptr,
+      const AiCancelCheck& cancelled = nullptr) const;
 
   // lines that ended up untranslated in the last translate() call
   int untranslatedLines() const { return untranslated; }

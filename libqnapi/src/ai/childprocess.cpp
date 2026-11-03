@@ -14,6 +14,7 @@
 
 #include "ai/childprocess.h"
 
+#include <QDeadlineTimer>
 #include <QRegularExpression>
 
 #ifdef Q_OS_WIN
@@ -62,6 +63,22 @@ void bindToParentLifetime(QProcess& process) {
 #else
   Q_UNUSED(process);
 #endif
+}
+
+WaitResult waitForFinished(QProcess& process, int timeoutMsecs,
+                           const AiCancelCheck& cancelled) {
+  QDeadlineTimer deadline(timeoutMsecs);
+  while (!process.waitForFinished(250)) {
+    if (process.state() == QProcess::NotRunning) break;
+
+    const bool stop = cancelled && cancelled();
+    if (stop || deadline.hasExpired()) {
+      process.kill();
+      process.waitForFinished();
+      return stop ? WaitResult::Cancelled : WaitResult::TimedOut;
+    }
+  }
+  return WaitResult::Finished;
 }
 
 QString tail(const QByteArray& output, int lines) {

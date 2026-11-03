@@ -29,20 +29,22 @@ bool AudioExtractor::isAvailable() const {
 
 Either<AiError, QString> AudioExtractor::extract(
     const QString& moviePath, const QString& wavPath,
-    const QString& languageCode) const {
+    const QString& languageCode, const AiCancelCheck& cancelled) const {
   if (!languageCode.isEmpty()) {
     // fails when no track carries that tag, which is common: many files have
     // a single untagged track
-    auto tagged = run(moviePath, wavPath, "0:a:m:language:" + languageCode);
-    if (tagged.is2nd()) return tagged;
+    auto tagged =
+        run(moviePath, wavPath, "0:a:m:language:" + languageCode, cancelled);
+    if (tagged.is2nd() || tagged.as1st().cancelled) return tagged;
   }
 
-  return run(moviePath, wavPath, "0:a:0");
+  return run(moviePath, wavPath, "0:a:0", cancelled);
 }
 
 Either<AiError, QString> AudioExtractor::run(const QString& moviePath,
                                              const QString& wavPath,
-                                             const QString& streamSpec) const {
+                                             const QString& streamSpec,
+                                             const AiCancelCheck& cancelled) const {
   QFile::remove(wavPath);
 
   const QStringList args = {
@@ -59,10 +61,12 @@ Either<AiError, QString> AudioExtractor::run(const QString& moviePath,
   }
   ChildProcess::bindToParentLifetime(p);
 
-  if (!p.waitForFinished(timeoutMsecs)) {
-    p.kill();
-    p.waitForFinished();
+  const ChildProcess::WaitResult waited =
+      ChildProcess::waitForFinished(p, timeoutMsecs, cancelled);
+  if (waited != ChildProcess::WaitResult::Finished) {
     QFile::remove(wavPath);
+    if (waited == ChildProcess::WaitResult::Cancelled)
+      return AiError::cancellation();
     return AiError{QObject::tr("ffmpeg timed out extracting audio")};
   }
 

@@ -199,6 +199,8 @@ int AiSubtitleGenerator::generate(const QStringList& movieFilePaths,
       QDir(config.generalConfig().tmpPath()).filePath("QNapi.ai-llama.log");
   const auto llm = LibQNapi::llamaServer(aiConfig, llamaLog);
 
+  const AiCancelCheck cancelled = [&l]() { return l.abortRequested(); };
+
   // --- 1. transcription ----------------------------------------------------
   QMap<int, SrtCueList> transcriptions;
   const QString audioLanguage =
@@ -213,18 +215,20 @@ int AiSubtitleGenerator::generate(const QStringList& movieFilePaths,
     l.transcriptionStarted(i);
 
     const QString wav = tempPath(config, ".wav");
-    auto audio = extractor->extract(movie, wav, audioLanguage);
+    auto audio = extractor->extract(movie, wav, audioLanguage, cancelled);
     if (audio.is1st()) {
+      if (audio.as1st().cancelled) return 0;
       l.transcriptionFinished(i, 0, audio.as1st().message, timer.elapsed());
       continue;
     }
 
     auto transcription = whisper->transcribe(
         wav, detectSource ? QString("auto") : sourceLanguage,
-        [&](int percent) { l.transcriptionProgress(i, percent); });
+        [&](int percent) { l.transcriptionProgress(i, percent); }, cancelled);
     QFile::remove(wav);
 
     if (transcription.is1st()) {
+      if (transcription.as1st().cancelled) return 0;
       l.transcriptionFinished(i, 0, transcription.as1st().message,
                               timer.elapsed());
       continue;
@@ -246,8 +250,9 @@ int AiSubtitleGenerator::generate(const QStringList& movieFilePaths,
   QElapsedTimer loadTimer;
   loadTimer.start();
 
-  auto started = llm->start();
+  auto started = llm->start(cancelled);
   if (started.is1st()) {
+    if (started.as1st().cancelled) return 0;
     l.modelFailed(started.as1st().message, llamaLog);
     return 0;
   }
@@ -278,9 +283,11 @@ int AiSubtitleGenerator::generate(const QStringList& movieFilePaths,
 
     auto translation = translator->translate(
         transcriptions[i], titleFor(movie),
-        [&](int done, int count) { l.translationProgress(i, done, count); });
+        [&](int done, int count) { l.translationProgress(i, done, count); },
+        cancelled);
 
     if (translation.is1st()) {
+      if (translation.as1st().cancelled) break;
       result.error = translation.as1st().message;
       result.msecs = timer.elapsed();
       l.translationFinished(i, result);

@@ -30,7 +30,8 @@ SubtitleTranslator::SubtitleTranslator(
 
 Either<AiError, SrtCueList> SubtitleTranslator::translate(
     const SrtCueList& source, const QString& title,
-    const std::function<void(int, int)>& progress) const {
+    const std::function<void(int, int)>& progress,
+    const AiCancelCheck& cancelled) const {
   untranslated = 0;
 
   // one line per cue: the model handles line breaks badly, and the result is
@@ -47,6 +48,8 @@ Either<AiError, SrtCueList> SubtitleTranslator::translate(
   if (progress) progress(0, total);
 
   for (int from = 0; from < total; from += chunkSize) {
+    // checked between requests; one in flight takes seconds, not minutes
+    if (cancelled && cancelled()) return AiError::cancellation();
     const int to = qMin(from + chunkSize, total);
     auto r = translateRange(sourceTexts, result, from, to, title);
     if (r.is1st()) return r.as1st();

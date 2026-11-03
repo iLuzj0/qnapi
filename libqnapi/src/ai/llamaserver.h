@@ -44,7 +44,7 @@ class LlamaServer {
   bool isAvailable() const;
 
   // Starts the server and waits until the model is loaded.
-  Either<AiError, QString> start();
+  Either<AiError, QString> start(const AiCancelCheck& cancelled = nullptr);
   void stop();
   bool isRunning() const;
 

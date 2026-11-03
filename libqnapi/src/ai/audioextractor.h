@@ -35,13 +35,15 @@ class AudioExtractor {
   // Writes 16 kHz mono 16-bit WAV to wavPath and returns it. When the movie
   // has several audio tracks, the one tagged with languageCode (ISO 639-2,
   // e.g. "eng") is preferred over the first one.
-  Either<AiError, QString> extract(const QString& moviePath,
-                                   const QString& wavPath,
-                                   const QString& languageCode) const;
+  Either<AiError, QString> extract(
+      const QString& moviePath, const QString& wavPath,
+      const QString& languageCode,
+      const AiCancelCheck& cancelled = nullptr) const;
 
  private:
   Either<AiError, QString> run(const QString& moviePath, const QString& wavPath,
-                               const QString& streamSpec) const;
+                               const QString& streamSpec,
+                               const AiCancelCheck& cancelled) const;
 
   QString ffmpeg;
 };
