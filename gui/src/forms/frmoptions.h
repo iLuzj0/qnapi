@@ -69,6 +69,15 @@ class frmOptions : public QDialog {
   QSharedPointer<const SubtitleDownloadEnginesRegistry> enginesRegistry;
 
   void showAllEncodings();
+
+  AiConfig aiConfigFromForm(const AiConfig &base) const;
+  QString currentDefaultGuidelines() const;
+  void aiLanguagesChanged();
+  void updateAiStatus();
+
+  // the default guidelines last put in the editor, so a language change can
+  // tell an untouched default from the user's own text
+  QString shownDefaultGuidelines;
 };
 
 #endif

@@ -118,6 +118,16 @@ class AiSubtitleGenerator {
   // SubtitleLanguage gives are translated into the UI language.
   static QString englishLanguageName(const QString& language);
 
+  // The style rules the translator uses when none are configured, for a
+  // source language code ("auto" to detect) and a target language code.
+  static QString defaultGuidelines(const QString& sourceLanguage,
+                                   const QString& targetLanguage);
+
+ private:
+  static QString sourceLanguageName(const QString& sourceLanguage);
+
+ public:
+
  private:
   const QNapiConfig config;
 };

@@ -88,6 +88,18 @@ QString AiSubtitleGenerator::englishLanguageName(const QString& language) {
   return names.value(two, l.toFullName().isEmpty() ? language : l.toFullName());
 }
 
+QString AiSubtitleGenerator::sourceLanguageName(const QString& sourceLanguage) {
+  return sourceLanguage.toLower() == "auto"
+             ? QString("the original language")
+             : englishLanguageName(sourceLanguage);
+}
+
+QString AiSubtitleGenerator::defaultGuidelines(const QString& sourceLanguage,
+                                               const QString& targetLanguage) {
+  return SubtitleTranslator::defaultGuidelines(
+      sourceLanguageName(sourceLanguage), englishLanguageName(targetLanguage));
+}
+
 QStringList AiSubtitleGenerator::missingTools() const {
   const AiConfig aiConfig = config.aiConfig();
   const auto extractor = LibQNapi::audioExtractor(aiConfig);
@@ -259,9 +271,7 @@ int AiSubtitleGenerator::generate(const QStringList& movieFilePaths,
   l.modelLoaded(loadTimer.elapsed());
 
   const auto translator = LibQNapi::subtitleTranslator(
-      llm, aiConfig,
-      detectSource ? QString("the original language")
-                   : englishLanguageName(sourceLanguage),
+      llm, aiConfig, sourceLanguageName(sourceLanguage),
       englishLanguageName(targetLanguage));
 
   const auto postProcessor =

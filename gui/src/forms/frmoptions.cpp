@@ -73,6 +73,50 @@ frmOptions::frmOptions(QWidget *parent, Qt::WindowFlags f)
                              lang, QVariant(tlcode));
   }
 
+  ui.cbAiSourceLang->addItem(tr("Detect automatically"), QVariant("auto"));
+  foreach (QString lang, SubtitleLanguage("").listLanguages()) {
+    tlcode = SubtitleLanguage(lang).toTwoLetter();
+    ui.cbAiSourceLang->addItem(
+        QIcon(QString(":/languages/%1.png").arg(tlcode)), lang,
+        QVariant(tlcode));
+  }
+
+  ui.leAiFfmpeg->setPlaceholderText(AiConfig::defaultFfmpegPath());
+  ui.leAiWhisper->setPlaceholderText(AiConfig::defaultWhisperPath());
+  ui.leAiWhisperModel->setPlaceholderText(AiConfig::defaultWhisperModel());
+  ui.leAiLlamaServer->setPlaceholderText(AiConfig::defaultLlamaServerPath());
+  ui.leAiLlmModel->setPlaceholderText(AiConfig::defaultLlmModel());
+  ui.sbAiChunkSize->setRange(AiConfig::minChunkSize, AiConfig::maxChunkSize);
+
+  const QList<QPair<QPushButton *, QLineEdit *>> aiPaths = {
+      {ui.pbAiFfmpeg, ui.leAiFfmpeg},
+      {ui.pbAiWhisper, ui.leAiWhisper},
+      {ui.pbAiWhisperModel, ui.leAiWhisperModel},
+      {ui.pbAiLlamaServer, ui.leAiLlamaServer},
+      {ui.pbAiLlmModel, ui.leAiLlmModel}};
+  for (const auto &aiPath : aiPaths) {
+    QLineEdit *edit = aiPath.second;
+    connect(aiPath.first, &QPushButton::clicked, this, [this, edit]() {
+      const QString current =
+          LibQNapi::resolveAiPath(edit->text(), edit->placeholderText());
+      const QString path = QFileDialog::getOpenFileName(
+          this, tr("Select a file"), QFileInfo(current).path());
+      if (!path.isEmpty()) edit->setText(QDir::toNativeSeparators(path));
+    });
+    connect(edit, &QLineEdit::textChanged, this, &frmOptions::updateAiStatus);
+  }
+  connect(ui.cbAiEnabled, &QCheckBox::toggled, this,
+          &frmOptions::updateAiStatus);
+  connect(ui.pbAiGuidelinesDefault, &QPushButton::clicked, this, [this]() {
+    ui.teAiGuidelines->setPlainText(currentDefaultGuidelines());
+  });
+  connect(ui.cbAiSourceLang,
+          static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+          this, &frmOptions::aiLanguagesChanged);
+  connect(ui.cbLang,
+          static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+          this, &frmOptions::aiLanguagesChanged);
+
   setAttribute(Qt::WA_QuitOnClose, false);
 
   connect(ui.le7zPath, SIGNAL(textChanged(const QString &)), this,
@@ -392,7 +436,8 @@ void frmOptions::writeConfig() {
   auto updatedConfig =
       config.setGeneralConfig(updatedGeneralConfig)
           .setEnabledEngines(updatedEnabledEngines)
-          .setPostProcessingConfig(updatedPostProcessingConfig);
+          .setPostProcessingConfig(updatedPostProcessingConfig)
+          .setAiConfig(aiConfigFromForm(config.aiConfig()));
 
   LibQNapi::writeConfig(updatedConfig);
 }
@@ -499,6 +544,79 @@ void frmOptions::readConfig(const QNapiConfig &config) {
   showAllEncodingsClicked();
 
   ui.gbPpEnable->setChecked(config.postProcessingConfig().enabled());
+
+  const AiConfig ai = config.aiConfig();
+  ui.cbAiEnabled->setChecked(ai.fallbackEnabled());
+  ui.leAiFfmpeg->setText(ai.ffmpegPath());
+  ui.leAiWhisper->setText(ai.whisperPath());
+  ui.leAiWhisperModel->setText(ai.whisperModel());
+  ui.leAiLlamaServer->setText(ai.llamaServerPath());
+  ui.leAiLlmModel->setText(ai.llmModel());
+  const QString source = ai.sourceLanguage().toLower() == "auto"
+                             ? QString("auto")
+                             : SubtitleLanguage(ai.sourceLanguage()).toTwoLetter();
+  ui.cbAiSourceLang->setCurrentIndex(
+      qMax(0, ui.cbAiSourceLang->findData(source)));
+  ui.leAiLlamaArgs->setText(ai.llamaServerArgs());
+  ui.sbAiChunkSize->setValue(ai.chunkSize());
+  shownDefaultGuidelines = currentDefaultGuidelines();
+  ui.teAiGuidelines->setPlainText(ai.translationGuidelines().trimmed().isEmpty()
+                                      ? shownDefaultGuidelines
+                                      : ai.translationGuidelines());
+  updateAiStatus();
+}
+
+QString frmOptions::currentDefaultGuidelines() const {
+  return AiSubtitleGenerator::defaultGuidelines(
+      ui.cbAiSourceLang->currentData().toString(),
+      ui.cbLang->currentData().toString());
+}
+
+void frmOptions::aiLanguagesChanged() {
+  const QString fresh = currentDefaultGuidelines();
+  if (ui.teAiGuidelines->toPlainText().trimmed() ==
+      shownDefaultGuidelines.trimmed()) {
+    ui.teAiGuidelines->setPlainText(fresh);
+  }
+  shownDefaultGuidelines = fresh;
+}
+
+AiConfig frmOptions::aiConfigFromForm(const AiConfig &base) const {
+  // an unchanged default is stored as empty, so it follows the language
+  // settings and later improvements to the built-in text
+  QString guidelines = ui.teAiGuidelines->toPlainText().trimmed();
+  if (guidelines == currentDefaultGuidelines().trimmed()) guidelines.clear();
+
+  return base.setFallbackEnabled(ui.cbAiEnabled->isChecked())
+      .setFfmpegPath(ui.leAiFfmpeg->text().trimmed())
+      .setWhisperPath(ui.leAiWhisper->text().trimmed())
+      .setWhisperModel(ui.leAiWhisperModel->text().trimmed())
+      .setLlamaServerPath(ui.leAiLlamaServer->text().trimmed())
+      .setLlmModel(ui.leAiLlmModel->text().trimmed())
+      .setSourceLanguage(ui.cbAiSourceLang->currentData().toString())
+      .setChunkSize(ui.sbAiChunkSize->value())
+      .setTranslationGuidelines(guidelines)
+      .setLlamaServerArgs(ui.leAiLlamaArgs->text().trimmed());
+}
+
+void frmOptions::updateAiStatus() {
+  const QNapiConfig formConfig =
+      QNapiConfig().setAiConfig(aiConfigFromForm(AiConfig()));
+  const QStringList missing = AiSubtitleGenerator(formConfig).missingTools();
+
+  if (missing.isEmpty()) {
+    ui.lbAiStatus->setText(tr("All tools and models were found."));
+    ui.lbAiStatus->setStyleSheet("");
+    return;
+  }
+
+  QStringList lines;
+  foreach (const QString &path, missing) {
+    lines << QDir::toNativeSeparators(path);
+  }
+  ui.lbAiStatus->setText(tr("Not found:") + "\n" + lines.join("\n"));
+  ui.lbAiStatus->setStyleSheet(ui.cbAiEnabled->isChecked() ? "color:red;"
+                                                           : "");
 }
 
 void frmOptions::restoreDefaults() {
