@@ -2,6 +2,14 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="it_IT">
 <context>
+    <name>AiFallbackArgParser</name>
+    <message>
+        <location filename="../libqnapi/src/parser/aifallbackargparser.cpp" line="32"/>
+        <source>When no subtitles in the main language are found, generate them locally: transcribe the audio (whisper.cpp) and translate it with a local language model (llama.cpp). Needs a CUDA GPU, ffmpeg and the models next to the executable</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>BackupLangArgParser</name>
     <message>
         <location filename="../libqnapi/src/parser/backuplangargparser.cpp" line="32"/>
@@ -22,6 +30,83 @@
         <location filename="../libqnapi/src/parser/backuplangargparser.cpp" line="51"/>
         <source>Alternative subtitles language</source>
         <translation>Lingua sottotitoli alternativa</translation>
+    </message>
+</context>
+<context>
+    <name>CliAiFallback::ConsoleListener</name>
+    <message numerus="yes">
+        <location filename="../cli/src/cliaifallback.cpp" line="41"/>
+        <source>AI fallback: generating %1 subtitles for %n file(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <location filename="../cli/src/cliaifallback.cpp" line="46"/>
+        <source>AI fallback is unavailable, missing:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../cli/src/cliaifallback.cpp" line="51"/>
+        <source>Build the tools with scripts/build-ai-tools.bat and download the models with scripts/download-ai-models.ps1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../cli/src/cliaifallback.cpp" line="75"/>
+        <source>%n line(s) transcribed in %1</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <location filename="../cli/src/cliaifallback.cpp" line="80"/>
+        <source>AI fallback: nothing was transcribed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../cli/src/cliaifallback.cpp" line="84"/>
+        <source>Loading the translation model...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../cli/src/cliaifallback.cpp" line="88"/>
+        <source>Model loaded in %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../cli/src/cliaifallback.cpp" line="92"/>
+        <source>AI fallback: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../cli/src/cliaifallback.cpp" line="94"/>
+        <source>Server log: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../cli/src/cliaifallback.cpp" line="100"/>
+        <source>Translating %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../cli/src/cliaifallback.cpp" line="114"/>
+        <source>AI subtitles saved (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../cli/src/cliaifallback.cpp" line="117"/>
+        <source>%n line(s) left untranslated</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <location filename="../cli/src/cliaifallback.cpp" line="130"/>
+        <source>Transcribing %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -62,12 +147,12 @@
         <translation>QNapi: eliminazione file temporanei...</translation>
     </message>
     <message>
-        <location filename="../cli/src/climain.cpp" line="121"/>
+        <location filename="../cli/src/climain.cpp" line="123"/>
         <source>QNapi: finished.</source>
         <translation>QNapi: operazione conclusa.</translation>
     </message>
     <message>
-        <location filename="../cli/src/main.cpp" line="85"/>
+        <location filename="../cli/src/main.cpp" line="91"/>
         <source>Command line argument parsing error:</source>
         <translation>Errore di analisi dell&apos;argomento della riga di comando:</translation>
     </message>
@@ -85,115 +170,225 @@
         <translation>Impossibile scrivere nella cartella temporanea: %1</translation>
     </message>
     <message>
-        <location filename="../cli/src/clisubtitlesdownloader.cpp" line="53"/>
+        <location filename="../cli/src/clisubtitlesdownloader.cpp" line="255"/>
+        <source>%1 - already has subtitles in the main language, no AI needed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../cli/src/clisubtitlesdownloader.cpp" line="260"/>
+        <source>AI fallback: every file has subtitles already</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Calculating checksums...</source>
-        <translation>Calcolo checksum...</translation>
+        <translation type="vanished">Calcolo checksum...</translation>
     </message>
     <message>
-        <location filename="../cli/src/clisubtitlesdownloader.cpp" line="63"/>
-        <location filename="../cli/src/clisubtitlesdownloader.cpp" line="73"/>
         <source>Searching for subtitles [%1] (%2)...</source>
-        <translation>Ricerca sottotitoli [%1] (%2)...</translation>
+        <translation type="vanished">Ricerca sottotitoli [%1] (%2)...</translation>
     </message>
     <message>
-        <location filename="../cli/src/clisubtitlesdownloader.cpp" line="66"/>
-        <location filename="../cli/src/clisubtitlesdownloader.cpp" line="82"/>
         <source>Searching for subtitles in alternative language [%1] (%2)...</source>
-        <translation>Ricerca sottotitoli in lingua alternativa [%1] (%2)...</translation>
+        <translation type="vanished">Ricerca sottotitoli in lingua alternativa [%1] (%2)...</translation>
     </message>
     <message>
-        <location filename="../cli/src/clisubtitlesdownloader.cpp" line="95"/>
         <source>0)	Do not download subtitles for this video</source>
-        <translation>0)	Non scaricare sottotitoli per questo video</translation>
+        <translation type="vanished">0)	Non scaricare sottotitoli per questo video</translation>
     </message>
     <message>
-        <location filename="../cli/src/clisubtitlesdownloader.cpp" line="96"/>
         <source>Found subtitles:</source>
-        <translation>Trovati sottotitoli:</translation>
+        <translation type="vanished">Trovati sottotitoli:</translation>
     </message>
     <message>
-        <location filename="../cli/src/clisubtitlesdownloader.cpp" line="104"/>
         <source> (good)</source>
-        <translation> (buona qualità)</translation>
+        <translation type="vanished"> (buona qualità)</translation>
     </message>
     <message>
-        <location filename="../cli/src/clisubtitlesdownloader.cpp" line="106"/>
         <source> (bad)</source>
-        <translation> (cattiva qualità)</translation>
+        <translation type="vanished"> (cattiva qualità)</translation>
     </message>
     <message>
-        <location filename="../cli/src/clisubtitlesdownloader.cpp" line="137"/>
         <source>Select subtitles to download: </source>
-        <translation>Selezionare sottotitoli da scaricare: </translation>
+        <translation type="vanished">Selezionare sottotitoli da scaricare: </translation>
     </message>
     <message>
-        <location filename="../cli/src/clisubtitlesdownloader.cpp" line="148"/>
         <source>Downloading subtitles...</source>
-        <translation>Scaricamento sottotitoli...</translation>
+        <translation type="vanished">Scaricamento sottotitoli...</translation>
     </message>
     <message>
-        <location filename="../cli/src/clisubtitlesdownloader.cpp" line="150"/>
         <source>Unable to download subtitles!</source>
-        <translation>Impossibile scaricare sottotitoli!</translation>
+        <translation type="vanished">Impossibile scaricare sottotitoli!</translation>
     </message>
     <message>
-        <location filename="../cli/src/clisubtitlesdownloader.cpp" line="154"/>
         <source>Unpacking subtitles...</source>
-        <translation>Scompattamento sottotitoli...</translation>
+        <translation type="vanished">Scompattamento sottotitoli...</translation>
     </message>
     <message>
-        <location filename="../cli/src/clisubtitlesdownloader.cpp" line="156"/>
         <source>Failed to unpack subtitles!</source>
-        <translation>Impossibile scompattare i sottotitoli!</translation>
+        <translation type="vanished">Impossibile scompattare i sottotitoli!</translation>
     </message>
     <message>
-        <location filename="../cli/src/clisubtitlesdownloader.cpp" line="161"/>
         <source>Post-processing subtitles file...</source>
-        <translation>Post-elaborazione file sottotitoli...</translation>
+        <translation type="vanished">Post-elaborazione file sottotitoli...</translation>
     </message>
     <message>
-        <location filename="../cli/src/clisubtitlesdownloader.cpp" line="165"/>
         <source>Adjusting subtitles...</source>
-        <translation>Adattamento sottotitoli...</translation>
+        <translation type="vanished">Adattamento sottotitoli...</translation>
     </message>
     <message>
-        <location filename="../cli/src/clisubtitlesdownloader.cpp" line="167"/>
         <source>Could not adjust subtitles!</source>
-        <translation>Impossibile adattare i sottotitoli!</translation>
+        <translation type="vanished">Impossibile adattare i sottotitoli!</translation>
     </message>
     <message>
-        <location filename="../cli/src/clisubtitlesdownloader.cpp" line="178"/>
         <source>Downloading subtitles for &apos;%1&apos; [%2/%3]</source>
-        <translation>Scaricamento sottotitoli per &apos;%1&apos; [%2/%3]</translation>
+        <translation type="vanished">Scaricamento sottotitoli per &apos;%1&apos; [%2/%3]</translation>
     </message>
     <message>
-        <location filename="../cli/src/clisubtitlesdownloader.cpp" line="186"/>
         <source>No permission to write to the directory &apos;%1&apos;!</source>
-        <translation>Mancano i permessi per scrivere nella cartella &apos;%1&apos;!</translation>
+        <translation type="vanished">Mancano i permessi per scrivere nella cartella &apos;%1&apos;!</translation>
     </message>
     <message>
-        <location filename="../cli/src/clisubtitlesdownloader.cpp" line="196"/>
         <source>Subtitles not found!</source>
-        <translation>Sottotitoli non trovati!</translation>
+        <translation type="vanished">Sottotitoli non trovati!</translation>
     </message>
     <message numerus="yes">
-        <location filename="../cli/src/clisubtitlesdownloader.cpp" line="228"/>
         <source>Processing of remaining %n file(s) was ignored due to critical error.</source>
-        <translation>
+        <translation type="vanished">
             <numerusform>L&apos;elaborazione di un file rimanente è stato ignorato a causa di un errore critico.</numerusform>
             <numerusform>L&apos;elaborazione di %n file rimanenti è stata ignorata a causa di un errore critico.</numerusform>
         </translation>
     </message>
 </context>
 <context>
+    <name>CliSubtitlesDownloader::ConsoleListener</name>
+    <message>
+        <location filename="../cli/src/clisubtitlesdownloader.cpp" line="68"/>
+        <source>Processing %1 files, %2 at a time...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../cli/src/clisubtitlesdownloader.cpp" line="77"/>
+        <source>Downloading subtitles for &apos;%1&apos; [%2/%3]</source>
+        <translation>Scaricamento sottotitoli per &apos;%1&apos; [%2/%3]</translation>
+    </message>
+    <message>
+        <location filename="../cli/src/clisubtitlesdownloader.cpp" line="93"/>
+        <source>Calculating checksums...</source>
+        <translation>Calcolo checksum...</translation>
+    </message>
+    <message>
+        <location filename="../cli/src/clisubtitlesdownloader.cpp" line="96"/>
+        <source>Searching for subtitles [%1] (%2)...</source>
+        <translation>Ricerca sottotitoli [%1] (%2)...</translation>
+    </message>
+    <message>
+        <location filename="../cli/src/clisubtitlesdownloader.cpp" line="101"/>
+        <source>Searching for subtitles in alternative language [%1] (%2)...</source>
+        <translation>Ricerca sottotitoli in lingua alternativa [%1] (%2)...</translation>
+    </message>
+    <message>
+        <location filename="../cli/src/clisubtitlesdownloader.cpp" line="106"/>
+        <source>Search failed (%4) - retrying in %1 s (%2/%3)...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../cli/src/clisubtitlesdownloader.cpp" line="113"/>
+        <source>Downloading subtitles...</source>
+        <translation>Scaricamento sottotitoli...</translation>
+    </message>
+    <message>
+        <location filename="../cli/src/clisubtitlesdownloader.cpp" line="116"/>
+        <source>Unpacking subtitles...</source>
+        <translation>Scompattamento sottotitoli...</translation>
+    </message>
+    <message>
+        <location filename="../cli/src/clisubtitlesdownloader.cpp" line="119"/>
+        <source>Post-processing subtitles file...</source>
+        <translation>Post-elaborazione file sottotitoli...</translation>
+    </message>
+    <message>
+        <location filename="../cli/src/clisubtitlesdownloader.cpp" line="122"/>
+        <source>Adjusting subtitles...</source>
+        <translation>Adattamento sottotitoli...</translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../cli/src/clisubtitlesdownloader.cpp" line="138"/>
+        <source>%n file(s) were rate-limited; waiting %1 s before retrying...</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <location filename="../cli/src/clisubtitlesdownloader.cpp" line="151"/>
+        <source>Select subtitles to download: </source>
+        <translation>Selezionare sottotitoli da scaricare: </translation>
+    </message>
+    <message>
+        <location filename="../cli/src/clisubtitlesdownloader.cpp" line="170"/>
+        <source>No permission to write to the directory &apos;%1&apos;!</source>
+        <translation>Mancano i permessi per scrivere nella cartella &apos;%1&apos;!</translation>
+    </message>
+    <message>
+        <location filename="../cli/src/clisubtitlesdownloader.cpp" line="175"/>
+        <source>Subtitles not found!</source>
+        <translation>Sottotitoli non trovati!</translation>
+    </message>
+    <message>
+        <location filename="../cli/src/clisubtitlesdownloader.cpp" line="179"/>
+        <source>Unable to download subtitles!</source>
+        <translation>Impossibile scaricare sottotitoli!</translation>
+    </message>
+    <message>
+        <location filename="../cli/src/clisubtitlesdownloader.cpp" line="183"/>
+        <source>Failed to unpack subtitles!</source>
+        <translation>Impossibile scompattare i sottotitoli!</translation>
+    </message>
+    <message>
+        <location filename="../cli/src/clisubtitlesdownloader.cpp" line="187"/>
+        <source>Could not adjust subtitles!</source>
+        <translation>Impossibile adattare i sottotitoli!</translation>
+    </message>
+    <message>
+        <location filename="../cli/src/clisubtitlesdownloader.cpp" line="203"/>
+        <source>still rate-limited, try again later</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../cli/src/clisubtitlesdownloader.cpp" line="207"/>
+        <source>could not download subtitles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../cli/src/clisubtitlesdownloader.cpp" line="214"/>
+        <source>0)	Do not download subtitles for this video</source>
+        <translation>0)	Non scaricare sottotitoli per questo video</translation>
+    </message>
+    <message>
+        <location filename="../cli/src/clisubtitlesdownloader.cpp" line="215"/>
+        <source>Found subtitles:</source>
+        <translation>Trovati sottotitoli:</translation>
+    </message>
+    <message>
+        <location filename="../cli/src/clisubtitlesdownloader.cpp" line="222"/>
+        <source> (good)</source>
+        <translation> (buona qualità)</translation>
+    </message>
+    <message>
+        <location filename="../cli/src/clisubtitlesdownloader.cpp" line="224"/>
+        <source> (bad)</source>
+        <translation> (cattiva qualità)</translation>
+    </message>
+</context>
+<context>
     <name>Console</name>
     <message>
-        <location filename="../libqnapi/src/utils/console.cpp" line="59"/>
+        <location filename="../libqnapi/src/utils/console.cpp" line="60"/>
         <source>You must enter a number!</source>
         <translation>È necessario inserire un numero!</translation>
     </message>
     <message>
-        <location filename="../libqnapi/src/utils/console.cpp" line="64"/>
+        <location filename="../libqnapi/src/utils/console.cpp" line="65"/>
         <source>You must enter a number between %1 and %2</source>
         <translation>Inserisci un numero compreso tra %1 e %2</translation>
     </message>
@@ -255,97 +450,192 @@
 <context>
     <name>GetThread</name>
     <message>
-        <location filename="../gui/src/forms/frmprogress.cpp" line="268"/>
+        <location filename="../gui/src/forms/frmprogress.cpp" line="311"/>
         <source>Checking permissions of the video directory...</source>
         <translation>Controllo permessi della cartella video...</translation>
     </message>
     <message>
-        <location filename="../gui/src/forms/frmprogress.cpp" line="271"/>
+        <location filename="../gui/src/forms/frmprogress.cpp" line="529"/>
         <source>No permission to write to the directory &apos;%1&apos;!</source>
         <translation>Mancano i permessi per scrivere nella cartella &apos;%1&apos;!</translation>
     </message>
     <message>
-        <location filename="../gui/src/forms/frmprogress.cpp" line="279"/>
+        <location filename="../gui/src/forms/frmprogress.cpp" line="315"/>
         <source>Calculating checksum of the file...</source>
         <translation>Calcolo checksum del file...</translation>
     </message>
+    <message numerus="yes">
+        <location filename="../gui/src/forms/frmprogress.cpp" line="286"/>
+        <source>Processing %n file(s), %1 at a time...</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
-        <location filename="../gui/src/forms/frmprogress.cpp" line="292"/>
-        <location filename="../gui/src/forms/frmprogress.cpp" line="308"/>
+        <location filename="../gui/src/forms/frmprogress.cpp" line="319"/>
         <source>Searching for subtitles [%1] (%2)...</source>
         <translation>Ricerca sottotitoli [%1] (%2)...</translation>
     </message>
     <message>
-        <location filename="../gui/src/forms/frmprogress.cpp" line="298"/>
-        <location filename="../gui/src/forms/frmprogress.cpp" line="322"/>
+        <location filename="../gui/src/forms/frmprogress.cpp" line="325"/>
         <source>Searching for subtitles in alternative language [%1] (%2)...</source>
         <translation>Ricerca sottotitoli in lingua alternativa [%1] (%2)...</translation>
     </message>
     <message>
-        <location filename="../gui/src/forms/frmprogress.cpp" line="360"/>
+        <location filename="../gui/src/forms/frmprogress.cpp" line="331"/>
+        <source>Nothing found, retrying in %1 s (%2/%3)...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../gui/src/forms/frmprogress.cpp" line="338"/>
         <source>Downloading subtitles file...</source>
         <translation>Scaricamento file sottotitoli...</translation>
     </message>
     <message>
-        <location filename="../gui/src/forms/frmprogress.cpp" line="373"/>
+        <location filename="../gui/src/forms/frmprogress.cpp" line="342"/>
         <source>Unpacking subtitles file...</source>
         <translation>Scompattamento file sottotitoli...</translation>
     </message>
     <message>
-        <location filename="../gui/src/forms/frmprogress.cpp" line="383"/>
+        <location filename="../gui/src/forms/frmprogress.cpp" line="346"/>
         <source>Post-processing subtitles...</source>
         <translation>Post-elaborazione sottotitoli...</translation>
     </message>
     <message>
-        <location filename="../gui/src/forms/frmprogress.cpp" line="388"/>
+        <location filename="../gui/src/forms/frmprogress.cpp" line="350"/>
         <source>Adjusting subtitles...</source>
         <translation>Adattamento sottotitoli...</translation>
     </message>
+    <message numerus="yes">
+        <location filename="../gui/src/forms/frmprogress.cpp" line="379"/>
+        <source>%n file(s) were rate-limited; waiting %1 s before retrying...</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../gui/src/forms/frmprogress.cpp" line="410"/>
+        <source> (+%n more)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
-        <location filename="../gui/src/forms/frmprogress.cpp" line="396"/>
+        <location filename="../gui/src/forms/frmprogress.cpp" line="414"/>
+        <source>%1 of %2 files done, %3 in progress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../gui/src/forms/frmprogress.cpp" line="447"/>
+        <source>Generating %1 subtitles for %n file(s)...</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <location filename="../gui/src/forms/frmprogress.cpp" line="457"/>
+        <source>Transcribing the audio (%1/%2)...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../gui/src/forms/frmprogress.cpp" line="464"/>
+        <source>Transcribing the audio (%1/%2): %3%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../gui/src/forms/frmprogress.cpp" line="479"/>
+        <source>Loading the translation model...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../gui/src/forms/frmprogress.cpp" line="490"/>
+        <source>Translating (%1/%2)...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../gui/src/forms/frmprogress.cpp" line="495"/>
+        <source>Translating (%1/%2): line %3 of %4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../gui/src/forms/frmprogress.cpp" line="534"/>
+        <source>still rate-limited, try again later</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../gui/src/forms/frmprogress.cpp" line="537"/>
         <source>Could not adjust subtitles!</source>
         <translation>Impossibile adattare i sottotitoli!</translation>
+    </message>
+    <message>
+        <location filename="../gui/src/forms/frmprogress.cpp" line="591"/>
+        <source>AI subtitles could not be generated, these files were not found:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../gui/src/forms/frmprogress.cpp" line="594"/>
+        <source>Check the paths on the AI subtitles tab in Settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../gui/src/forms/frmprogress.cpp" line="596"/>
+        <source>The translation model could not be started:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../gui/src/forms/frmprogress.cpp" line="614"/>
+        <source>(generated by AI)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../gui/src/forms/frmprogress.cpp" line="618"/>
+        <source>AI: %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>GuiMain</name>
     <message>
-        <location filename="../gui/src/guimain.cpp" line="97"/>
+        <location filename="../gui/src/guimain.cpp" line="101"/>
         <source>List of languages recognized by QNapi, including corresponding</source>
         <translation>Lista delle lingue riconosciute da QNapi, inclusi i corrispondenti</translation>
     </message>
     <message>
-        <location filename="../gui/src/guimain.cpp" line="99"/>
+        <location filename="../gui/src/guimain.cpp" line="103"/>
         <source>two-letter language codes:</source>
         <translation>codici lingua a due lettere:</translation>
     </message>
     <message>
-        <location filename="../gui/src/guimain.cpp" line="114"/>
+        <location filename="../gui/src/guimain.cpp" line="118"/>
         <source>Current default subtitles language: %1 (%2)</source>
         <translation>Lingua sottotitoli predefinita corrente: %1 (%2)</translation>
     </message>
     <message>
-        <location filename="../gui/src/guimain.cpp" line="119"/>
+        <location filename="../gui/src/guimain.cpp" line="123"/>
         <source>No alternative subtitles language has been set</source>
         <translation>Non è stata impostata alcuna lingua sottotitoli alternativa</translation>
     </message>
     <message>
-        <location filename="../gui/src/guimain.cpp" line="121"/>
+        <location filename="../gui/src/guimain.cpp" line="125"/>
         <source>Current alternative subtitles language: %1 (%2)</source>
         <translation>Lingua sottotitoli alternativa corrente: %1 (%2)</translation>
     </message>
     <message>
-        <location filename="../gui/src/guimain.cpp" line="130"/>
+        <location filename="../gui/src/guimain.cpp" line="134"/>
         <source>QNapi - command line argument parsing error</source>
         <translation>QNapi - errore di analisi dell&apos;argomento della riga di comando</translation>
     </message>
     <message>
-        <location filename="../gui/src/guimain.cpp" line="171"/>
+        <location filename="../gui/src/guimain.cpp" line="175"/>
         <source>QNapi - CLI executable not found</source>
         <translation>QNapi - versione per riga di comando non trovata</translation>
     </message>
     <message>
-        <location filename="../gui/src/guimain.cpp" line="172"/>
+        <location filename="../gui/src/guimain.cpp" line="176"/>
         <source>You have requested to run QNapi in command-line mode, but unfortunately command-line binary &apos;%1&apos; could not be found.</source>
         <translation>Ha richiesto l&apos;avvio dell&apos;applicazione della riga di comando, ma il binario &apos;%1&apos; non è stato trovato.</translation>
     </message>
@@ -366,6 +656,29 @@
         <location filename="../libqnapi/src/utils/helphelper.cpp" line="34"/>
         <source>Available options:</source>
         <translation>Opzioni disponibili:</translation>
+    </message>
+</context>
+<context>
+    <name>JobsArgParser</name>
+    <message>
+        <location filename="../libqnapi/src/parser/jobsargparser.cpp" line="31"/>
+        <source>You need to pass the number of parallel downloads after %1 argument</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libqnapi/src/parser/jobsargparser.cpp" line="41"/>
+        <source>Invalid number of parallel downloads passed: %1 (expected 1 to %2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libqnapi/src/parser/jobsargparser.cpp" line="52"/>
+        <source>count</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libqnapi/src/parser/jobsargparser.cpp" line="53"/>
+        <source>Number of files to process in parallel (1 to %1, default %2). Subtitle services throttle requests that arrive one after another, so processing several files at once is dramatically faster</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -392,9 +705,32 @@
     </message>
 </context>
 <context>
+    <name>LangSuffixArgParser</name>
+    <message>
+        <location filename="../libqnapi/src/parser/langsuffixargparser.cpp" line="31"/>
+        <source>You need to pass the language suffix mode after %1 argument</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libqnapi/src/parser/langsuffixargparser.cpp" line="47"/>
+        <source>Invalid language suffix mode passed: %1 (expected none, 2 or 3)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libqnapi/src/parser/langsuffixargparser.cpp" line="57"/>
+        <source>mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libqnapi/src/parser/langsuffixargparser.cpp" line="58"/>
+        <source>Append the subtitles language to the file name, as media servers expect (none, 2 for two-letter e.g. movie.pl.srt, 3 for three-letter e.g. movie.pol.srt)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>MaiaObject</name>
     <message>
-        <location filename="../deps/libmaia/maiaObject.cpp" line="288"/>
+        <location filename="../deps/libmaia/maia/maiaObject.cpp" line="314"/>
         <source>parse error: invalid xml-rpc. not conforming to spec.</source>
         <translation>analizza l&apos;errore: xml-rpc non valido. non conforme alle specifiche.</translation>
     </message>
@@ -402,67 +738,67 @@
 <context>
     <name>QNapiApp</name>
     <message>
-        <location filename="../gui/src/qnapiapp.cpp" line="92"/>
-        <location filename="../gui/src/qnapiapp.cpp" line="103"/>
+        <location filename="../gui/src/qnapiapp.cpp" line="100"/>
         <location filename="../gui/src/qnapiapp.cpp" line="111"/>
-        <location filename="../gui/src/qnapiapp.cpp" line="122"/>
+        <location filename="../gui/src/qnapiapp.cpp" line="119"/>
+        <location filename="../gui/src/qnapiapp.cpp" line="130"/>
         <source>Download subtitles</source>
         <translation>Scarica sottotitoli</translation>
     </message>
     <message>
-        <location filename="../gui/src/qnapiapp.cpp" line="96"/>
+        <location filename="../gui/src/qnapiapp.cpp" line="104"/>
         <source>Scan directories</source>
         <translation>Scansiona cartelle</translation>
     </message>
     <message>
-        <location filename="../gui/src/qnapiapp.cpp" line="100"/>
+        <location filename="../gui/src/qnapiapp.cpp" line="108"/>
         <source>Convert subtitles</source>
         <translation>Converti sottotitoli</translation>
     </message>
     <message>
-        <location filename="../gui/src/qnapiapp.cpp" line="107"/>
-        <location filename="../gui/src/qnapiapp.cpp" line="118"/>
+        <location filename="../gui/src/qnapiapp.cpp" line="115"/>
         <location filename="../gui/src/qnapiapp.cpp" line="126"/>
+        <location filename="../gui/src/qnapiapp.cpp" line="134"/>
         <source>Create an account</source>
         <translation>Crea un account</translation>
     </message>
     <message>
-        <location filename="../gui/src/qnapiapp.cpp" line="115"/>
+        <location filename="../gui/src/qnapiapp.cpp" line="123"/>
         <source>Upload subtitles</source>
         <translation>Invia sottotitoli</translation>
     </message>
     <message>
-        <location filename="../gui/src/qnapiapp.cpp" line="130"/>
+        <location filename="../gui/src/qnapiapp.cpp" line="138"/>
         <source>Settings</source>
         <translation>Impostazioni</translation>
     </message>
     <message>
-        <location filename="../gui/src/qnapiapp.cpp" line="133"/>
+        <location filename="../gui/src/qnapiapp.cpp" line="141"/>
         <source>About</source>
         <translation>Informazioni</translation>
     </message>
     <message>
-        <location filename="../gui/src/qnapiapp.cpp" line="136"/>
+        <location filename="../gui/src/qnapiapp.cpp" line="144"/>
         <source>Quit</source>
         <translation>Esci</translation>
     </message>
     <message>
-        <location filename="../gui/src/qnapiapp.cpp" line="140"/>
+        <location filename="../gui/src/qnapiapp.cpp" line="148"/>
         <source>NapiProjekt</source>
         <translation>NapiProjekt</translation>
     </message>
     <message>
-        <location filename="../gui/src/qnapiapp.cpp" line="145"/>
+        <location filename="../gui/src/qnapiapp.cpp" line="153"/>
         <source>OpenSubtitles</source>
         <translation>OpenSubtitles</translation>
     </message>
     <message>
-        <location filename="../gui/src/qnapiapp.cpp" line="151"/>
+        <location filename="../gui/src/qnapiapp.cpp" line="159"/>
         <source>Napisy24</source>
         <translation>Napisy24</translation>
     </message>
     <message>
-        <location filename="../gui/src/qnapiapp.cpp" line="195"/>
+        <location filename="../gui/src/qnapiapp.cpp" line="203"/>
         <source>Select one or more video files to download subtitles for</source>
         <translation>Scegli uno o più video file per cui scaricare sottotitoli</translation>
     </message>
@@ -483,9 +819,26 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../libqnapi/src/engines/napiprojektdownloadengine.cpp" line="63"/>
+        <location filename="../libqnapi/src/engines/napiprojektdownloadengine.cpp" line="66"/>
         <source>&lt;b&gt;www.napiprojekt.pl&lt;/b&gt; subtitles download engine</source>
         <translation>Motore scaricamento sottotitoli &lt;b&gt;www.napiprojekt.pl&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <location filename="../libqnapi/src/engines/napiprojektdownloadengine.cpp" line="160"/>
+        <location filename="../libqnapi/src/engines/napiprojektdownloadengine.cpp" line="227"/>
+        <source>NapiProjekt did not respond in time.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libqnapi/src/engines/napiprojektdownloadengine.cpp" line="161"/>
+        <location filename="../libqnapi/src/engines/napiprojektdownloadengine.cpp" line="228"/>
+        <source>Network error while contacting NapiProjekt: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libqnapi/src/engines/napiprojektdownloadengine.cpp" line="243"/>
+        <source>NapiProjekt is rate-limiting requests; try again in a few seconds.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../libqnapi/src/engines/napisy24downloadengine.cpp" line="26"/>
@@ -493,12 +846,52 @@
         <translation>Motore scaricamento sottotitoli &lt;b&gt;www.napisy24.pl&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../libqnapi/src/engines/opensubtitlesdownloadengine.cpp" line="27"/>
+        <location filename="../libqnapi/src/engines/napisy24downloadengine.cpp" line="103"/>
+        <source>Napisy24 did not respond in time.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libqnapi/src/engines/napisy24downloadengine.cpp" line="104"/>
+        <source>Network error while contacting Napisy24: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libqnapi/src/engines/opensubtitlesdownloadengine.cpp" line="29"/>
         <source>&lt;b&gt;www.opensubtitles.org&lt;/b&gt; subtitles download engine</source>
         <translation>Motore scaricamento sottotitoli &lt;b&gt;www.opensubtitles.org&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../libqnapi/src/subconvert/subtitleconverter.cpp" line="157"/>
+        <location filename="../libqnapi/src/engines/opensubtitlesdownloadengine.cpp" line="229"/>
+        <source>OpenSubtitles returned a placeholder instead of subtitles because the session is anonymous. Enter your opensubtitles.org account in Options -&gt; OpenSubtitles.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libqnapi/src/engines/opensubtitlesdownloadengine.cpp" line="233"/>
+        <source>OpenSubtitles returned a placeholder instead of subtitles for account &apos;%1&apos;. The account is logged in but is not entitled to download this subtitle (VIP membership or a higher download quota may be required).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libqnapi/src/engines/opensubtitlesdownloadengine.cpp" line="263"/>
+        <source>OpenSubtitles did not respond in time.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libqnapi/src/engines/opensubtitlesdownloadengine.cpp" line="264"/>
+        <source>Could not reach OpenSubtitles (%1).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libqnapi/src/engines/opensubtitlesdownloadengine.cpp" line="277"/>
+        <source>OpenSubtitles refused an anonymous session (%1).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libqnapi/src/engines/opensubtitlesdownloadengine.cpp" line="279"/>
+        <source>OpenSubtitles rejected the account &apos;%1&apos; (%2). Check the user name and password in Options.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libqnapi/src/subconvert/subtitleconverter.cpp" line="164"/>
         <source>Subtitles downloaded and processed by QNapi|</source>
         <translation>Sottotitoli scaricati e processati da QNapi |</translation>
     </message>
@@ -688,29 +1081,139 @@
         <translation>Italiano</translation>
     </message>
     <message>
-        <location filename="../gui/src/main.cpp" line="86"/>
+        <location filename="../gui/src/main.cpp" line="92"/>
         <source>First Run</source>
         <translation>Prima esecuzione</translation>
     </message>
     <message>
-        <location filename="../gui/src/main.cpp" line="87"/>
+        <location filename="../gui/src/main.cpp" line="93"/>
         <source>This is the first launch of the program QNapi. Do you want to configure it now?</source>
         <translation>Questa è la prima esecuzione del programma QNapi. Vuoi configurarlo adesso?</translation>
     </message>
     <message>
-        <location filename="../gui/src/guimain.cpp" line="214"/>
+        <location filename="../gui/src/guimain.cpp" line="218"/>
         <source>QNapi: deleting temporary files...</source>
         <translation>QNapi: eliminazione file temporanei...</translation>
     </message>
     <message>
-        <location filename="../gui/src/guimain.cpp" line="229"/>
+        <location filename="../gui/src/guimain.cpp" line="233"/>
         <source>QNapi: finished.</source>
         <translation>QNapi: operazione conclusa.</translation>
     </message>
     <message>
-        <location filename="../libqnapi/src/qnapi.cpp" line="89"/>
+        <location filename="../libqnapi/src/qnapi.cpp" line="111"/>
         <source>No subtitles found!</source>
         <translation>Nessun sottotitolo trovato!</translation>
+    </message>
+    <message>
+        <location filename="../libqnapi/src/ai/aierror.h" line="33"/>
+        <source>cancelled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libqnapi/src/ai/aisubtitlegenerator.cpp" line="311"/>
+        <source>cannot write temporary file %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libqnapi/src/ai/aisubtitlegenerator.cpp" line="328"/>
+        <source>could not save the subtitles next to the movie</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libqnapi/src/ai/audioextractor.cpp" line="59"/>
+        <source>Could not start ffmpeg: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libqnapi/src/ai/audioextractor.cpp" line="69"/>
+        <source>ffmpeg timed out extracting audio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libqnapi/src/ai/audioextractor.cpp" line="77"/>
+        <source>ffmpeg could not extract audio (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libqnapi/src/ai/llamaserver.cpp" line="65"/>
+        <source>No free local port for llama-server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libqnapi/src/ai/llamaserver.cpp" line="92"/>
+        <source>Could not start llama-server: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libqnapi/src/ai/llamaserver.cpp" line="109"/>
+        <source>llama-server exited while loading the model (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libqnapi/src/ai/llamaserver.cpp" line="125"/>
+        <source>llama-server did not become ready in time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libqnapi/src/ai/llamaserver.cpp" line="147"/>
+        <source>llama-server is not running (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libqnapi/src/ai/llamaserver.cpp" line="167"/>
+        <source>llama-server did not answer in time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libqnapi/src/ai/llamaserver.cpp" line="170"/>
+        <source>llama-server request failed (%1 %2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libqnapi/src/ai/llamaserver.cpp" line="179"/>
+        <source>llama-server returned no answer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libqnapi/src/ai/subtitletranslator.cpp" line="187"/>
+        <source>the model&apos;s answer is not valid JSON</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libqnapi/src/ai/whispertranscriber.cpp" line="240"/>
+        <source>Could not start whisper: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libqnapi/src/ai/whispertranscriber.cpp" line="260"/>
+        <source>whisper timed out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libqnapi/src/ai/whispertranscriber.cpp" line="282"/>
+        <source>whisper failed (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libqnapi/src/ai/whispertranscriber.cpp" line="287"/>
+        <source>whisper produced no output file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libqnapi/src/ai/whispertranscriber.cpp" line="295"/>
+        <source>cannot read whisper&apos;s output (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libqnapi/src/ai/whispertranscriber.cpp" line="301"/>
+        <source>whisper found no speech in the audio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libqnapi/src/engines/subtitledownloadengine.cpp" line="72"/>
+        <source>Could not open the video file &apos;%1&apos;: %2</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -756,7 +1259,7 @@
 <context>
     <name>SubtitleMatcher</name>
     <message>
-        <location filename="../libqnapi/src/subtitlematcher.cpp" line="100"/>
+        <location filename="../libqnapi/src/subtitlematcher.cpp" line="128"/>
         <source>_copy</source>
         <translation>_copia</translation>
     </message>
@@ -951,44 +1454,44 @@
         <translation>Converti</translation>
     </message>
     <message>
-        <location filename="../gui/src/forms/frmconvert.cpp" line="79"/>
+        <location filename="../gui/src/forms/frmconvert.cpp" line="83"/>
         <source>Choose a subtitles file</source>
         <translation>Scegliere un file sottotitoli</translation>
     </message>
     <message>
-        <location filename="../gui/src/forms/frmconvert.cpp" line="96"/>
+        <location filename="../gui/src/forms/frmconvert.cpp" line="100"/>
         <source>incorrect</source>
         <translation>errato</translation>
     </message>
     <message>
-        <location filename="../gui/src/forms/frmconvert.cpp" line="141"/>
+        <location filename="../gui/src/forms/frmconvert.cpp" line="145"/>
         <source>Default (%1)</source>
         <translation>Predefinita (%1)</translation>
     </message>
     <message>
-        <location filename="../gui/src/forms/frmconvert.cpp" line="170"/>
-        <location filename="../gui/src/forms/frmconvert.cpp" line="192"/>
+        <location filename="../gui/src/forms/frmconvert.cpp" line="174"/>
+        <location filename="../gui/src/forms/frmconvert.cpp" line="196"/>
         <source>Select a video file</source>
         <translation>Selezionare un file video</translation>
     </message>
     <message>
-        <location filename="../gui/src/forms/frmconvert.cpp" line="244"/>
+        <location filename="../gui/src/forms/frmconvert.cpp" line="248"/>
         <source>Subtitles converted</source>
         <translation>Sottotitoli convertiti</translation>
     </message>
     <message>
-        <location filename="../gui/src/forms/frmconvert.cpp" line="245"/>
+        <location filename="../gui/src/forms/frmconvert.cpp" line="249"/>
         <source>Changed subtitles format from &apos;%1&apos; to &apos;%2&apos;</source>
         <translatorcomment>convertito?</translatorcomment>
         <translation>Formato sottotitoli cambiato da &apos;%1&apos; a &apos;%2&apos;</translation>
     </message>
     <message>
-        <location filename="../gui/src/forms/frmconvert.cpp" line="248"/>
+        <location filename="../gui/src/forms/frmconvert.cpp" line="252"/>
         <source>Could not change subtitle format!</source>
         <translation>Impossibile cambiare formato sottotitoli!</translation>
     </message>
     <message>
-        <location filename="../gui/src/forms/frmconvert.cpp" line="249"/>
+        <location filename="../gui/src/forms/frmconvert.cpp" line="253"/>
         <source>An error occured while converting subtitles!</source>
         <translation>Si è verificato un errore durante la conversione dei sottotitoli!</translation>
     </message>
@@ -1026,17 +1529,17 @@
         <translation>I sottotitoli &lt;b&gt;probabilmente non corrispondenti&lt;/b&gt; al video sono evidenziati in rosso.</translation>
     </message>
     <message>
-        <location filename="../gui/src/forms/frmlistsubtitles.cpp" line="35"/>
+        <location filename="../gui/src/forms/frmlistsubtitles.cpp" line="37"/>
         <source>Select the subtitles which you want to download for video file&lt;br&gt;&lt;br&gt;&lt;b&gt;%1&lt;/b&gt;</source>
         <translation>Seleziona i sottotitoli che vuoi scaricare per il file video&lt;br&gt;&lt;br&gt;&lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../gui/src/forms/frmlistsubtitles.cpp" line="88"/>
+        <location filename="../gui/src/forms/frmlistsubtitles.cpp" line="90"/>
         <source>No subtitle selected</source>
         <translation>Nessun sottotitolo selezionato</translation>
     </message>
     <message>
-        <location filename="../gui/src/forms/frmlistsubtitles.cpp" line="89"/>
+        <location filename="../gui/src/forms/frmlistsubtitles.cpp" line="91"/>
         <source>You need to select a subtitle from the list!</source>
         <translation>È necessario selezionare un sottotitolo dalla lista!</translation>
     </message>
@@ -1059,17 +1562,27 @@
         <translation>Password:</translation>
     </message>
     <message>
-        <location filename="../gui/ui/napiprojekt/frmnapiprojektconfig.ui" line="76"/>
+        <location filename="../gui/ui/napiprojekt/frmnapiprojektconfig.ui" line="63"/>
+        <source>Use the fast API as the official NapiProjekt client</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../gui/ui/napiprojekt/frmnapiprojektconfig.ui" line="66"/>
+        <source>NapiProjekt&apos;s fast API is not rate-limited, but it refuses QNapi by name. With this option QNapi identifies itself as the official NapiProjekt client to use it. Off: QNapi uses the slower, rate-limited endpoint.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../gui/ui/napiprojekt/frmnapiprojektconfig.ui" line="86"/>
         <source>Create an account</source>
         <translation>Crea un account</translation>
     </message>
     <message>
-        <location filename="../gui/ui/napiprojekt/frmnapiprojektconfig.ui" line="96"/>
+        <location filename="../gui/ui/napiprojekt/frmnapiprojektconfig.ui" line="106"/>
         <source>Cancel</source>
         <translation>Annulla</translation>
     </message>
     <message>
-        <location filename="../gui/ui/napiprojekt/frmnapiprojektconfig.ui" line="103"/>
+        <location filename="../gui/ui/napiprojekt/frmnapiprojektconfig.ui" line="113"/>
         <source>Save</source>
         <translation>Salva</translation>
     </message>
@@ -1153,285 +1666,419 @@
         <translation>Generale</translation>
     </message>
     <message>
-        <location filename="../gui/ui/frmoptions.ui" line="47"/>
+        <location filename="../gui/ui/frmoptions.ui" line="34"/>
+        <source>Language code in file names:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../gui/ui/frmoptions.ui" line="41"/>
+        <source>Media servers such as Jellyfin, Plex and Emby find external subtitles by the language code in their name (Movie.pol.srt)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../gui/ui/frmoptions.ui" line="45"/>
+        <source>None (Movie.srt)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../gui/ui/frmoptions.ui" line="50"/>
+        <source>Two letters (Movie.pl.srt)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../gui/ui/frmoptions.ui" line="55"/>
+        <source>Three letters (Movie.pol.srt)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../gui/ui/frmoptions.ui" line="76"/>
         <source>Do not show any windows while retrieving subtitles in command-line</source>
         <translation>Non mostrare alcuna finestra durante lo scaricamento dei sottotitoli da linea di comando</translation>
     </message>
     <message>
-        <location filename="../gui/ui/frmoptions.ui" line="53"/>
+        <location filename="../gui/ui/frmoptions.ui" line="82"/>
         <source>Silent batch mode</source>
         <translation>Modalità in serie silenziosa</translation>
     </message>
     <message>
-        <location filename="../gui/ui/frmoptions.ui" line="60"/>
+        <location filename="../gui/ui/frmoptions.ui" line="89"/>
         <source>Path to 7z executable:</source>
         <translation>Percorso all&apos;eseguibile 7z:</translation>
     </message>
     <message>
-        <location filename="../gui/ui/frmoptions.ui" line="67"/>
+        <location filename="../gui/ui/frmoptions.ui" line="96"/>
         <source>Path to temporary directory:</source>
         <translation>Percorso alla cartella temporanea:</translation>
     </message>
     <message>
-        <location filename="../gui/ui/frmoptions.ui" line="87"/>
+        <location filename="../gui/ui/frmoptions.ui" line="116"/>
         <source>Alternative subtitles language:</source>
         <translation>Lingua sottotitoli alternativa:</translation>
     </message>
     <message>
-        <location filename="../gui/ui/frmoptions.ui" line="94"/>
+        <location filename="../gui/ui/frmoptions.ui" line="123"/>
         <source>Subtitles file permissions: </source>
         <translation>Permessi file sottotitoli: </translation>
     </message>
     <message>
-        <location filename="../gui/ui/frmoptions.ui" line="163"/>
+        <location filename="../gui/ui/frmoptions.ui" line="192"/>
         <source>Show icon in the system tray (requires application restart)</source>
         <translation>Mostra icona nel vassoio di sistema (richiede riavvio applicazione)</translation>
     </message>
     <message>
-        <location filename="../gui/ui/frmoptions.ui" line="187"/>
+        <location filename="../gui/ui/frmoptions.ui" line="216"/>
         <source>Preferred subtitles language:</source>
         <translation>Lingua sottotitoli preferita:</translation>
     </message>
     <message>
-        <location filename="../gui/ui/frmoptions.ui" line="215"/>
+        <location filename="../gui/ui/frmoptions.ui" line="244"/>
         <source>Do not create a copy of existing subtitles. Overwrite them without confirmation.</source>
         <translation>Non creare una copia dei sottotitoli esistenti. Sovrascrivili senza chiedere conferma.</translation>
     </message>
     <message>
-        <location filename="../gui/ui/frmoptions.ui" line="222"/>
+        <location filename="../gui/ui/frmoptions.ui" line="251"/>
         <source>User interface language:</source>
         <translation>Lingua interfaccia utente:</translation>
     </message>
     <message>
-        <location filename="../gui/ui/frmoptions.ui" line="230"/>
-        <location filename="../gui/src/forms/frmoptions.cpp" line="405"/>
+        <location filename="../gui/ui/frmoptions.ui" line="259"/>
+        <location filename="../gui/src/forms/frmoptions.cpp" line="452"/>
         <source>Auto-detected based on system language (%1)</source>
         <translation>Autorilevamento in base alla lingua di sistema (%1)</translation>
     </message>
     <message>
-        <location filename="../gui/ui/frmoptions.ui" line="235"/>
+        <location filename="../gui/ui/frmoptions.ui" line="264"/>
         <source>English</source>
         <comment>en</comment>
         <translation>Inglese</translation>
     </message>
     <message>
-        <location filename="../gui/ui/frmoptions.ui" line="244"/>
+        <location filename="../gui/ui/frmoptions.ui" line="273"/>
         <source>Italian</source>
         <comment>it</comment>
         <translation>Italiano</translation>
     </message>
     <message>
-        <location filename="../gui/ui/frmoptions.ui" line="253"/>
+        <location filename="../gui/ui/frmoptions.ui" line="282"/>
         <source>Polish</source>
         <comment>pl</comment>
         <translation>Polacco</translation>
     </message>
     <message>
-        <location filename="../gui/ui/frmoptions.ui" line="273"/>
+        <location filename="../gui/ui/frmoptions.ui" line="302"/>
         <source>UI Language change will be applied on next application launch</source>
         <translation>Il cambiamento alla lingua della UI verrà attuato al prossimo avvio dell&apos;applicazione</translation>
     </message>
     <message>
-        <location filename="../gui/ui/frmoptions.ui" line="281"/>
+        <location filename="../gui/ui/frmoptions.ui" line="310"/>
         <source>Subtitles download engines</source>
         <translation>Motori di scaricamento sottotitoli</translation>
     </message>
     <message>
-        <location filename="../gui/ui/frmoptions.ui" line="287"/>
+        <location filename="../gui/ui/frmoptions.ui" line="316"/>
+        <source>Files processed at the same time:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../gui/ui/frmoptions.ui" line="319"/>
+        <source>The services block requests that arrive one after another but let several at once through, so a whole season is much faster in parallel. Only used when no list of subtitles has to be shown, or when it may be shown for several files at once.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../gui/ui/frmoptions.ui" line="336"/>
         <source>Available engines to download subtitles from:</source>
         <translation>Motori disponibili da cui scaricare sottotitoli:</translation>
     </message>
     <message>
-        <location filename="../gui/ui/frmoptions.ui" line="300"/>
+        <location filename="../gui/ui/frmoptions.ui" line="349"/>
         <source>Subtitles download policy:</source>
         <translation>Politiche scaricamento sottotitoli:</translation>
     </message>
     <message>
-        <location filename="../gui/ui/frmoptions.ui" line="314"/>
+        <location filename="../gui/ui/frmoptions.ui" line="363"/>
         <source>Always show a list of available subtitles</source>
         <translation>Mostra sempre una lista di sottotitoli disponibili</translation>
     </message>
     <message>
-        <location filename="../gui/ui/frmoptions.ui" line="319"/>
+        <location filename="../gui/ui/frmoptions.ui" line="368"/>
         <source>Show a list of available subtitles only if needed</source>
         <translation>Mostra una lista di sottotitoli disponibili solo se necessario</translation>
     </message>
     <message>
-        <location filename="../gui/ui/frmoptions.ui" line="324"/>
+        <location filename="../gui/ui/frmoptions.ui" line="373"/>
         <source>Always obtain first matching subtitles and never show a list</source>
         <translation>Ottieni sempre i primi sottotitoli corrispondenti e non mostrare mai una lista</translation>
     </message>
     <message>
-        <location filename="../gui/ui/frmoptions.ui" line="357"/>
+        <location filename="../gui/ui/frmoptions.ui" line="406"/>
         <source>Move up</source>
         <translation>Sposta in su</translation>
     </message>
     <message>
-        <location filename="../gui/ui/frmoptions.ui" line="374"/>
+        <location filename="../gui/ui/frmoptions.ui" line="423"/>
         <source>Subtitles search policy:</source>
         <translation>Politiche ricerca sottotitoli:</translation>
     </message>
     <message>
-        <location filename="../gui/ui/frmoptions.ui" line="384"/>
+        <location filename="../gui/ui/frmoptions.ui" line="433"/>
         <source>Move down  </source>
         <translation>Sposta in giù  </translation>
     </message>
     <message>
-        <location filename="../gui/ui/frmoptions.ui" line="398"/>
+        <location filename="../gui/ui/frmoptions.ui" line="447"/>
         <source>Information</source>
         <translation>Informazioni</translation>
     </message>
     <message>
-        <location filename="../gui/ui/frmoptions.ui" line="412"/>
+        <location filename="../gui/ui/frmoptions.ui" line="461"/>
         <source>Configure</source>
         <translation>Configura</translation>
     </message>
     <message>
-        <location filename="../gui/ui/frmoptions.ui" line="427"/>
+        <location filename="../gui/ui/frmoptions.ui" line="476"/>
         <source>Stop the search after finding a matching subtitles (faster)</source>
         <translation>Interrompi la ricerca dopo aver trovato sottotitoli (veloce)</translation>
     </message>
     <message>
-        <location filename="../gui/ui/frmoptions.ui" line="432"/>
+        <location filename="../gui/ui/frmoptions.ui" line="481"/>
         <source>Search all available subtitles (slower)</source>
         <translation>Cerca tutti i sottotitoli disponibili (lento)</translation>
     </message>
     <message>
-        <location filename="../gui/ui/frmoptions.ui" line="437"/>
+        <location filename="../gui/ui/frmoptions.ui" line="486"/>
         <source>Find all subtitles, also in alternative language (slowest)</source>
         <translation>Trova tutti i sottotitoli, anche in lingua alternativa (molto lento)</translation>
     </message>
     <message>
-        <location filename="../gui/ui/frmoptions.ui" line="446"/>
+        <location filename="../gui/ui/frmoptions.ui" line="495"/>
         <source>Subtitles post-processing</source>
         <translation>Post-elaborazione sottotitoli</translation>
     </message>
     <message>
-        <location filename="../gui/ui/frmoptions.ui" line="452"/>
+        <location filename="../gui/ui/frmoptions.ui" line="501"/>
         <source>Enable post-processing for downloaded subtitles</source>
         <translation>Abilita post-elaborazione per i sottotitoli scaricati</translation>
     </message>
     <message>
-        <location filename="../gui/ui/frmoptions.ui" line="466"/>
+        <location filename="../gui/ui/frmoptions.ui" line="515"/>
         <source>Character encoding:</source>
         <translation>Codifica caratteri:</translation>
     </message>
     <message>
-        <location filename="../gui/ui/frmoptions.ui" line="480"/>
-        <location filename="../gui/ui/frmoptions.ui" line="691"/>
+        <location filename="../gui/ui/frmoptions.ui" line="529"/>
+        <location filename="../gui/ui/frmoptions.ui" line="740"/>
         <source>Keep the original</source>
         <translation>Conserva l&apos;originale</translation>
     </message>
     <message>
-        <location filename="../gui/ui/frmoptions.ui" line="485"/>
+        <location filename="../gui/ui/frmoptions.ui" line="534"/>
         <source>Convert (settings below)</source>
         <translation>Converti (impostazioni sotto)</translation>
     </message>
     <message>
-        <location filename="../gui/ui/frmoptions.ui" line="490"/>
+        <location filename="../gui/ui/frmoptions.ui" line="539"/>
         <source>Replace diacritic characters with their ASCII equivalents</source>
         <translation>Sostituisci caratteri diacritici con gli equivalenti ASCII</translation>
     </message>
     <message>
-        <location filename="../gui/ui/frmoptions.ui" line="527"/>
+        <location filename="../gui/ui/frmoptions.ui" line="576"/>
         <source>From:</source>
         <translation>Da:</translation>
     </message>
     <message>
-        <location filename="../gui/ui/frmoptions.ui" line="580"/>
+        <location filename="../gui/ui/frmoptions.ui" line="629"/>
         <source>To:</source>
         <translation>A:</translation>
     </message>
     <message>
-        <location filename="../gui/ui/frmoptions.ui" line="650"/>
+        <location filename="../gui/ui/frmoptions.ui" line="699"/>
         <source>Show all available character encodings</source>
         <translation>Mostra tutte le codifiche carattere disponibili</translation>
     </message>
     <message>
-        <location filename="../gui/ui/frmoptions.ui" line="677"/>
+        <location filename="../gui/ui/frmoptions.ui" line="726"/>
         <source>Subtitles format:</source>
         <translation>Formato sottotitoli:</translation>
     </message>
     <message>
-        <location filename="../gui/ui/frmoptions.ui" line="699"/>
+        <location filename="../gui/ui/frmoptions.ui" line="748"/>
         <source>Subtitles extension:</source>
         <translation>Estensione sottotitoli:</translation>
     </message>
     <message>
-        <location filename="../gui/ui/frmoptions.ui" line="713"/>
-        <location filename="../gui/src/forms/frmoptions.cpp" line="257"/>
+        <location filename="../gui/ui/frmoptions.ui" line="762"/>
+        <location filename="../gui/src/forms/frmoptions.cpp" line="301"/>
         <source>Default</source>
         <translation>Predefinita</translation>
     </message>
     <message>
-        <location filename="../gui/ui/frmoptions.ui" line="739"/>
+        <location filename="../gui/ui/frmoptions.ui" line="788"/>
         <source>Do not add information about QNapi while converting between formats</source>
         <translation>Non aggiungere informazioni su QNapi nella conversione tra formati</translation>
     </message>
     <message>
-        <location filename="../gui/ui/frmoptions.ui" line="749"/>
+        <location filename="../gui/ui/frmoptions.ui" line="798"/>
         <source>Attempt to automatically detect encoding</source>
         <translation>Tenta di riconoscere automaticamente la codifica</translation>
     </message>
     <message>
-        <location filename="../gui/ui/frmoptions.ui" line="759"/>
+        <location filename="../gui/ui/frmoptions.ui" line="808"/>
         <source>Remove subtitles lines that contain the following words:</source>
         <translation>Rimuovi linee sottotitoli che contengono le parole seguenti:</translation>
     </message>
     <message>
-        <location filename="../gui/ui/frmoptions.ui" line="783"/>
+        <location filename="../gui/ui/frmoptions.ui" line="827"/>
+        <source>AI subtitles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../gui/ui/frmoptions.ui" line="833"/>
+        <source>Generate subtitles with AI when no service has them</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../gui/ui/frmoptions.ui" line="840"/>
+        <source>The audio is transcribed with whisper.cpp and translated into the preferred subtitles language by a local language model (llama.cpp). It takes several minutes per file and works best on a graphics card. Empty paths mean the default files next to QNapi.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../gui/ui/frmoptions.ui" line="850"/>
+        <source>ffmpeg:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../gui/ui/frmoptions.ui" line="860"/>
+        <location filename="../gui/ui/frmoptions.ui" line="883"/>
+        <location filename="../gui/ui/frmoptions.ui" line="906"/>
+        <location filename="../gui/ui/frmoptions.ui" line="929"/>
+        <location filename="../gui/ui/frmoptions.ui" line="952"/>
+        <source>...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../gui/ui/frmoptions.ui" line="873"/>
+        <source>whisper-cli:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../gui/ui/frmoptions.ui" line="896"/>
+        <source>Speech recognition model:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../gui/ui/frmoptions.ui" line="919"/>
+        <source>llama-server:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../gui/ui/frmoptions.ui" line="942"/>
+        <source>Translation model (GGUF):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../gui/ui/frmoptions.ui" line="965"/>
+        <source>Language spoken in the movie:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../gui/ui/frmoptions.ui" line="975"/>
+        <source>Extra llama-server options:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../gui/ui/frmoptions.ui" line="982"/>
+        <source>Appended to llama-server&apos;s command line and override its defaults, e.g. -ngl 20 for a model larger than the graphics card&apos;s memory, or --jinja for a model whose chat template is not recognised</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../gui/ui/frmoptions.ui" line="989"/>
+        <source>Lines per translation request:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../gui/ui/frmoptions.ui" line="1006"/>
+        <source>Translation guidelines ({source} and {target} stand for the language names):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../gui/ui/frmoptions.ui" line="1016"/>
+        <source>Restore default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../gui/ui/frmoptions.ui" line="1042"/>
         <source>Restore defaults</source>
         <translation>Ripristina predefiniti</translation>
     </message>
     <message>
-        <location filename="../gui/ui/frmoptions.ui" line="803"/>
+        <location filename="../gui/ui/frmoptions.ui" line="1062"/>
         <source>Cancel</source>
         <translation>Annulla</translation>
     </message>
     <message>
-        <location filename="../gui/ui/frmoptions.ui" line="810"/>
+        <location filename="../gui/ui/frmoptions.ui" line="1069"/>
         <source>Save</source>
         <translation>Salva</translation>
     </message>
     <message>
-        <location filename="../gui/src/forms/frmoptions.cpp" line="129"/>
+        <location filename="../gui/src/forms/frmoptions.cpp" line="73"/>
+        <source>Detect automatically</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../gui/src/forms/frmoptions.cpp" line="99"/>
+        <source>Select a file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../gui/src/forms/frmoptions.cpp" line="173"/>
         <source>Specify the path for 7z executable</source>
         <translation>Specificare il percorso per l&apos;eseguibile 7z</translation>
     </message>
     <message>
-        <location filename="../gui/src/forms/frmoptions.cpp" line="134"/>
+        <location filename="../gui/src/forms/frmoptions.cpp" line="178"/>
         <source>Invalid path</source>
         <translation>Percorso non valido</translation>
     </message>
     <message>
-        <location filename="../gui/src/forms/frmoptions.cpp" line="135"/>
+        <location filename="../gui/src/forms/frmoptions.cpp" line="179"/>
         <source>Defined path to 7z executable is invalid. If you can not locate 7z executable, try installing p7zip-full package.</source>
         <translation>Il percorso all&apos;eseguibile 7z definito non è valido. Se non si riesce a trovare l&apos;eseguibile 7z, provare a installare il pacchetto completo p7zip.</translation>
     </message>
     <message>
-        <location filename="../gui/src/forms/frmoptions.cpp" line="149"/>
+        <location filename="../gui/src/forms/frmoptions.cpp" line="193"/>
         <source>Specify temporary directory</source>
         <translation>Specificare cartella temporanea</translation>
     </message>
     <message>
-        <location filename="../gui/src/forms/frmoptions.cpp" line="183"/>
+        <location filename="../gui/src/forms/frmoptions.cpp" line="227"/>
         <source>Warning</source>
         <translation>Avviso</translation>
     </message>
     <message>
-        <location filename="../gui/src/forms/frmoptions.cpp" line="184"/>
+        <location filename="../gui/src/forms/frmoptions.cpp" line="228"/>
         <source>At least one subtitles engine must remain active!</source>
         <translation>Almeno uno dei motori sottotitoli deve rimanere attivo!</translation>
     </message>
     <message>
-        <location filename="../gui/src/forms/frmoptions.cpp" line="251"/>
+        <location filename="../gui/src/forms/frmoptions.cpp" line="295"/>
         <source>%1 subtitles engine info</source>
         <translation>Info motore sottotitoli %1</translation>
     </message>
     <message>
-        <location filename="../gui/src/forms/frmoptions.cpp" line="263"/>
+        <location filename="../gui/src/forms/frmoptions.cpp" line="307"/>
         <source>Default (%1)</source>
         <translation>Predefinita (%1)</translation>
+    </message>
+    <message>
+        <location filename="../gui/src/forms/frmoptions.cpp" line="607"/>
+        <source>All tools and models were found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../gui/src/forms/frmoptions.cpp" line="616"/>
+        <source>Not found:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1452,62 +2099,72 @@
         <translation>Annulla</translation>
     </message>
     <message>
-        <location filename="../gui/src/forms/frmprogress.cpp" line="86"/>
+        <location filename="../gui/src/forms/frmprogress.cpp" line="93"/>
         <source>Can not find p7zip!</source>
         <translation>Impossibile trovare p7zip!</translation>
     </message>
     <message>
-        <location filename="../gui/src/forms/frmprogress.cpp" line="87"/>
+        <location filename="../gui/src/forms/frmprogress.cpp" line="94"/>
         <source>The path to the program p7zip is incorrect!</source>
         <translation>Il percorso al programma p7zip è errato!</translation>
     </message>
     <message>
-        <location filename="../gui/src/forms/frmprogress.cpp" line="93"/>
+        <location filename="../gui/src/forms/frmprogress.cpp" line="100"/>
         <source>Invalid temporary directory!</source>
         <translation>Cartella temporanea non valida!</translation>
     </message>
     <message>
-        <location filename="../gui/src/forms/frmprogress.cpp" line="94"/>
+        <location filename="../gui/src/forms/frmprogress.cpp" line="101"/>
         <source>Unable to write to the temporary directory! Check your settings.</source>
         <translation>Impossibile scrivere nella cartella temporanea! Controllare le impostazioni.</translation>
     </message>
     <message>
-        <location filename="../gui/src/forms/frmprogress.cpp" line="100"/>
+        <location filename="../gui/src/forms/frmprogress.cpp" line="107"/>
         <source>No files!</source>
         <translation>Nessun file!</translation>
     </message>
     <message>
-        <location filename="../gui/src/forms/frmprogress.cpp" line="101"/>
+        <location filename="../gui/src/forms/frmprogress.cpp" line="108"/>
         <source>Can&apos;t download subtitles as no movie files specified!</source>
         <translation>Impossibile scaricare sottotitoli dato che nessun file film è stato specificato!</translation>
     </message>
     <message>
-        <location filename="../gui/src/forms/frmprogress.cpp" line="133"/>
+        <location filename="../gui/src/forms/frmprogress.cpp" line="142"/>
+        <source>QNapi - generating subtitles with AI...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../gui/src/forms/frmprogress.cpp" line="143"/>
         <source>QNapi - downloading subtitles (%1/%2)</source>
         <translation>QNapi - scaricamento sottotitoli (%1/%2)</translation>
     </message>
     <message>
-        <location filename="../gui/src/forms/frmprogress.cpp" line="136"/>
+        <location filename="../gui/src/forms/frmprogress.cpp" line="146"/>
         <source>QNapi - downloading subtitles...</source>
         <translation>QNapi - scaricamento sottotitoli...</translation>
     </message>
     <message>
-        <location filename="../gui/src/forms/frmprogress.cpp" line="170"/>
+        <location filename="../gui/src/forms/frmprogress.cpp" line="179"/>
         <source>Critical error!</source>
         <translation>Errore critico!</translation>
     </message>
     <message>
-        <location filename="../gui/src/forms/frmprogress.cpp" line="187"/>
+        <location filename="../gui/src/forms/frmprogress.cpp" line="186"/>
+        <source>AI subtitles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../gui/src/forms/frmprogress.cpp" line="206"/>
         <source>QNapi</source>
         <translation>QNapi</translation>
     </message>
     <message>
-        <location filename="../gui/src/forms/frmprogress.cpp" line="188"/>
+        <location filename="../gui/src/forms/frmprogress.cpp" line="207"/>
         <source>Do you want to cancel subtitles downloading?</source>
         <translation>Si desidera annullare lo scaricamento dei sottotitoli?</translation>
     </message>
     <message>
-        <location filename="../gui/src/forms/frmprogress.cpp" line="193"/>
+        <location filename="../gui/src/forms/frmprogress.cpp" line="212"/>
         <source>Finishing the tasks...</source>
         <translation>Conclusione operazioni in corso...</translation>
     </message>
@@ -1526,7 +2183,7 @@
     </message>
     <message>
         <location filename="../gui/ui/frmscan.ui" line="63"/>
-        <location filename="../gui/src/forms/frmscan.cpp" line="167"/>
+        <location filename="../gui/src/forms/frmscan.cpp" line="172"/>
         <source>Scan</source>
         <translation>Scansiona</translation>
     </message>
@@ -1582,7 +2239,7 @@
     </message>
     <message>
         <location filename="../gui/ui/frmscan.ui" line="214"/>
-        <location filename="../gui/src/forms/frmscan.cpp" line="123"/>
+        <location filename="../gui/src/forms/frmscan.cpp" line="128"/>
         <source>Cancel</source>
         <translation>Annulla</translation>
     </message>
@@ -1597,32 +2254,32 @@
         <translation>Segui collegamenti simbolici</translation>
     </message>
     <message>
-        <location filename="../gui/src/forms/frmscan.cpp" line="103"/>
+        <location filename="../gui/src/forms/frmscan.cpp" line="108"/>
         <source>Select the folder to scan</source>
         <translation>Seleziona la cartella da scansionare</translation>
     </message>
     <message>
-        <location filename="../gui/src/forms/frmscan.cpp" line="124"/>
+        <location filename="../gui/src/forms/frmscan.cpp" line="129"/>
         <source>Scanning directories...</source>
         <translation>Scansione cartelle...</translation>
     </message>
     <message>
-        <location filename="../gui/src/forms/frmscan.cpp" line="141"/>
+        <location filename="../gui/src/forms/frmscan.cpp" line="146"/>
         <source>Interrupting directory scanning...</source>
         <translation>Arresto scansione cartelle...</translation>
     </message>
     <message>
-        <location filename="../gui/src/forms/frmscan.cpp" line="161"/>
+        <location filename="../gui/src/forms/frmscan.cpp" line="166"/>
         <source>Scanning directory &lt;b&gt;%1&lt;/b&gt;...</source>
         <translation>Scansione cartella &lt;b&gt;%1&lt;/b&gt;...</translation>
     </message>
     <message>
-        <location filename="../gui/src/forms/frmscan.cpp" line="170"/>
+        <location filename="../gui/src/forms/frmscan.cpp" line="175"/>
         <source>Select the videos you wish to download subtitles for.</source>
         <translation>Seleziona i video per cui si desidera scaricare sottotitoli.</translation>
     </message>
     <message>
-        <location filename="../gui/src/forms/frmscan.cpp" line="171"/>
+        <location filename="../gui/src/forms/frmscan.cpp" line="176"/>
         <source>No video files found.</source>
         <translation>Nessun file video trovato.</translation>
     </message>
@@ -1650,24 +2307,24 @@
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="../gui/src/forms/frmsummary.cpp" line="75"/>
+        <location filename="../gui/src/forms/frmsummary.cpp" line="87"/>
         <source>Subtitles downloaded for %1 %2</source>
         <translation>Scaricati sottotitoli per %1 %2</translation>
     </message>
     <message>
-        <location filename="../gui/src/forms/frmsummary.cpp" line="77"/>
-        <location filename="../gui/src/forms/frmsummary.cpp" line="80"/>
+        <location filename="../gui/src/forms/frmsummary.cpp" line="89"/>
+        <location filename="../gui/src/forms/frmsummary.cpp" line="92"/>
         <source>files</source>
         <translation>file</translation>
     </message>
     <message>
-        <location filename="../gui/src/forms/frmsummary.cpp" line="77"/>
-        <location filename="../gui/src/forms/frmsummary.cpp" line="80"/>
+        <location filename="../gui/src/forms/frmsummary.cpp" line="89"/>
+        <location filename="../gui/src/forms/frmsummary.cpp" line="92"/>
         <source>file</source>
         <translation>file</translation>
     </message>
     <message>
-        <location filename="../gui/src/forms/frmsummary.cpp" line="78"/>
+        <location filename="../gui/src/forms/frmsummary.cpp" line="90"/>
         <source>Could not download subtitles for %1 %2</source>
         <translation>Impossibile scaricare sottotitoli per %1 %2</translation>
     </message>
