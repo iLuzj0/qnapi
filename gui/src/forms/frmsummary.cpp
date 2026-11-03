@@ -22,7 +22,8 @@
 #include <QListWidget>
 
 frmSummary::frmSummary(QWidget *parent, Qt::WindowFlags f)
-    : QDialog(parent, f) {
+    : QDialog(parent, f),
+      enginesRegistry(LibQNapi::subtitleDownloadEngineRegistry()) {
   ui.setupUi(this);
 
   setAttribute(Qt::WA_QuitOnClose, false);
