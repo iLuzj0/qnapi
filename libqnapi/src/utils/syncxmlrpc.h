@@ -24,11 +24,17 @@
 class SyncXmlRpc : public QObject {
   Q_OBJECT
  public:
-  SyncXmlRpc(const QUrl& endPoint);
+  static const int defaultTimeoutMsecs = 20000;
+
+  explicit SyncXmlRpc(const QUrl& endPoint,
+                      int timeoutMsecs = defaultTimeoutMsecs);
 
   bool request(const QString& method, const QVariantList& args);
   QVariant getResponse() const;
   QVariant getError() const;
+
+  // true when the last request was given up on because it ran out of time
+  bool timedOut() const { return timeout; }
 
  private slots:
 
@@ -37,12 +43,14 @@ class SyncXmlRpc : public QObject {
   void whenFault(int err, const QString& msg);
 
  private:
-  bool result;
-  int error;
+  bool result = false;
+  int error = 0;
   QString message;
   QVariant resp;
   QEventLoop loop;
   MaiaXmlRpcClient rpc;
+  int timeoutMsecs;
+  bool timeout = false;
 };
 
 #endif

@@ -27,14 +27,24 @@
 class SyncHTTP : public QObject {
   Q_OBJECT
  public:
-  SyncHTTP();
+  // a request that never completes used to block the whole search forever
+  static const int defaultTimeoutMsecs = 20000;
+
+  explicit SyncHTTP(int timeoutMsecs = defaultTimeoutMsecs);
 
   QNetworkReply* syncGet(const QNetworkRequest& req);
   QNetworkReply* syncPost(const QNetworkRequest& req, const QByteArray& data);
 
+  // true when the last request was aborted because it ran out of time
+  bool timedOut() const { return timeout; }
+
  private:
+  QNetworkReply* awaitReply(QNetworkReply* reply);
+
   QEventLoop loop;
   QNetworkAccessManager manager;
+  int timeoutMsecs;
+  bool timeout;
 };
 
 #endif

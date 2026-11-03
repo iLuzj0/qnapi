@@ -14,12 +14,32 @@
 
 #include "syncxmlrpc.h"
 
-SyncXmlRpc::SyncXmlRpc(const QUrl &endPoint) : rpc(endPoint) {}
+#include <QTimer>
+
+SyncXmlRpc::SyncXmlRpc(const QUrl &endPoint, int timeoutMsecs)
+    : rpc(endPoint), timeoutMsecs(timeoutMsecs) {}
 
 bool SyncXmlRpc::request(const QString &method, const QVariantList &args) {
+  result = false;
+  timeout = false;
+  resp = QVariant();
+
   rpc.call(method, args, this, SLOT(whenResponse(QVariant &)), this,
            SLOT(whenFault(int, const QString &)));
+
+  // without a deadline an unanswered call blocks the search indefinitely
+  QTimer timer;
+  timer.setSingleShot(true);
+  connect(&timer, &QTimer::timeout, this, [this]() {
+    timeout = true;
+    result = false;
+    loop.exit();
+  });
+
+  if (timeoutMsecs > 0) timer.start(timeoutMsecs);
+
   loop.exec();
+
   return result;
 }
 

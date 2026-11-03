@@ -17,23 +17,39 @@
 
 #include "synchttp.h"
 
-SyncHTTP::SyncHTTP() : manager(this) {}
+#include <QTimer>
+
+SyncHTTP::SyncHTTP(int timeoutMsecs)
+    : manager(this), timeoutMsecs(timeoutMsecs), timeout(false) {}
+
+QNetworkReply* SyncHTTP::awaitReply(QNetworkReply* reply) {
+  timeout = false;
+
+  // QNetworkReply::finished() is emitted for failures too (including abort),
+  // so it alone is enough to leave the loop. Note that the old
+  // QNetworkReply::error() signal no longer exists in Qt6 - it was renamed to
+  // errorOccurred(), and connecting to the old name silently did nothing.
+  connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
+
+  QTimer timer;
+  timer.setSingleShot(true);
+  connect(&timer, &QTimer::timeout, this, [this, reply]() {
+    timeout = true;
+    reply->abort();
+  });
+
+  if (timeoutMsecs > 0) timer.start(timeoutMsecs);
+
+  loop.exec();
+
+  return reply;
+}
 
 QNetworkReply* SyncHTTP::syncGet(const QNetworkRequest& req) {
-  QNetworkReply* reply = manager.get(req);
-  connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
-  connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), &loop,
-          SLOT(quit()));
-  loop.exec();
-  return reply;
+  return awaitReply(manager.get(req));
 }
 
 QNetworkReply* SyncHTTP::syncPost(const QNetworkRequest& req,
                                   const QByteArray& data) {
-  QNetworkReply* reply = manager.post(req, data);
-  connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
-  connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), &loop,
-          SLOT(quit()));
-  loop.exec();
-  return reply;
+  return awaitReply(manager.post(req, data));
 }
