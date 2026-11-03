@@ -15,7 +15,14 @@
 
 #include "qsingleapplication.h"
 
+// Each platform has its own QInterProcessChannel with a different layout;
+// compiling this file against the other one makes `new` allocate the wrong
+// size, and the constructor then writes past the end of the block.
+#ifdef Q_OS_WIN
+#include "qinterprocesschannel_win32.h"
+#else
 #include "qinterprocesschannel.h"
+#endif
 #include "qmanagedrequest.h"
 
 #include <QStringList>
