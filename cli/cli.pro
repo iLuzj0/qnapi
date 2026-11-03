@@ -36,8 +36,8 @@ macx {
     QT_CONFIG -= no-pkg-config
     CONFIG -= app_bundle
     LIBS += -framework CoreFoundation
-    QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.8
-    QMAKE_CXXFLAGS_X86_64 = -mmacosx-version-min=10.8
+    QMAKE_MACOSX_DEPLOYMENT_TARGET = 11.0
+    QMAKE_CXXFLAGS_X86_64 = -mmacosx-version-min=11.0
 }
 
 !win32 {

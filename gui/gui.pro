@@ -81,8 +81,8 @@ macx {
     DESTDIR = $${OUTDIR}
 
     LIBS += -framework CoreFoundation
-    QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.8
-    QMAKE_CXXFLAGS_X86_64 = -mmacosx-version-min=10.8
+    QMAKE_MACOSX_DEPLOYMENT_TARGET = 11.0
+    QMAKE_CXXFLAGS_X86_64 = -mmacosx-version-min=11.0
     ICON = $${OUTDIR}/qnapi.icns
     QMAKE_INFO_PLIST = $${OUTDIR}/Info.plist
     7ZIP_BINARY.files = $${OUTDIR}/content/7za
