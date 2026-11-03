@@ -89,6 +89,11 @@ void ConfigWriter::writeEngineConfig(QString engineName,
                                      QSettings& settings) const {
   settings.setValue(engineName + "/nick", engineConfig.nick());
   settings.setValue(engineName + "/password", engineConfig.password());
+  if (engineConfig.officialClientApi() ||
+      settings.contains(engineName + "/official_client_api")) {
+    settings.setValue(engineName + "/official_client_api",
+                      engineConfig.officialClientApi());
+  }
 }
 
 void ConfigWriter::writePostProcessingConfig(

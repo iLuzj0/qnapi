@@ -26,6 +26,7 @@ frmNapiProjektConfig::frmNapiProjektConfig(const EngineConfig &config,
 
   ui.leNick->setText(config.nick());
   ui.lePass->setText(config.password());
+  ui.cbOfficialClientApi->setChecked(config.officialClientApi());
 
   QIcon napiProjektIcon = QIcon(QPixmap(NapiProjektDownloadEngine::pixmapData));
   setWindowIcon(napiProjektIcon);
@@ -40,7 +41,9 @@ frmNapiProjektConfig::frmNapiProjektConfig(const EngineConfig &config,
 EngineConfig frmNapiProjektConfig::getConfig() const { return config; }
 
 void frmNapiProjektConfig::accept() {
-  config = config.setNick(ui.leNick->text()).setPassword(ui.lePass->text());
+  config = config.setNick(ui.leNick->text())
+               .setPassword(ui.lePass->text())
+               .setOfficialClientApi(ui.cbOfficialClientApi->isChecked());
   QDialog::accept();
 }
 

@@ -130,16 +130,20 @@ Maybe<QByteArray> NapiProjektDownloadEngine::fetchSubtitlesViaApi(
     QString lang, QString checksum) const {
   if (checksum.isEmpty()) return nothing();
 
-  // NapiProjekt refuses some clients on this endpoint. Once refused, stop
-  // asking: a rejected request still counts against the rate limit that
-  // guards the legacy endpoint we fall back to.
+  // NapiProjekt refuses some clients on this endpoint, QNapi among them. Once
+  // refused, stop asking: a rejected request still counts against the rate
+  // limit that guards the legacy endpoint we fall back to.
   static bool apiUnavailable = false;
   if (apiUnavailable) return nothing();
 
+  // Mode 17 under the official client's name is accepted, but presenting
+  // QNapi as another program is the user's call, so it is opt-in.
+  const bool asOfficialClient = engineConfig.officialClientApi();
+
   QUrlQuery params;
   params.addQueryItem("downloaded_subtitles_id", checksum);
-  params.addQueryItem("mode", "17");
-  params.addQueryItem("client", "NapiProjekt");
+  params.addQueryItem("mode", asOfficialClient ? "17" : "1");
+  params.addQueryItem("client", asOfficialClient ? "NapiProjekt" : "QNapi");
   params.addQueryItem("client_ver", "0");
   params.addQueryItem("downloaded_subtitles_lang", npLangWrapper(lang));
   params.addQueryItem("downloaded_subtitles_txt", "1");

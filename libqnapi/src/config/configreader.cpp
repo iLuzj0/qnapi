@@ -132,8 +132,10 @@ const QMap<QString, EngineConfig> ConfigReader::readEnginesConfig(
 
 const EngineConfig ConfigReader::readEngineConfig(
     QString engineName, const QSettings& settings) const {
-  return EngineConfig(settings.value(engineName + "/nick", "").toString(),
-                      settings.value(engineName + "/password", "").toString());
+  return EngineConfig(
+      settings.value(engineName + "/nick", "").toString(),
+      settings.value(engineName + "/password", "").toString(),
+      settings.value(engineName + "/official_client_api", false).toBool());
 }
 
 const PostProcessingConfig ConfigReader::readPostProcessingConfig(
