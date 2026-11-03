@@ -168,3 +168,15 @@ QSharedPointer<const SubtitleTranslator> LibQNapi::subtitleTranslator(
   return QSharedPointer<const SubtitleTranslator>(new SubtitleTranslator(
       server, sourceLanguage, targetLanguage, config.chunkSize()));
 }
+
+QSharedPointer<const BatchDownloader> LibQNapi::batchDownloader(
+    const QNapiConfig& config, const Maybe<QString>& specificEngine) {
+  return QSharedPointer<const BatchDownloader>(
+      new BatchDownloader(config, specificEngine));
+}
+
+QSharedPointer<const AiSubtitleGenerator> LibQNapi::aiSubtitleGenerator(
+    const QNapiConfig& config) {
+  return QSharedPointer<const AiSubtitleGenerator>(
+      new AiSubtitleGenerator(config));
+}

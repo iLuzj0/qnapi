@@ -22,6 +22,7 @@ RCC_DIR = tmp
 OBJECTS_DIR = tmp
 
 SOURCES += src/config/configreader.cpp \
+    src/ai/aisubtitlegenerator.cpp \
     src/ai/audioextractor.cpp \
     src/ai/childprocess.cpp \
     src/ai/llamaserver.cpp \
@@ -41,6 +42,7 @@ SOURCES += src/config/configreader.cpp \
     src/engines/opensubtitlesdownloadengine.cpp \
     src/engines/subtitledownloadengine.cpp \
     src/engines/subtitledownloadenginesregistry.cpp \
+    src/batchdownloader.cpp \
     src/libqnapi.cpp \
     src/movieinfo/libmediainfomovieinfoprovider.cpp \
     src/subconvert/formats/microdvd.cpp \
@@ -83,6 +85,7 @@ SOURCES += src/config/configreader.cpp \
 
 HEADERS += src/config/configreader.h \
     src/ai/aierror.h \
+    src/ai/aisubtitlegenerator.h \
     src/ai/audioextractor.h \
     src/ai/childprocess.h \
     src/ai/llamaserver.h \
@@ -103,6 +106,7 @@ HEADERS += src/config/configreader.h \
     src/engines/subtitledownloadengine.h \
     src/engines/subtitledownloadenginemetadata.h \
     src/engines/subtitledownloadenginesregistry.h \
+    src/batchdownloader.h \
     src/libqnapi.h \
     src/movieinfo/libmediainfomovieinfoprovider.h \
     src/movieinfo/movieinfo.h \

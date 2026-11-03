@@ -15,6 +15,7 @@
 #ifndef LIBQNAPI_H
 #define LIBQNAPI_H
 
+#include "ai/aisubtitlegenerator.h"
 #include "ai/audioextractor.h"
 #include "ai/llamaserver.h"
 #include "ai/subtitletranslator.h"
@@ -34,6 +35,7 @@
 
 #include "utils/p7zipdecoder.h"
 
+#include "batchdownloader.h"
 #include "subtitlematcher.h"
 #include "subtitlepostprocessor.h"
 
@@ -82,6 +84,10 @@ class LibQNapi {
   static QSharedPointer<const SubtitlePostProcessor> subtitlePostProcessor(
       const PostProcessingConfig& config);
 
+  static QSharedPointer<const BatchDownloader> batchDownloader(
+      const QNapiConfig& config,
+      const Maybe<QString>& specificEngine = nothing());
+
   // AI fallback. An empty configured path selects defaultPath; relative paths
   // are relative to the executable's directory.
   static QString resolveAiPath(const QString& configuredPath,
@@ -95,6 +101,8 @@ class LibQNapi {
   static QSharedPointer<const SubtitleTranslator> subtitleTranslator(
       const QSharedPointer<LlamaServer>& server, const AiConfig& config,
       const QString& sourceLanguage, const QString& targetLanguage);
+  static QSharedPointer<const AiSubtitleGenerator> aiSubtitleGenerator(
+      const QNapiConfig& config);
 };
 
 #endif  // LIBQNAPI_H

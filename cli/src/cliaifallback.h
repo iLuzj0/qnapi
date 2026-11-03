@@ -21,15 +21,9 @@
 #include "tr.h"
 #include "utils/console.h"
 
-// The --ai-fallback step, run after the download rounds for the files that
-// still have no subtitles in the main language:
-//
-//   1. extract each file's audio (ffmpeg) and transcribe it (whisper.cpp);
-//   2. start llama-server once and translate all transcriptions;
-//   3. post-process and save them like downloaded subtitles.
-//
-// Transcription and translation run as separate phases so that whisper and
-// the LLM never compete for VRAM, and the LLM is loaded only once.
+// Console front end of the --ai-fallback step, run after the download rounds
+// for the files that still have no subtitles in the main language; the work
+// itself is done by AiSubtitleGenerator.
 namespace CliAiFallback {
 
 Q_DECLARE_NAMESPACE_TR(CliAiFallback)
@@ -37,16 +31,6 @@ Q_DECLARE_NAMESPACE_TR(CliAiFallback)
 // Returns the number of files that got subtitles.
 int generateSubtitles(const Console& c, const QStringList& movieFilePaths,
                       const QNapiConfig& config);
-
-// True when a subtitle file in the given language already sits next to the
-// movie (Movie.pol.srt, Movie.pl.srt, ...); the AI step leaves those alone.
-// With unlabelledCounts, a plain Movie.srt counts too: without a language
-// suffix there is no telling what language it is, and the AI output would
-// overwrite it.
-bool hasSubtitlesInLanguage(const QString& movieFilePath,
-                            const QString& language,
-                            const QStringList& subtitleExtensions,
-                            bool unlabelledCounts);
 
 }  // namespace CliAiFallback
 
