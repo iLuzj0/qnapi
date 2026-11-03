@@ -46,6 +46,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: git submodule update --init deps/libmaia deps/qt-maybe
+      # cli.pro links libmediainfo through pkg-config on every Unix, macOS too
+      - run: brew install libmediainfo
       - uses: jurplel/install-qt-action@v4
         with:
           version: '6.7.3'
