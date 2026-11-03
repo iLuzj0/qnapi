@@ -40,7 +40,9 @@ jobs:
           mingw32-make -j4
 
   macos:
-    runs-on: macos-latest
+    # Qt 6.7's qyieldcpu.h calls __yield, which the Xcode 16 on macos-15
+    # rejects as an implicit declaration; macos-14 ships Xcode 15
+    runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
       - run: git submodule update --init deps/libmaia deps/qt-maybe
