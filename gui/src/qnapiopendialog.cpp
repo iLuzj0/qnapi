@@ -101,8 +101,8 @@ bool QNapiOpenDialog::selectDirectory() {
   return !dir.isEmpty();
 #else
   if (!placeWindow()) return false;
-  // QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks ?
-  setFileMode(QFileDialog::DirectoryOnly);
+  setFileMode(QFileDialog::Directory);
+  setOption(QFileDialog::ShowDirsOnly, true);
   return exec();
 #endif
 }
