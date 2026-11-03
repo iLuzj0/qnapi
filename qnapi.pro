@@ -68,15 +68,24 @@ win32 {
                 doc/LICENSE-pl
     doc.path = $${INSTALL_PREFIX}
 
-    icudlls.files = $$[QT_INSTALL_BINS]/icuin54.dll \
-                    $$[QT_INSTALL_BINS]/icuuc54.dll \
-                    $$[QT_INSTALL_BINS]/icudt54.dll
-    icudlls.path = $${INSTALL_PREFIX}
+    lessThan(QT_MAJOR_VERSION, 6) {
+        icudlls.files = $$[QT_INSTALL_BINS]/icuin54.dll \
+                        $$[QT_INSTALL_BINS]/icuuc54.dll \
+                        $$[QT_INSTALL_BINS]/icudt54.dll
+        icudlls.path = $${INSTALL_PREFIX}
+        INSTALLS += icudlls
+    }
 
     libmediainfodlls.files += deps/libmediainfo/bin/MediaInfo.dll
     libmediainfodlls.path = $${INSTALL_PREFIX}
 
-    DEPLOYWIN_FLAGS = --no-translations --no-quick-import --no-system-d3d-compiler --no-angle --no-webkit --no-webkit2
+    DEPLOYWIN_FLAGS = --no-translations --no-quick-import --no-system-d3d-compiler
+    lessThan(QT_MAJOR_VERSION, 6) {
+        DEPLOYWIN_FLAGS += --no-angle --no-webkit --no-webkit2
+    }
+    greaterThan(QT_MAJOR_VERSION, 5) {
+        DEPLOYWIN_FLAGS += --no-opengl-sw --compiler-runtime
+    }
     deploywin.commands += windeployqt $${DEPLOYWIN_FLAGS}
     !no_cli:deploywin.commands += $${INSTALL_PREFIX}/qnapic.exe
     !no_gui:deploywin.commands += $${INSTALL_PREFIX}/qnapi.exe
@@ -87,7 +96,7 @@ win32 {
 
     QMAKE_EXTRA_TARGETS += deploywin platform
 
-    INSTALLS = p7zip doc icudlls libmediainfodlls platform
+    INSTALLS += p7zip doc libmediainfodlls platform
 }
 
 doxygen.commands = rm -fr doc/doxygen/* && doxygen Doxyfile && echo "Doxygen documentation generated in doc/doxygen/index.html"

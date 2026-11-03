@@ -12,6 +12,7 @@
 **
 *****************************************************************************/
 
+#include <QRegExp>
 #include "microdvd.h"
 
 bool MicroDVDSubtitleFormat::detect(const QStringList &lines) const {

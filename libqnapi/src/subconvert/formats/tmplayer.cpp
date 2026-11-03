@@ -12,6 +12,7 @@
 **
 *****************************************************************************/
 
+#include <QRegExp>
 #include "tmplayer.h"
 
 bool TMPlayerSubtitleFormat::detect(const QStringList &lines) const {

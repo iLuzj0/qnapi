@@ -14,6 +14,8 @@
 
 #include "frmscan.h"
 #include "libqnapi.h"
+#include <QGuiApplication>
+#include <QScreen>
 
 frmScan::frmScan(QWidget *parent, Qt::WindowFlags f)
     : QDialog(parent, f), scanConfig(LibQNapi::loadConfig().scanConfig()) {
@@ -57,7 +59,7 @@ frmScan::frmScan(QWidget *parent, Qt::WindowFlags f)
   iconFilm = QIcon(":/ui/film.png");
 
   QRect position = frameGeometry();
-  position.moveCenter(QDesktopWidget().availableGeometry().center());
+  position.moveCenter(QGuiApplication::primaryScreen()->availableGeometry().center());
   move(position.topLeft());
 }
 

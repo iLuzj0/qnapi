@@ -12,6 +12,7 @@
 **
 *****************************************************************************/
 
+#include <QRegExp>
 #include "subtitleformat.h"
 #include <QMap>
 

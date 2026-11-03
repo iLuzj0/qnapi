@@ -13,6 +13,7 @@
 *****************************************************************************/
 
 #include "engines/subtitledownloadengine.h"
+#include <QRandomGenerator>
 #include <QDir>
 #include <QFlags>
 #include <QLoggingCategory>
@@ -51,12 +52,7 @@ void SubtitleDownloadEngine::updateSubtitleInfo(const SubtitleInfo& si) {
 }
 
 QString SubtitleDownloadEngine::generateTmpFileName() const {
-  static bool gen_inited;
-  if (!gen_inited) {
-    qsrand(time(0));
-    gen_inited = true;
-  }
-  return QString("QNapi.%1.tmp").arg(qrand());
+  return QString("QNapi.%1.tmp").arg(QRandomGenerator::global()->generate());
 }
 
 QString SubtitleDownloadEngine::generateTmpPath() const {

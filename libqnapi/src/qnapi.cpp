@@ -12,6 +12,7 @@
 **
 *****************************************************************************/
 
+#include <algorithm>
 #include "qnapi.h"
 #include "libqnapi.h"
 #include "subtitlematcher.h"
@@ -109,7 +110,7 @@ QList<SubtitleInfo> QNapi::listSubtitles() {
     return 2;
   };
 
-  qStableSort(subtitlesList.begin(), subtitlesList.end(),
+  std::stable_sort(subtitlesList.begin(), subtitlesList.end(),
               [&](const SubtitleInfo& si1, const SubtitleInfo& si2) {
                 return langRank(si1.lang) < langRank(si2.lang);
               });

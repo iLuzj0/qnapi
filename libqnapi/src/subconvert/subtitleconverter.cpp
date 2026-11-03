@@ -14,6 +14,7 @@
 
 #include "subtitleconverter.h"
 #include <QFile>
+#include <QTextCodec>
 #include <QTextStream>
 #include <cmath>
 #include "libqnapi.h"
@@ -184,13 +185,25 @@ QStringList SubtitleConverter::readFile(const QString &filename,
   long current = 0;
   QFile inputFile(filename);
   if (inputFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-    QTextStream in(&inputFile);
-    in.setCodec(qPrintable(encoding));
-    while (!in.atEnd() && (atMostLines == 0 || current < atMostLines)) {
-      buff += in.readLine();
-      ++current;
-    }
+    QTextCodec *codec = QTextCodec::codecForName(qPrintable(encoding));
+    const QByteArray rawContent = inputFile.readAll();
     inputFile.close();
+
+    QString content = codec ? codec->toUnicode(rawContent)
+                            : QString::fromUtf8(rawContent);
+
+    // mirror QIODevice::Text + QTextStream::readLine() semantics
+    content.replace(QLatin1String("\r\n"), QLatin1String("\n"));
+    content.replace(QLatin1Char('\r'), QLatin1Char('\n'));
+    if (content.endsWith(QLatin1Char('\n'))) content.chop(1);
+
+    if (!content.isEmpty()) {
+      foreach (const QString &line, content.split(QLatin1Char('\n'))) {
+        if (atMostLines != 0 && current >= atMostLines) break;
+        buff += line;
+        ++current;
+      }
+    }
   }
   return buff;
 }
@@ -199,9 +212,10 @@ bool SubtitleConverter::writeFile(const QString &filename, QString encoding,
                                   const QStringList &lines) const {
   QFile outputFile(filename);
   if (outputFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-    QTextStream out(&outputFile);
-    out.setCodec(qPrintable(encoding));
-    foreach (QString line, lines) { out << line << "\n"; }
+    QTextCodec *codec = QTextCodec::codecForName(qPrintable(encoding));
+    QString content;
+    foreach (QString line, lines) { content += line + QLatin1Char('\n'); }
+    outputFile.write(codec ? codec->fromUnicode(content) : content.toUtf8());
     outputFile.close();
     return true;
   } else {

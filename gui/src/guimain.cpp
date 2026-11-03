@@ -14,6 +14,7 @@
 
 #include "guimain.h"
 #include <signal.h>
+#include <QRegularExpression>
 #include <QDir>
 #include <QFileInfo>
 #include <QLibraryInfo>
@@ -143,7 +144,7 @@ Maybe<QString> cliExecutablePath() {
 
 #ifndef Q_OS_WIN
   searchPaths << QProcess::systemEnvironment()
-                     .filter(QRegExp("^PATH=(.*)$"))
+                     .filter(QRegularExpression("^PATH=(.*)$"))
                      .value(0)
                      .mid(5)
                      .split(":")
@@ -184,7 +185,7 @@ void installTranslation(QCoreApplication &app, QTranslator *qtTranslator,
                         QTranslator *translator, const QNapiConfig &config) {
   QString uiLanguage = LibQNapi::uiLanguage(config.generalConfig());
 
-  QString resourceDir = QLibraryInfo::location(QLibraryInfo::TranslationsPath);
+  QString resourceDir = QLibraryInfo::path(QLibraryInfo::TranslationsPath);
 
   qtTranslator->load("qt_" + uiLanguage, resourceDir);
   app.installTranslator(qtTranslator);

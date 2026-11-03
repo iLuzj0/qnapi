@@ -12,6 +12,7 @@
 **
 *****************************************************************************/
 
+#include <QRegExp>
 #include "subrip.h"
 
 bool SubRipSubtitleFormat::detect(const QStringList &lines) const {

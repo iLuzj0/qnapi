@@ -12,6 +12,7 @@
 **
 *****************************************************************************/
 
+#include <QRegExp>
 #include "mpl2.h"
 
 bool MPL2SubtitleFormat::detect(const QStringList &lines) const {

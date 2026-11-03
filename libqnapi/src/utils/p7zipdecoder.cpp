@@ -12,6 +12,7 @@
 **
 *****************************************************************************/
 
+#include <QRegExp>
 #include "p7zipdecoder.h"
 
 #include <QProcess>

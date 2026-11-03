@@ -12,6 +12,7 @@
 **
 *****************************************************************************/
 
+#include <QRegExp>
 #include "opensubtitlesdownloadengine.h"
 #include "subtitlelanguage.h"
 

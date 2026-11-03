@@ -1,4 +1,4 @@
-QT += network xml
+QT += network xml core5compat
 QT -= gui
 
 TARGET = qnapi
@@ -7,13 +7,13 @@ TEMPLATE = lib
 CONFIG += staticlib \
           warn_on \
           silent \
-          c++11
+          c++17
 
 DESTDIR = $$PWD
 
 INCLUDEPATH += $$PWD/src
 
-include(../deps/libmaia/maia.pri)
+include(../deps/libmaia/maia/maia.pri)
 include(../deps/qt-maybe/qt-maybe.pri)
 
 UI_DIR = tmp

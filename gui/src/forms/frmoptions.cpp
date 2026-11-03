@@ -26,6 +26,7 @@
 
 #include "libqnapi.h"
 
+#include <algorithm>
 #include <QLocale>
 
 #ifdef Q_OS_MAC
@@ -112,7 +113,7 @@ frmOptions::frmOptions(QWidget *parent, Qt::WindowFlags f)
   }
 
   QRect position = frameGeometry();
-  position.moveCenter(QDesktopWidget().availableGeometry().center());
+  position.moveCenter(QGuiApplication::primaryScreen()->availableGeometry().center());
   move(position.topLeft());
 }
 
@@ -315,7 +316,7 @@ void frmOptions::showAllEncodings() {
   ui.cbEncTo->clear();
 
   QList<QByteArray> codecs = QTextCodec::availableCodecs();
-  qSort(codecs.begin(), codecs.end());
+  std::sort(codecs.begin(), codecs.end());
   for (QList<QByteArray>::iterator i = codecs.begin(); i != codecs.end(); i++) {
     ui.cbEncFrom->addItem(*i);
     ui.cbEncTo->addItem(*i);
