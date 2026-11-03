@@ -1,6 +1,32 @@
 QNapi ChangeLog:
 ================
 
+(nie wydana) v0.2.4:
+ * przeniesienie na Qt 6 - wymagane Qt 6.4+ z modulem Core5Compat oraz
+   kompilator C++17
+ * pobieranie napisow dla wielu plikow naraz (-j, takze w GUI) - serwisy
+   blokuja zapytania wysylane jedno po drugim, a przepuszczaja kilka
+   rownoczesnych, wiec caly sezon pobiera sie w kilka sekund; pliki objete
+   limitem zapytan sa ponawiane razem po krotkiej przerwie
+ * rozpoznawanie limitu zapytan NapiProjektu zamiast zglaszania
+   "nie znaleziono napisow"
+ * kod jezyka w nazwie pliku z napisami (-ls), np. film.pol.srt, jak
+   oczekuja Jellyfin, Plex i Emby
+ * generowanie napisow przez AI, gdy zaden serwis ich nie ma (-ai, karta
+   "Napisy AI" w ustawieniach): transkrypcja whisper.cpp i tlumaczenie
+   lokalnym modelem jezykowym (llama.cpp), z edytowalnymi wskazowkami
+   dla tlumaczenia
+ * opcjonalne szybkie API NapiProjektu (jako oficjalny klient programu)
+ * poprawiona awaria GUI w Windows (przepelnienie sterty w obsludze
+   pojedynczej instancji)
+ * pliki wyslane do dzialajacego QNapi nie gina, gdy przychodzi ich
+   kilka naraz
+ * OpenSubtitles: wykrywanie zastepczego pliku zwracanego anonimowym
+   sesjom, zglaszanie bledow pobierania i zapisu
+ * limit czasu dla zapytan sieciowych; sprawdzanie kodu wyjscia 7-Zip
+ * poprawki konwersji napisow (TMPlayer, SubRip, nieznany format)
+ * GitHub Actions zamiast Travis CI i AppVeyor
+
 2017-05-19 v0.2.3:
  * mozliwosc wyboru jezyka interfejsu uzytkownika (angielski/polski/włoski) - (thx Fincer, luigino)
  * przebudowany podsystem konfiguracji aplikacji

@@ -23,13 +23,19 @@ qnapi \- uno strumento per scaricare sottotitoli di film
  -f, \-\-format [formato]     Seleziona formato file sottotitoli destinazione
                             (mDVD,MPL2,SRT,TMP)
  -e, \-\-extension [est]      Selezione estensione file sottotitoli destinazione
+ -ls,\-\-lang\-suffix [modo]   Aggiunge la lingua dei sottotitoli al nome del file
+                            (none, 2 per film.it.srt, 3 per film.ita.srt)
+ -j, \-\-jobs [numero]        Numero di file elaborati in parallelo (1-8)
+ -ai,\-\-ai\-fallback          Genera i sottotitoli in locale (whisper.cpp e un
+                            modello linguistico locale, llama.cpp) per i file
+                            senza sottotitoli disponibili
 
  -o, \-\-options            Mostra opzioni programma (solo GUI)
  -h, \-\-help               Mostra testo di aiuto
  -hl,\-\-help\-languages     Lista delle lingue sottotitoli disponibili
 
 .SH AUTHOR
-Copyright (C) 2008-2017 Piotr Krzeminski <pio.krzeminski@gmail.com>
+Copyright (C) 2008-2026 Piotr Krzeminski <pio.krzeminski@gmail.com>
 http://qnapi.github.io
 .SH LICENSE
 QNapi è distribuito sotto la GNU General Public License v2 o successiva.

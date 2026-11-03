@@ -21,13 +21,20 @@ qnapi \- narzedzie do automatycznego pobierania i dopasowywania napisow do filmo
  -lb,\-\-lang\-backup [jezyk]  Zapasowy jezyk napisow
  -f, \-\-format [format]      Format napisow (mDVD,MPL2,SRT,TMP)
  -e, \-\-extension [ext]      Rozszerzenie pliku z napisami
+ -ls,\-\-lang\-suffix [tryb]   Dodaj jezyk napisow do nazwy pliku, jak oczekuja
+                            serwery multimediow (none, 2 dla film.pl.srt,
+                            3 dla film.pol.srt)
+ -j, \-\-jobs [liczba]        Liczba plikow przetwarzanych rownolegle (1-8)
+ -ai,\-\-ai\-fallback          Wygeneruj napisy lokalnie (whisper.cpp i lokalny
+                            model jezykowy llama.cpp) dla plikow, dla ktorych
+                            zaden serwis nie ma napisow
 
  -o, \-\-options            Konfiguruj program (tylko w trybie GUI)
  -h, \-\-help               Pokaz tekst pomocy
  -hl,\-\-help\-languages     Lista jezykow, w jakich mozna pobierac napisy
 
 .SH AUTOR
-Copyright (C) 2008-2017 Piotr Krzeminski <pio.krzeminski@gmail.com>
+Copyright (C) 2008-2026 Piotr Krzeminski <pio.krzeminski@gmail.com>
 http://qnapi.github.io
 .SH LICENCJA
 Program QNapi rozprowadzany jest na licencji GNU General Public License w wersji drugiej lub kazdej pozniejszej.

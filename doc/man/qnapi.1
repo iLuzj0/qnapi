@@ -23,13 +23,20 @@ qnapi \- a tool for downloading subtitles for movies
  -f, \-\-format [format]      Select target subtitles file format
                             (mDVD,MPL2,SRT,TMP)
  -e, \-\-extension [ext]      Select target subtitles file extension
+ -ls,\-\-lang\-suffix [mode]   Add the subtitles language to the file name,
+                            as media servers expect (none, 2 for movie.pl.srt,
+                            3 for movie.pol.srt)
+ -j, \-\-jobs [count]         Number of files processed in parallel (1-8)
+ -ai,\-\-ai\-fallback          Generate subtitles locally with whisper.cpp and
+                            a local language model (llama.cpp) for files
+                            no service has subtitles for
 
  -o, \-\-options            Show program options (only GUI)
  -h, \-\-help               Show help text
  -hl,\-\-help\-languages     List of available subtitles languages
 
 .SH AUTHOR
-Copyright (C) 2008-2017 Piotr Krzeminski <pio.krzeminski@gmail.com>
+Copyright (C) 2008-2026 Piotr Krzeminski <pio.krzeminski@gmail.com>
 http://qnapi.github.io
 .SH LICENSE
 QNapi is distributed under the GNU General Public License v2 or later.
