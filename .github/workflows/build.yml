@@ -1,0 +1,51 @@
+name: build
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  linux:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      # whisper.cpp and llama.cpp are only needed for the AI tools
+      - run: git submodule update --init deps/libmaia deps/qt-maybe
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qt6-base-dev libqt6core5compat6-dev \
+            qt6-l10n-tools libmediainfo-dev libgl-dev
+      - run: qmake6 CONFIG+=no_ai
+      - run: make -j"$(nproc)"
+      - run: ./qnapic --help
+
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: git submodule update --init deps/libmaia deps/qt-maybe
+      - uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.7.3'
+          arch: win64_mingw
+          modules: qt5compat
+          tools: tools_mingw1120
+      - name: Build
+        shell: cmd
+        run: |
+          set PATH=%IQTA_TOOLS%\mingw1120_64\bin;%PATH%
+          qmake CONFIG+=no_ai
+          mingw32-make -j4
+
+  macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: git submodule update --init deps/libmaia deps/qt-maybe
+      - uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.7.3'
+          modules: qt5compat
+      - run: qmake CONFIG+=no_ai
+      - run: make -j"$(sysctl -n hw.ncpu)"
