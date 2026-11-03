@@ -120,7 +120,9 @@ bool SubtitleMatcher::dryCopy(QString srcFilePath, QString dstFilePath) const {
       !srcFile.open(QIODevice::ReadOnly)) {
     dstFile.close();
   } else {
-    result = dstFile.write(srcFile.readAll()) > 0;
+    const QByteArray content = srcFile.readAll();
+    // write() returns the byte count, so an empty source file is not an error
+    result = dstFile.write(content) == content.size();
     srcFile.close();
     dstFile.close();
   }
