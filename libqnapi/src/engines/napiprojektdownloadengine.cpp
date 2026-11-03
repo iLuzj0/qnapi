@@ -195,7 +195,10 @@ QString NapiProjektDownloadEngine::checksum(QString filename, bool limit10M) {
   QFile file(filename);
   QByteArray fileArray;
 
-  if (!file.open(QIODevice::ReadOnly)) return QString("");
+  if (!openMovieFile(file)) {
+    checkSum.clear();
+    return QString("");
+  }
 
   fileArray = limit10M ? file.read(NAPI_10MB) : file.readAll();
   file.close();

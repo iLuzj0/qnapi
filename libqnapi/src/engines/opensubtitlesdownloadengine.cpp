@@ -58,7 +58,12 @@ QString OpenSubtitlesDownloadEngine::checksum(QString filename) {
   if (filename.isEmpty()) filename = movie;
 
   QFile file(filename);
-  if (!file.open(QIODevice::ReadOnly)) return QString("");
+  if (!openMovieFile(file)) {
+    // do not leave the previous file's hash behind, or the next search would
+    // silently look for the wrong movie
+    checkSum.clear();
+    return QString("");
+  }
 
   fileSize = file.size();
   quint64 hash = fileSize;

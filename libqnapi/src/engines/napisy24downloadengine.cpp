@@ -50,7 +50,10 @@ QString Napisy24DownloadEngine::checksum(QString filename) {
   if (filename.isEmpty()) filename = movie;
 
   QFile file(filename);
-  if (!file.open(QIODevice::ReadOnly)) return QString("");
+  if (!openMovieFile(file)) {
+    checkSum.clear();
+    return QString("");
+  }
 
   fileSize = file.size();
   quint64 hash = fileSize;

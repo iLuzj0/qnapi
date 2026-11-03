@@ -15,6 +15,7 @@
 #include "engines/subtitledownloadengine.h"
 #include <QRandomGenerator>
 #include <QDir>
+#include <QThread>
 #include <QFlags>
 #include <QLoggingCategory>
 #include "subconvert/subtitleformatsregistry.h"
@@ -33,6 +34,24 @@ void SubtitleDownloadEngine::clearSubtitlesList() {
     if (QFile::exists(s.sourceLocation)) QFile::remove(s.sourceLocation);
   }
   subtitlesList.clear();
+}
+
+bool SubtitleDownloadEngine::openMovieFile(QFile& file) const {
+  if (file.open(QIODevice::ReadOnly)) return true;
+
+  // Only a file that exists but refuses to open is worth waiting for; a
+  // genuinely missing file should fail immediately.
+  if (QFileInfo::exists(file.fileName())) {
+    for (int attempt = 0; attempt < 3; ++attempt) {
+      QThread::msleep(250);
+      if (file.open(QIODevice::ReadOnly)) return true;
+    }
+  }
+
+  engineErrorMsg = QObject::tr("Could not open the video file '%1': %2")
+                       .arg(QFileInfo(file.fileName()).fileName(),
+                            file.errorString());
+  return false;
 }
 
 Maybe<SubtitleInfo> SubtitleDownloadEngine::resolveById(QUuid id) {

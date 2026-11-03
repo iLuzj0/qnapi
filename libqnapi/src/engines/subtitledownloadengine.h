@@ -63,6 +63,12 @@ class SubtitleDownloadEngine {
 
   SubtitleDownloadEngine(const QString& tmpPath);
 
+  // Opens the movie file for hashing. A file handed over by Explorer's
+  // "Send to" is often still locked for a moment by an antivirus scan, a
+  // thumbnailer or a media indexer; that used to surface as "no subtitles
+  // found" and made a second run look like a lottery.
+  bool openMovieFile(QFile& file) const;
+
   Maybe<SubtitleInfo> resolveById(QUuid id);
   void updateSubtitleInfo(const SubtitleInfo& si);
 

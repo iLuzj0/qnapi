@@ -65,9 +65,15 @@ void QNapi::clearSubtitlesList() {
 }
 
 void QNapi::checksum() {
+  checksumErrors.clear();
+
   foreach (QSharedPointer<SubtitleDownloadEngine> e, enginesList) {
+    e->clearErrorMessage();
     e->checksum(movie);
+    if (!e->errorMessage().isEmpty()) checksumErrors << e->errorMessage();
   }
+
+  checksumErrors.removeDuplicates();
 }
 
 bool QNapi::lookForSubtitles(QString lang, QString engine) {
@@ -94,7 +100,7 @@ bool QNapi::lookForSubtitles(QString lang, QString engine) {
   if (!result) {
     // distinguish "the search worked and found nothing" from "the search
     // itself failed", which otherwise look identical to the user
-    QStringList reasons = engineErrors;
+    QStringList reasons = checksumErrors + engineErrors;
     reasons.removeDuplicates();
 
     errorMsg = reasons.isEmpty() ? QObject::tr("No subtitles found!")
