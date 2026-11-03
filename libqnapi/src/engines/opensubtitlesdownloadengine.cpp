@@ -212,6 +212,26 @@ bool OpenSubtitlesDownloadEngine::unpack(QUuid id) {
 
   if (!copied || !QFile::exists(subtitlesTmp)) return false;
 
+  // OpenSubtitles answers "200 OK" and then serves a stub telling the user to
+  // log in / go VIP; without this check that stub was saved next to the movie
+  // as if it were the subtitles
+  if (looksLikePlaceholder(subtitlesTmp)) {
+    engineErrorMsg =
+        isAnonymous()
+            ? QObject::tr(
+                  "OpenSubtitles returned a placeholder instead of subtitles "
+                  "because the session is anonymous. Enter your "
+                  "opensubtitles.org account in Options -> OpenSubtitles.")
+            : QObject::tr(
+                  "OpenSubtitles returned a placeholder instead of subtitles "
+                  "for account '%1'. The account is logged in but is not "
+                  "entitled to download this subtitle (VIP membership or a "
+                  "higher download quota may be required).")
+                  .arg(engineConfig.nick());
+    QFile::remove(subtitlesTmp);
+    return false;
+  }
+
   return true;
 }
 
@@ -220,15 +240,60 @@ void OpenSubtitlesDownloadEngine::cleanup() {
   if (QFile::exists(subtitlesTmp)) QFile::remove(subtitlesTmp);
 }
 
+bool OpenSubtitlesDownloadEngine::isAnonymous() const {
+  return engineConfig.nick().trimmed().isEmpty();
+}
+
 bool OpenSubtitlesDownloadEngine::login() {
   QString userAgent = QString("QNapi v%1").arg(qnapiDisplayableVersion);
   QVariantList args;
   args << engineConfig.nick() << engineConfig.password() << language.toLower()
        << userAgent;
-  if (!rpc.request("LogIn", args)) return false;
-  token = (rpc.getResponse().toMap())["token"].toString();
 
-  return !token.isEmpty();
+  if (!rpc.request("LogIn", args)) {
+    engineErrorMsg =
+        rpc.timedOut()
+            ? QObject::tr("OpenSubtitles did not respond in time.")
+            : QObject::tr("Could not reach OpenSubtitles (%1).")
+                  .arg(rpc.getError().toString());
+    return false;
+  }
+
+  const QVariantMap response = rpc.getResponse().toMap();
+  const QString status = response["status"].toString();
+  token = response["token"].toString();
+
+  if (token.isEmpty()) {
+    // the server reports bad credentials as a non-200 status with no token
+    engineErrorMsg =
+        isAnonymous()
+            ? QObject::tr("OpenSubtitles refused an anonymous session (%1).")
+                  .arg(status)
+            : QObject::tr(
+                  "OpenSubtitles rejected the account '%1' (%2). Check the "
+                  "user name and password in Options.")
+                  .arg(engineConfig.nick(), status);
+    return false;
+  }
+
+  return true;
+}
+
+bool OpenSubtitlesDownloadEngine::looksLikePlaceholder(
+    const QString& filePath) const {
+  QFileInfo fi(filePath);
+
+  // the placeholder OpenSubtitles serves instead of real subtitles is a
+  // single short cue; keep the size bound tight so that genuine subtitles
+  // carrying an OpenSubtitles ad line are not mistaken for it
+  if (!fi.exists() || fi.size() > 1024) return false;
+
+  QFile f(filePath);
+  if (!f.open(QIODevice::ReadOnly)) return false;
+  const QString content = QString::fromUtf8(f.readAll()).toLower();
+  f.close();
+
+  return content.contains("osdb.link") || content.contains("vip member");
 }
 
 void OpenSubtitlesDownloadEngine::logout() {

@@ -53,6 +53,10 @@ class OpenSubtitlesDownloadEngine : public SubtitleDownloadEngine {
 
   // sprawdza czy dana instancja klasy jest zalogowana na sewerze
   bool isLogged() { return !token.isEmpty(); }
+  // true when no account is configured, so the session is anonymous
+  bool isAnonymous() const;
+  // detects the stub file served in place of real subtitles
+  bool looksLikePlaceholder(const QString& filePath) const;
   // loguje na serwer OpenSubtitles
   bool login();
   // wylogowuje z serwera
