@@ -14,6 +14,8 @@
 
 #include "qinterprocesschannel_win32.h"
 
+#include <QElapsedTimer>
+
 /*!
     \class QInterProcessChannel
 
@@ -100,20 +102,40 @@ void QInterProcessChannel::sendMessage(const QByteArray& msg) {
 
     HANDLE hPipe;
 
-    // loop to get pipe's handle
+    // The server recreates its single pipe instance after every message, so
+    // there is a short window in which no instance exists and CreateFile fails
+    // with ERROR_FILE_NOT_FOUND. Giving up there silently dropped the request,
+    // which is why sending several files at once sometimes did nothing at all.
+    // Keep trying until the deadline before declaring failure.
+    const int connectTimeoutMsecs = 5000;
+    QElapsedTimer connectDeadline;
+    connectDeadline.start();
+
     for (;;) {
       hPipe = CreateFileA(qPrintable(pipeName), GENERIC_WRITE, 0, NULL,
                           OPEN_EXISTING, 0, NULL);
 
       if (hPipe != INVALID_HANDLE_VALUE) break;
 
-      if (GetLastError() != ERROR_PIPE_BUSY) {
+      const DWORD lastError = GetLastError();
+
+      if (connectDeadline.elapsed() >= connectTimeoutMsecs) {
         ReleaseMutex(mutex);
+        CloseHandle(mutex);
         return;
       }
 
-      // wait max 1s and retry
-      WaitNamedPipeA(qPrintable(pipeName), 1000);
+      if (lastError == ERROR_PIPE_BUSY) {
+        // an instance exists but is serving someone else
+        WaitNamedPipeA(qPrintable(pipeName), 1000);
+      } else if (lastError == ERROR_FILE_NOT_FOUND) {
+        // server is between two CreateNamedPipe calls
+        Sleep(50);
+      } else {
+        ReleaseMutex(mutex);
+        CloseHandle(mutex);
+        return;
+      }
     }
 
     // ok, now we have pipe's handle, we can prepare buffers and write to the
@@ -128,12 +150,15 @@ void QInterProcessChannel::sendMessage(const QByteArray& msg) {
         WriteFile(hPipe, buffer, strlen(buffer) + 1, &bytesWritten, NULL);
 
     if (!writeSuccess) {
+      CloseHandle(hPipe);
       ReleaseMutex(mutex);
+      CloseHandle(mutex);
       return;
     }
 
     CloseHandle(hPipe);
     ReleaseMutex(mutex);
+    CloseHandle(mutex);
   } else {
     // qWarning("::sendMessage(%d): Empty messages are not carried out...",
     // GetCurrentProcessId());
