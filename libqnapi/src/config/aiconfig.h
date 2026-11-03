@@ -36,33 +36,18 @@ class AiConfig {
   static QString defaultLlmModel();
 
  private:
-  bool fallbackEnabled_;
+  bool fallbackEnabled_ = false;
   QString ffmpegPath_;
   QString whisperPath_;
   QString whisperModel_;
   QString llamaServerPath_;
   QString llmModel_;
-  QString sourceLanguage_;
-  int chunkSize_;
+  QString sourceLanguage_ = "en";
+  int chunkSize_ = defaultChunkSize;
+  QString translationGuidelines_;
+  QString llamaServerArgs_;
 
  public:
-  AiConfig()
-      : fallbackEnabled_(false),
-        sourceLanguage_("en"),
-        chunkSize_(defaultChunkSize) {}
-  AiConfig(const bool& fallbackEnabled, const QString& ffmpegPath,
-           const QString& whisperPath, const QString& whisperModel,
-           const QString& llamaServerPath, const QString& llmModel,
-           const QString& sourceLanguage, const int& chunkSize)
-      : fallbackEnabled_(fallbackEnabled),
-        ffmpegPath_(ffmpegPath),
-        whisperPath_(whisperPath),
-        whisperModel_(whisperModel),
-        llamaServerPath_(llamaServerPath),
-        llmModel_(llmModel),
-        sourceLanguage_(sourceLanguage),
-        chunkSize_(chunkSize) {}
-
   bool fallbackEnabled() const { return fallbackEnabled_; }
   QString ffmpegPath() const { return ffmpegPath_; }
   QString whisperPath() const { return whisperPath_; }
@@ -79,38 +64,64 @@ class AiConfig {
                ? chunkSize_
                : defaultChunkSize;
   }
+  // Style rules for the translation, one per line, with {source} and
+  // {target} standing for the language names. Empty selects the built-in
+  // rules, see SubtitleTranslator::defaultGuidelines().
+  QString translationGuidelines() const { return translationGuidelines_; }
+  // appended to llama-server's command line, so they override the defaults
+  // (e.g. "-ngl 20" for a model larger than the GPU's memory, or "--jinja")
+  QString llamaServerArgs() const { return llamaServerArgs_; }
 
   const AiConfig setFallbackEnabled(const bool& fallbackEnabled) const {
-    return AiConfig(fallbackEnabled, ffmpegPath_, whisperPath_, whisperModel_,
-                    llamaServerPath_, llmModel_, sourceLanguage_, chunkSize_);
+    AiConfig c = *this;
+    c.fallbackEnabled_ = fallbackEnabled;
+    return c;
   }
   const AiConfig setFfmpegPath(const QString& ffmpegPath) const {
-    return AiConfig(fallbackEnabled_, ffmpegPath, whisperPath_, whisperModel_,
-                    llamaServerPath_, llmModel_, sourceLanguage_, chunkSize_);
+    AiConfig c = *this;
+    c.ffmpegPath_ = ffmpegPath;
+    return c;
   }
   const AiConfig setWhisperPath(const QString& whisperPath) const {
-    return AiConfig(fallbackEnabled_, ffmpegPath_, whisperPath, whisperModel_,
-                    llamaServerPath_, llmModel_, sourceLanguage_, chunkSize_);
+    AiConfig c = *this;
+    c.whisperPath_ = whisperPath;
+    return c;
   }
   const AiConfig setWhisperModel(const QString& whisperModel) const {
-    return AiConfig(fallbackEnabled_, ffmpegPath_, whisperPath_, whisperModel,
-                    llamaServerPath_, llmModel_, sourceLanguage_, chunkSize_);
+    AiConfig c = *this;
+    c.whisperModel_ = whisperModel;
+    return c;
   }
   const AiConfig setLlamaServerPath(const QString& llamaServerPath) const {
-    return AiConfig(fallbackEnabled_, ffmpegPath_, whisperPath_, whisperModel_,
-                    llamaServerPath, llmModel_, sourceLanguage_, chunkSize_);
+    AiConfig c = *this;
+    c.llamaServerPath_ = llamaServerPath;
+    return c;
   }
   const AiConfig setLlmModel(const QString& llmModel) const {
-    return AiConfig(fallbackEnabled_, ffmpegPath_, whisperPath_, whisperModel_,
-                    llamaServerPath_, llmModel, sourceLanguage_, chunkSize_);
+    AiConfig c = *this;
+    c.llmModel_ = llmModel;
+    return c;
   }
   const AiConfig setSourceLanguage(const QString& sourceLanguage) const {
-    return AiConfig(fallbackEnabled_, ffmpegPath_, whisperPath_, whisperModel_,
-                    llamaServerPath_, llmModel_, sourceLanguage, chunkSize_);
+    AiConfig c = *this;
+    c.sourceLanguage_ = sourceLanguage;
+    return c;
   }
   const AiConfig setChunkSize(const int& chunkSize) const {
-    return AiConfig(fallbackEnabled_, ffmpegPath_, whisperPath_, whisperModel_,
-                    llamaServerPath_, llmModel_, sourceLanguage_, chunkSize);
+    AiConfig c = *this;
+    c.chunkSize_ = chunkSize;
+    return c;
+  }
+  const AiConfig setTranslationGuidelines(
+      const QString& translationGuidelines) const {
+    AiConfig c = *this;
+    c.translationGuidelines_ = translationGuidelines;
+    return c;
+  }
+  const AiConfig setLlamaServerArgs(const QString& llamaServerArgs) const {
+    AiConfig c = *this;
+    c.llamaServerArgs_ = llamaServerArgs;
+    return c;
   }
 
   QString toString() const;

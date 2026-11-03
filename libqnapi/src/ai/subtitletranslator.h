@@ -41,7 +41,13 @@ class SubtitleTranslator {
 
   SubtitleTranslator(const QSharedPointer<LlamaServer>& server,
                      const QString& sourceLanguageName,
-                     const QString& targetLanguageName, int chunkSize);
+                     const QString& targetLanguageName, int chunkSize,
+                     const QString& guidelines = QString());
+
+  // The style rules used when none are configured; the line-per-key rules
+  // that keep the reply parseable are added separately and are not editable.
+  static QString defaultGuidelines(const QString& sourceLanguageName,
+                                   const QString& targetLanguageName);
 
   // title: shown to the model as context (names, register); typically the
   // movie file's name. progress is called with (cues done, cues total).
@@ -72,6 +78,7 @@ class SubtitleTranslator {
   QString sourceLanguageName;
   QString targetLanguageName;
   int chunkSize;
+  QString guidelines;
   mutable int untranslated = 0;
 };
 

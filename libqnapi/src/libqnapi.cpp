@@ -159,14 +159,16 @@ QSharedPointer<LlamaServer> LibQNapi::llamaServer(const AiConfig& config,
   return QSharedPointer<LlamaServer>(new LlamaServer(
       resolveAiPath(config.llamaServerPath(),
                     AiConfig::defaultLlamaServerPath()),
-      resolveAiPath(config.llmModel(), AiConfig::defaultLlmModel()), logPath));
+      resolveAiPath(config.llmModel(), AiConfig::defaultLlmModel()), logPath,
+      config.llamaServerArgs()));
 }
 
 QSharedPointer<const SubtitleTranslator> LibQNapi::subtitleTranslator(
     const QSharedPointer<LlamaServer>& server, const AiConfig& config,
     const QString& sourceLanguage, const QString& targetLanguage) {
   return QSharedPointer<const SubtitleTranslator>(new SubtitleTranslator(
-      server, sourceLanguage, targetLanguage, config.chunkSize()));
+      server, sourceLanguage, targetLanguage, config.chunkSize(),
+      config.translationGuidelines()));
 }
 
 QSharedPointer<const BatchDownloader> LibQNapi::batchDownloader(

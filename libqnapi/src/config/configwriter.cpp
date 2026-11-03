@@ -130,4 +130,7 @@ void ConfigWriter::writeAiConfig(const AiConfig& aiConfig,
   settings.setValue("ai/llm_model", aiConfig.llmModel());
   settings.setValue("ai/source_language", aiConfig.sourceLanguage());
   settings.setValue("ai/chunk_size", aiConfig.chunkSize());
+  settings.setValue("ai/translation_guidelines",
+                    aiConfig.translationGuidelines());
+  settings.setValue("ai/llama_server_args", aiConfig.llamaServerArgs());
 }

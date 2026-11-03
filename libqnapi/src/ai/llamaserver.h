@@ -34,8 +34,9 @@ class LlamaServer {
   static const int requestTimeoutMsecs = 5 * 60 * 1000;
   static const int contextSize = 8192;
 
+  // extraArgs: appended to the command line, so they override the defaults
   LlamaServer(const QString& serverPath, const QString& modelPath,
-              const QString& logPath);
+              const QString& logPath, const QString& extraArgs = QString());
   ~LlamaServer();
 
   QString serverPath() const { return server; }
@@ -59,6 +60,7 @@ class LlamaServer {
   QString server;
   QString model;
   QString logPath;
+  QString extraArgs;
   QString baseUrl;
   QProcess* process;
 };

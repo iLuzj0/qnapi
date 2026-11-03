@@ -26,10 +26,11 @@
 #include "utils/synchttp.h"
 
 LlamaServer::LlamaServer(const QString& serverPath, const QString& modelPath,
-                         const QString& logPath)
+                         const QString& logPath, const QString& extraArgs)
     : server(serverPath),
       model(modelPath),
       logPath(logPath),
+      extraArgs(extraArgs),
       process(nullptr) {}
 
 LlamaServer::~LlamaServer() { stop(); }
@@ -64,9 +65,10 @@ Either<AiError, QString> LlamaServer::start() {
     return AiError{QObject::tr("No free local port for llama-server")};
   }
 
-  const QStringList args = {
+  QStringList args = {
       "-m", model, "--host", "127.0.0.1", "--port", QString::number(port),
-      // everything on the GPU; the model fits in 12 GB
+      // everything on the GPU; a model larger than its memory needs a lower
+      // -ngl in the extra arguments
       "-ngl", "999", "-c", QString::number(contextSize), "-np", "1", "-fa",
       "auto",
       // The built-in templates, picked by matching the model's own template.
@@ -74,6 +76,10 @@ Either<AiError, QString> LlamaServer::start() {
       // prompt into the JSON grammar, which Bielik's tokenizer cannot match,
       // so every schema-constrained request fails.
       "--no-jinja", "--no-webui"};
+  // llama.cpp takes the last occurrence of an option, so these override the
+  // defaults above; "--jinja" re-enables the template engine for models whose
+  // template llama.cpp does not recognise
+  args << QProcess::splitCommand(extraArgs);
 
   process = new QProcess();
   process->setProcessChannelMode(QProcess::MergedChannels);

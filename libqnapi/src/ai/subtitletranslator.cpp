@@ -21,11 +21,12 @@
 SubtitleTranslator::SubtitleTranslator(
     const QSharedPointer<LlamaServer>& server,
     const QString& sourceLanguageName, const QString& targetLanguageName,
-    int chunkSize)
+    int chunkSize, const QString& guidelines)
     : server(server),
       sourceLanguageName(sourceLanguageName),
       targetLanguageName(targetLanguageName),
-      chunkSize(qMax(1, chunkSize)) {}
+      chunkSize(qMax(1, chunkSize)),
+      guidelines(guidelines) {}
 
 Either<AiError, SrtCueList> SubtitleTranslator::translate(
     const SrtCueList& source, const QString& title,
@@ -226,20 +227,15 @@ bool SubtitleTranslator::looksValid(const QStringList& source,
 }
 
 bool SubtitleTranslator::polishPrompt() const {
-  // Bielik is trained mostly on Polish and follows Polish instructions more
+  // Polish-trained models such as Bielik follow Polish instructions more
   // faithfully (idioms, register) than the same instructions in English
   return sourceLanguageName == "English" && targetLanguageName == "Polish";
 }
 
-QString SubtitleTranslator::systemPrompt(const QString& title) const {
-  if (polishPrompt()) {
-    QString prompt = QString::fromUtf8(
-        "Jesteś doświadczonym tłumaczem napisów do filmów i seriali. "
-        "Tłumaczysz napisy z angielskiego na polski.\n"
-        "Zasady:\n"
-        "- Przetłumacz każdą linię, zachowując jej klucz. Każde tłumaczenie "
-        "zawiera wyłącznie treść swojej linii: nie przenoś słów między "
-        "liniami, nie łącz ani nie dziel linii.\n"
+QString SubtitleTranslator::defaultGuidelines(
+    const QString& sourceLanguageName, const QString& targetLanguageName) {
+  if (sourceLanguageName == "English" && targetLanguageName == "Polish") {
+    return QString::fromUtf8(
         "- Pisz naturalną, potoczną polszczyzną, tak jak zawodowy tłumacz "
         "napisów, a nie dosłownie. Tłumaczenie ma być zwięzłe, żeby dało się "
         "je przeczytać na ekranie.\n"
@@ -250,34 +246,56 @@ QString SubtitleTranslator::systemPrompt(const QString& title) const {
         "kontekstem.\n"
         "- Tekst pochodzi z automatycznego rozpoznawania mowy i może zawierać "
         "drobne błędy; tłumacz to, co najprawdopodobniej zostało "
-        "powiedziane.\n"
-        "- Zwróć wyłącznie obiekt JSON.");
+        "powiedziane.");
+  }
+
+  return QString(
+      "- Write natural, idiomatic, colloquial {target}, as a professional "
+      "subtitler would - not a word-for-word translation. Keep it short "
+      "enough to read on screen.\n"
+      "- Translate jokes, idioms and slang by meaning, keeping their tone.\n"
+      "- Do not translate personal names. Use grammatical gender consistent "
+      "with the context.\n"
+      "- The text comes from speech recognition and may contain small "
+      "errors; translate what was most likely said.");
+}
+
+QString SubtitleTranslator::systemPrompt(const QString& title) const {
+  QString rules =
+      guidelines.trimmed().isEmpty()
+          ? defaultGuidelines(sourceLanguageName, targetLanguageName)
+          : guidelines.trimmed();
+  rules.replace("{source}", sourceLanguageName)
+      .replace("{target}", targetLanguageName);
+
+  // The line-per-key rules are what keeps the reply parseable and the cues in
+  // sync, so they stay outside the editable guidelines.
+  QString prompt;
+  if (polishPrompt()) {
+    prompt = QString::fromUtf8(
+                 "Jesteś doświadczonym tłumaczem napisów do filmów i seriali. "
+                 "Tłumaczysz napisy z angielskiego na polski.\n"
+                 "Zasady:\n"
+                 "- Przetłumacz każdą linię, zachowując jej klucz. Każde "
+                 "tłumaczenie zawiera wyłącznie treść swojej linii: nie "
+                 "przenoś słów między liniami, nie łącz ani nie dziel "
+                 "linii.\n") +
+             rules + QString::fromUtf8("\n- Zwróć wyłącznie obiekt JSON.");
     if (!title.isEmpty()) {
       prompt += QString::fromUtf8("\n\nNapisy pochodzą z: %1").arg(title);
     }
     return prompt;
   }
 
-  QString prompt =
-      QString(
-          "You are an experienced subtitle translator. Translate film and "
-          "TV subtitles from %1 into %2.\n"
-          "Rules:\n"
-          "- Translate every line, keeping its key. Each translation must "
-          "contain only the content of its own line: never move words "
-          "between lines, never merge or split lines.\n"
-          "- Write natural, idiomatic, colloquial %2, as a professional "
-          "subtitler would - not a word-for-word translation. Keep it "
-          "short enough to read on screen.\n"
-          "- Translate jokes, idioms and slang by meaning, keeping their "
-          "tone.\n"
-          "- Do not translate personal names. Use grammatical gender "
-          "consistent with the context.\n"
-          "- The text comes from speech recognition and may contain small "
-          "errors; translate what was most likely said.\n"
-          "- Output only the JSON object.")
-          .arg(sourceLanguageName, targetLanguageName);
-
+  prompt = QString(
+               "You are an experienced subtitle translator. Translate film "
+               "and TV subtitles from %1 into %2.\n"
+               "Rules:\n"
+               "- Translate every line, keeping its key. Each translation "
+               "must contain only the content of its own line: never move "
+               "words between lines, never merge or split lines.\n")
+               .arg(sourceLanguageName, targetLanguageName) +
+           rules + "\n- Output only the JSON object.";
   if (!title.isEmpty()) {
     prompt += QString("\n\nThe subtitles are from: %1").arg(title);
   }

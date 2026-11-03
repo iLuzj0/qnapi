@@ -232,13 +232,19 @@ const GeneralConfig ConfigReader::resolveTmpPath(
 
 
 const AiConfig ConfigReader::readAiConfig(const QSettings& settings) const {
-  return AiConfig(
-      settings.value("ai/fallback", false).toBool(),
-      settings.value("ai/ffmpeg_path", "").toString(),
-      settings.value("ai/whisper_path", "").toString(),
-      settings.value("ai/whisper_model", "").toString(),
-      settings.value("ai/llama_server_path", "").toString(),
-      settings.value("ai/llm_model", "").toString(),
-      settings.value("ai/source_language", "en").toString(),
-      settings.value("ai/chunk_size", AiConfig::defaultChunkSize).toInt());
+  return AiConfig()
+      .setFallbackEnabled(settings.value("ai/fallback", false).toBool())
+      .setFfmpegPath(settings.value("ai/ffmpeg_path", "").toString())
+      .setWhisperPath(settings.value("ai/whisper_path", "").toString())
+      .setWhisperModel(settings.value("ai/whisper_model", "").toString())
+      .setLlamaServerPath(
+          settings.value("ai/llama_server_path", "").toString())
+      .setLlmModel(settings.value("ai/llm_model", "").toString())
+      .setSourceLanguage(settings.value("ai/source_language", "en").toString())
+      .setChunkSize(
+          settings.value("ai/chunk_size", AiConfig::defaultChunkSize).toInt())
+      .setTranslationGuidelines(
+          settings.value("ai/translation_guidelines", "").toString())
+      .setLlamaServerArgs(
+          settings.value("ai/llama_server_args", "").toString());
 }

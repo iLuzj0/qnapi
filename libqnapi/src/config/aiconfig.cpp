@@ -51,6 +51,9 @@ QString AiConfig::toString() const {
                   << "llamaServerPath: " << llamaServerPath() << Qt::endl
                   << "llmModel: " << llmModel() << Qt::endl
                   << "sourceLanguage: " << sourceLanguage() << Qt::endl
-                  << "chunkSize: " << chunkSize() << Qt::endl;
+                  << "chunkSize: " << chunkSize() << Qt::endl
+                  << "translationGuidelines: " << translationGuidelines()
+                  << Qt::endl
+                  << "llamaServerArgs: " << llamaServerArgs() << Qt::endl;
   return s;
 }
