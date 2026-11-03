@@ -35,6 +35,7 @@ class GetThread : public QNapiThread {
   Q_OBJECT
 
   friend class GuiBatchListener;
+  friend class GuiAiListener;
 
  public:
   GetThread();
@@ -45,6 +46,7 @@ class GetThread : public QNapiThread {
   void progressChange(int current, int all, float stageProgress);
   void criticalError(const QString &message);
   void selectSubtitles(QString fileName, SubtitleInfoList subtitles);
+  void aiPhaseStarted();
 
  private slots:
   void setCriticalMessage(const QString &msg) { criticalMessage = msg; }
@@ -67,6 +69,8 @@ class GetThread : public QNapiThread {
   Maybe<QString> specificEngine;
   QList<SubtitleInfo> subStatusList;
   QString criticalMessage;
+  // shown after the summary, e.g. when the AI tools could not be found
+  QString aiWarning;
   QNapiConfig config;
 
  private:
@@ -106,6 +110,7 @@ class frmProgress : public QWidget {
   void updateProgress(int current, int all, float stageProgress);
   void selectSubtitles(QString fileName, SubtitleInfoList subtitles);
   void downloadFinished();
+  void startAiPhase() { aiPhase = true; }
 
  private:
   void closeEvent(QCloseEvent *event);
@@ -118,6 +123,7 @@ class frmProgress : public QWidget {
   frmSummary summary;
 
   bool batchMode, showSummary, closeRequested;
+  bool aiPhase = false;
   QMutex mutex;
 };
 

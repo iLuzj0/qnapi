@@ -25,7 +25,9 @@
 
 #include <QMutexLocker>
 #include <QThread>
+#include <QMap>
 #include "batchdownloader.h"
+#include "subtitlelanguage.h"
 #include "qnapiapp.h"
 
 frmProgress::frmProgress(QWidget *parent, Qt::WindowFlags f)
@@ -50,6 +52,7 @@ frmProgress::frmProgress(QWidget *parent, Qt::WindowFlags f)
   connect(this, SIGNAL(subtitlesSelected(int)), &getThread,
           SLOT(subtitlesSelected(int)));
   connect(&getThread, SIGNAL(finished()), this, SLOT(downloadFinished()));
+  connect(&getThread, SIGNAL(aiPhaseStarted()), this, SLOT(startAiPhase()));
 
   QRect position = frameGeometry();
   position.moveCenter(QGuiApplication::primaryScreen()->availableGeometry().center());
@@ -113,6 +116,7 @@ bool frmProgress::download(const QNapiConfig &config) {
 
   showSummary = true;
   closeRequested = false;
+  aiPhase = false;
   ui.pbCancel->setEnabled(true);
 
   getThread.setConfig(config);
@@ -132,10 +136,11 @@ void frmProgress::updateProgress(int current, int all, float stageProgress) {
   if (stageProgress >= 0) lastStageProgress = stageProgress;
 
   QString windowTitle =
-      (lastAll > 1) ? QString(tr("QNapi - downloading subtitles (%1/%2)"))
-                          .arg(lastCurrent + 1)
-                          .arg(lastAll)
-                    : QString(tr("QNapi - downloading subtitles..."));
+      aiPhase ? tr("QNapi - generating subtitles with AI...")
+      : (lastAll > 1) ? QString(tr("QNapi - downloading subtitles (%1/%2)"))
+                            .arg(lastCurrent + 1)
+                            .arg(lastAll)
+                      : QString(tr("QNapi - downloading subtitles..."));
   setWindowTitle(windowTitle);
 
   ui.pbProgress->setMaximum(lastAll * 100);
@@ -173,6 +178,9 @@ void frmProgress::downloadFinished() {
     } else if (queue.size() > 0 && !getThread.subStatusList.isEmpty()) {
       summary.setSummaryList(getThread.subStatusList);
       summary.exec();
+    }
+    if (!getThread.aiWarning.isEmpty()) {
+      QMessageBox::warning(0, tr("AI subtitles"), getThread.aiWarning);
     }
   }
 
@@ -419,6 +427,93 @@ class GuiBatchListener : public BatchDownloadListener {
   QMutex mutex;
 };
 
+// Drives the progress window through the two AI phases: every file is
+// transcribed first, then the model is loaded once and translates them all.
+class GuiAiListener : public AiGenerationListener {
+ public:
+  GuiAiListener(GetThread &thread, const QStringList &paths)
+      : t(thread), paths(paths), count(paths.size()) {}
+
+  QMap<QString, AiFileResult> results;
+  QStringList missingTools;
+  QString failure;
+
+  void started(int fileCount, const QString &targetLanguageName) override {
+    emit t.aiPhaseStarted();
+    emit t.fileNameChange(QString());
+    emit t.actionChange(
+        GetThread::tr("Generating %1 subtitles for %n file(s)...", "",
+                      fileCount)
+            .arg(targetLanguageName));
+    emit t.progressChange(0, 2 * count, 0.0f);
+  }
+
+  void toolsMissing(const QStringList &paths) override { missingTools = paths; }
+
+  void transcriptionStarted(int index) override {
+    emit t.fileNameChange(name(index));
+    emit t.actionChange(GetThread::tr("Transcribing the audio (%1/%2)...")
+                            .arg(index + 1)
+                            .arg(count));
+    emit t.progressChange(index, 2 * count, 0.0f);
+  }
+
+  void transcriptionProgress(int index, int percent) override {
+    emit t.actionChange(GetThread::tr("Transcribing the audio (%1/%2): %3%")
+                            .arg(index + 1)
+                            .arg(count)
+                            .arg(percent));
+    emit t.progressChange(index, 2 * count, percent / 100.0f);
+  }
+
+  void transcriptionFinished(int index, int lines, const QString &error,
+                             qint64 msecs) override {
+    Q_UNUSED(msecs)
+    if (lines == 0) results[paths[index]].error = error;
+  }
+
+  void modelLoading() override {
+    emit t.fileNameChange(QString());
+    emit t.actionChange(GetThread::tr("Loading the translation model..."));
+    emit t.progressChange(count, 2 * count, 0.0f);
+  }
+
+  void modelFailed(const QString &error, const QString &logPath) override {
+    failure = error + "\n" + QDir::toNativeSeparators(logPath);
+  }
+
+  void translationStarted(int index) override {
+    emit t.fileNameChange(name(index));
+    emit t.actionChange(GetThread::tr("Translating (%1/%2)...")
+                            .arg(index + 1)
+                            .arg(count));
+    emit t.progressChange(count + index, 2 * count, 0.0f);
+  }
+
+  void translationProgress(int index, int done, int total) override {
+    emit t.actionChange(GetThread::tr("Translating (%1/%2): line %3 of %4")
+                            .arg(index + 1)
+                            .arg(count)
+                            .arg(done)
+                            .arg(total));
+    emit t.progressChange(count + index, 2 * count,
+                          total > 0 ? float(done) / total : 0.0f);
+  }
+
+  void translationFinished(int index, const AiFileResult &result) override {
+    results[paths[index]] = result;
+  }
+
+  bool abortRequested() const override { return t.abortRequested(); }
+
+ private:
+  QString name(int index) const { return QFileInfo(paths[index]).fileName(); }
+
+  GetThread &t;
+  const QStringList paths;
+  const int count;
+};
+
 namespace {
 
 SubtitleInfo summaryEntry(const QString &moviePath, const DownloadOutcome &o) {
@@ -452,6 +547,7 @@ SubtitleInfo summaryEntry(const QString &moviePath, const DownloadOutcome &o) {
 void GetThread::run() {
   abort = false;
   criticalMessage.clear();
+  aiWarning.clear();
   subStatusList.clear();
 
   const auto downloader = LibQNapi::batchDownloader(config, specificEngine);
@@ -475,8 +571,52 @@ void GetThread::run() {
     if (abort) return;
   }
 
+  QMap<QString, AiFileResult> aiResults;
+  if (config.aiConfig().fallbackEnabled()) {
+    const auto generator = LibQNapi::aiSubtitleGenerator(config);
+    const QStringList aiQueue =
+        generator->filesNeedingSubtitles(paths, outcomes, nullptr);
+    if (!aiQueue.isEmpty()) {
+      GuiAiListener listener(*this, aiQueue);
+      generator->generate(aiQueue, listener);
+      if (abort) return;
+
+      aiResults = listener.results;
+      if (!listener.missingTools.isEmpty()) {
+        QStringList missing;
+        foreach (const QString &path, listener.missingTools) {
+          missing << QDir::toNativeSeparators(path);
+        }
+        aiWarning = tr("AI subtitles could not be generated, these files "
+                       "were not found:") +
+                    "\n\n" + missing.join("\n") + "\n\n" +
+                    tr("Check the paths on the AI subtitles tab in Settings.");
+      } else if (!listener.failure.isEmpty()) {
+        aiWarning = tr("The translation model could not be started:") +
+                    "\n\n" + listener.failure;
+      }
+    }
+  }
+
+  const QString target =
+      SubtitleLanguage(config.generalConfig().language()).toTwoLetter();
+
   for (int i = 0; i < paths.size(); ++i) {
-    if (outcomes[i].processed)
-      subStatusList << summaryEntry(paths[i], outcomes[i]);
+    if (!outcomes[i].processed) continue;
+
+    SubtitleInfo entry = summaryEntry(paths[i], outcomes[i]);
+    if (aiResults.contains(paths[i])) {
+      const AiFileResult &ai = aiResults[paths[i]];
+      if (ai.saved) {
+        entry = SubtitleInfo(target, "AI", paths[i],
+                             QFileInfo(paths[i]).completeBaseName() + " " +
+                                 tr("(generated by AI)"),
+                             "", "srt", SUBTITLE_UNKNOWN);
+      } else if (!ai.error.isEmpty()) {
+        if (!entry.comment.isEmpty()) entry.comment += "; ";
+        entry.comment += tr("AI: %1").arg(ai.error);
+      }
+    }
+    subStatusList << entry;
   }
 }
