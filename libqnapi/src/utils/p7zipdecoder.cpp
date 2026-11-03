@@ -23,6 +23,11 @@ P7ZipDecoder::P7ZipDecoder(const QString& p7zipPath, int operationTimeoutMsecs)
 QStringList P7ZipDecoder::listArchiveFiles(const QString& archivePath) const {
   QString stdoutBuff = readP7ZipOutput({"l", "-slt", archivePath});
 
+  // The -slt header block carries a "Path = " line naming the archive
+  // itself; the archived entries only start after a line of dashes.
+  const int entriesStart = stdoutBuff.indexOf("----------");
+  if (entriesStart >= 0) stdoutBuff = stdoutBuff.mid(entriesStart);
+
 #ifdef Q_OS_WIN
   QRegExp r("\r\nPath = ([^\r\n]*)\r\n");
 #else
@@ -62,18 +67,32 @@ bool P7ZipDecoder::runP7Zip(const QStringList& args) const {
   QProcess p7zip;
   p7zip.start(p7zipPath, args);
 
-  bool result = p7zip.waitForFinished(operationTimeoutMsecs);
+  if (!p7zip.waitForFinished(operationTimeoutMsecs)) {
+    // do not leave the process running behind us
+    p7zip.kill();
+    p7zip.waitForFinished();
+    p7zip.close();
+    return false;
+  }
+
+  // waitForFinished() only reports that the process ended; 7-Zip signals
+  // failure through its exit code (0 = ok, 1 = non-fatal warning)
+  const bool succeeded = p7zip.exitStatus() == QProcess::NormalExit &&
+                         p7zip.exitCode() <= 1;
 
   p7zip.close();
 
-  return result;
+  return succeeded;
 }
 
 QString P7ZipDecoder::readP7ZipOutput(const QStringList& args) const {
   QProcess p7zip;
   p7zip.start(p7zipPath, args);
 
-  p7zip.waitForFinished(operationTimeoutMsecs);
+  if (!p7zip.waitForFinished(operationTimeoutMsecs)) {
+    p7zip.kill();
+    p7zip.waitForFinished();
+  }
 
   QString stdoutBuff = QByteArray(p7zip.readAll());
 
