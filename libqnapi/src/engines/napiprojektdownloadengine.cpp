@@ -86,6 +86,8 @@ QString NapiProjektDownloadEngine::checksum(QString filename) {
 }
 
 bool NapiProjektDownloadEngine::lookForSubtitles(QString lang) {
+  throttleRequests();
+
   Maybe<QString> tmpPackedFileOpt = downloadByLangAndChecksum(lang, checkSum);
 
   if (!tmpPackedFileOpt) {

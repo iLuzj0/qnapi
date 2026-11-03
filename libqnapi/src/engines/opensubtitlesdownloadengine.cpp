@@ -85,6 +85,8 @@ QString OpenSubtitlesDownloadEngine::checksum(QString filename) {
 // szuka napisow
 bool OpenSubtitlesDownloadEngine::lookForSubtitles(QString lang) {
   if (checkSum.isEmpty()) return false;
+
+  throttleRequests();
   if (!isLogged() && !login()) return false;
 
   QVariantMap paramsMap;

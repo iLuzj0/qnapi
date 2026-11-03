@@ -22,6 +22,8 @@
 #include <QMessageBox>
 #include <QSystemTrayIcon>
 #include "libqnapi.h"
+
+#include <QThread>
 #include "qnapiapp.h"
 
 frmProgress::frmProgress(QWidget *parent, Qt::WindowFlags f)
@@ -286,6 +288,26 @@ void GetThread::run() {
     bool found = false;
     SearchPolicy sp = config.generalConfig().searchPolicy();
 
+    // The services throttle bursts of requests and answer them as "no
+    // subtitles", so a whole-season batch used to report almost every file as
+    // missing while running the same files again found them. Retry after a
+    // pause instead of making the user do it by hand.
+    for (int attempt = 0; attempt <= QNapi::maxSearchRetries && !found;
+         ++attempt) {
+      if (attempt > 0) {
+        emit actionChange(
+            tr("Nothing found, retrying in %1 s (%2/%3)...")
+                .arg(QNapi::searchRetryDelayMsecs / 1000)
+                .arg(attempt)
+                .arg(QNapi::maxSearchRetries));
+
+        QThread::msleep(QNapi::searchRetryDelayMsecs);
+
+        ABORT_POINT
+
+        napi.clearSubtitlesList();
+      }
+
     if (sp == SP_SEARCH_ALL_WITH_BACKUP_LANG) {
       foreach (QString e, napi.listLoadedEngines()) {
         emit progressChange(i, queue.size(), 0.4f);
@@ -329,6 +351,7 @@ void GetThread::run() {
           ABORT_POINT
         }
       }
+    }
     }
 
     if (!found) {

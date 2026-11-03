@@ -75,6 +75,8 @@ QString Napisy24DownloadEngine::checksum(QString filename) {
 bool Napisy24DownloadEngine::lookForSubtitles(QString lang) {
   if (lang != "pl") return false;
 
+  throttleRequests();
+
   const QUrl url = QUrl("http://napisy24.pl/run/CheckSubAgent.php");
 
   auto credentials = getCredentials();

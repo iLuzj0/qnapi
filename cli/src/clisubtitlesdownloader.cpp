@@ -16,6 +16,7 @@
 #include "qnapi.h"
 
 #include <QFileInfo>
+#include <QThread>
 #include <iostream>
 
 namespace CliSubtitlesDownloader {
@@ -48,10 +49,9 @@ int configChecks(const Console& c, const QNapiConfig& config) {
   return EC_OK;
 }
 
-bool findSubtitles(const Console& c, const QNapiConfig& config, QNapi& napi) {
+bool findSubtitlesOnce(const Console& c, const QNapiConfig& config,
+                       QNapi& napi) {
   bool found = false;
-  c.printLineOrdinary(tr("Calculating checksums..."));
-  napi.checksum();
 
   SearchPolicy sp = config.generalConfig().searchPolicy();
   QString lang = config.generalConfig().language();
@@ -86,6 +86,29 @@ bool findSubtitles(const Console& c, const QNapiConfig& config, QNapi& napi) {
         if (sp == SP_BREAK_IF_FOUND && found) break;
       }
     }
+  }
+
+  return found;
+}
+
+bool findSubtitles(const Console& c, const QNapiConfig& config, QNapi& napi) {
+  c.printLineOrdinary(tr("Calculating checksums..."));
+  napi.checksum();
+
+  bool found = findSubtitlesOnce(c, config, napi);
+
+  for (int attempt = 1; !found && attempt <= QNapi::maxSearchRetries;
+       ++attempt) {
+    c.printLineOrdinary(
+        tr("Nothing found - the service may be throttling us, retrying in %1 "
+           "s (%2/%3)...")
+            .arg(QNapi::searchRetryDelayMsecs / 1000)
+            .arg(attempt)
+            .arg(QNapi::maxSearchRetries));
+
+    QThread::msleep(QNapi::searchRetryDelayMsecs);
+    napi.clearSubtitlesList();
+    found = findSubtitlesOnce(c, config, napi);
   }
 
   return found;

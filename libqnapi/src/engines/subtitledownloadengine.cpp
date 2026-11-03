@@ -15,6 +15,8 @@
 #include "engines/subtitledownloadengine.h"
 #include <QRandomGenerator>
 #include <QDir>
+#include <QElapsedTimer>
+#include <QMutex>
 #include <QThread>
 #include <QFlags>
 #include <QLoggingCategory>
@@ -34,6 +36,22 @@ void SubtitleDownloadEngine::clearSubtitlesList() {
     if (QFile::exists(s.sourceLocation)) QFile::remove(s.sourceLocation);
   }
   subtitlesList.clear();
+}
+
+void SubtitleDownloadEngine::throttleRequests() const {
+  static QMutex mutex;
+  static QElapsedTimer sinceLastRequest;
+
+  QMutexLocker locker(&mutex);
+
+  if (sinceLastRequest.isValid()) {
+    const qint64 elapsed = sinceLastRequest.elapsed();
+    if (elapsed >= 0 && elapsed < minRequestIntervalMsecs) {
+      QThread::msleep(minRequestIntervalMsecs - elapsed);
+    }
+  }
+
+  sinceLastRequest.restart();
 }
 
 bool SubtitleDownloadEngine::openMovieFile(QFile& file) const {

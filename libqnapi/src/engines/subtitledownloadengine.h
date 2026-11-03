@@ -69,6 +69,14 @@ class SubtitleDownloadEngine {
   // found" and made a second run look like a lottery.
   bool openMovieFile(QFile& file) const;
 
+  // The subtitle services throttle bursts of requests coming from one IP and
+  // answer them as "no subtitles", which is indistinguishable from a genuine
+  // miss. Downloading a whole season in one go therefore reported almost every
+  // file as not found, while retrying the same files one by one worked. Space
+  // outgoing searches out across all engines and both frontends.
+  static const int minRequestIntervalMsecs = 1500;
+  void throttleRequests() const;
+
   Maybe<SubtitleInfo> resolveById(QUuid id);
   void updateSubtitleInfo(const SubtitleInfo& si);
 

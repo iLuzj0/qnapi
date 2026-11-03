@@ -28,6 +28,13 @@
 
 class QNapi {
  public:
+  // The subtitle services throttle bursts and answer them as "no subtitles",
+  // so a whole-season batch reported most files as missing while running the
+  // same files again found them. Retrying after a pause is exactly what a user
+  // does by hand; do it automatically instead.
+  static const int maxSearchRetries = 2;
+  static const int searchRetryDelayMsecs = 5000;
+
   QNapi(const QNapiConfig& config,
         const Maybe<QString>& specificEngine = nothing());
   ~QNapi();
