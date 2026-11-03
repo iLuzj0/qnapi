@@ -28,7 +28,36 @@
        <string>General</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout">
-       <item row="10" column="0" colspan="3">
+       <item row="6" column="0">
+        <widget class="QLabel" name="lbLangSuffix">
+         <property name="text">
+          <string>Language code in file names:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="1" colspan="2">
+        <widget class="QComboBox" name="cbLangSuffix">
+         <property name="toolTip">
+          <string>Media servers such as Jellyfin, Plex and Emby find external subtitles by the language code in their name (Movie.pol.srt)</string>
+         </property>
+         <item>
+          <property name="text">
+           <string>None (Movie.srt)</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Two letters (Movie.pl.srt)</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Three letters (Movie.pol.srt)</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="11" column="0" colspan="3">
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -41,7 +70,7 @@
          </property>
         </spacer>
        </item>
-       <item row="7" column="0" colspan="3">
+       <item row="8" column="0" colspan="3">
         <widget class="QCheckBox" name="cbQuietBatch">
          <property name="toolTip">
           <string>Do not show any windows while retrieving subtitles in command-line</string>
@@ -88,14 +117,14 @@
          </property>
         </widget>
        </item>
-       <item row="8" column="0" colspan="2">
+       <item row="9" column="0" colspan="2">
         <widget class="QCheckBox" name="cbChangePermissions">
          <property name="text">
           <string>Subtitles file permissions: </string>
          </property>
         </widget>
        </item>
-       <item row="8" column="2">
+       <item row="9" column="2">
         <layout class="QHBoxLayout" name="_2">
          <property name="spacing">
           <number>6</number>
@@ -157,7 +186,7 @@
          </item>
         </layout>
        </item>
-       <item row="9" column="0" colspan="3">
+       <item row="10" column="0" colspan="3">
         <widget class="QCheckBox" name="cbShowDockIcon">
          <property name="text">
           <string>Show icon in the system tray (requires application restart)</string>
@@ -209,7 +238,7 @@
          </property>
         </widget>
        </item>
-       <item row="6" column="0" colspan="3">
+       <item row="7" column="0" colspan="3">
         <widget class="QCheckBox" name="cbNoBackup">
          <property name="text">
           <string>Do not create a copy of existing subtitles. Overwrite them without confirmation.</string>
@@ -281,6 +310,26 @@
        <string>Subtitles download engines</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_2">
+       <item row="13" column="0">
+        <widget class="QLabel" name="lbJobs">
+         <property name="text">
+          <string>Files processed at the same time:</string>
+         </property>
+         <property name="toolTip">
+          <string>The services block requests that arrive one after another but let several at once through, so a whole season is much faster in parallel. Only used when no list of subtitles has to be shown, or when it may be shown for several files at once.</string>
+         </property>
+        </widget>
+       </item>
+       <item row="14" column="0">
+        <widget class="QSpinBox" name="sbJobs">
+         <property name="minimum">
+          <number>1</number>
+         </property>
+         <property name="maximum">
+          <number>8</number>
+         </property>
+        </widget>
+       </item>
        <item row="0" column="0">
         <widget class="QLabel" name="lbAvailableEngines">
          <property name="text">

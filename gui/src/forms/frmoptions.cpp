@@ -354,7 +354,10 @@ void frmOptions::writeConfig() {
           .setDownloadPolicy(
               static_cast<DownloadPolicy>(ui.cbDownloadPolicy->currentIndex()))
           .setChangePermissionsEnabled(ui.cbChangePermissions->isChecked())
-          .setChangePermissionsTo(permissions);
+          .setChangePermissionsTo(permissions)
+          .setLanguageSuffix(
+              static_cast<LanguageSuffix>(ui.cbLangSuffix->currentIndex()))
+          .setJobs(ui.sbJobs->value());
 
   QList<QPair<QString, bool> > updatedEnabledEngines;
   for (int i = 0; i < ui.twEngines->rowCount(); ++i) {
@@ -419,8 +422,11 @@ void frmOptions::readConfig(const QNapiConfig &config) {
       SubtitleLanguage(config.generalConfig().language()).toTwoLetter()));
   ui.cbLangBackup->setCurrentIndex(ui.cbLangBackup->findData(
       SubtitleLanguage(config.generalConfig().backupLanguage()).toTwoLetter()));
+  ui.cbLangSuffix->setCurrentIndex(config.generalConfig().languageSuffix());
   ui.cbNoBackup->setChecked(config.generalConfig().noBackup());
   ui.cbQuietBatch->setChecked(config.generalConfig().quietBatch());
+  ui.sbJobs->setMaximum(GeneralConfig::maxJobs);
+  ui.sbJobs->setValue(config.generalConfig().jobs());
 
   ui.twEngines->clear();
 

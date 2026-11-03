@@ -21,6 +21,7 @@
 #include "Maybe.h"
 #include "guimain.h"
 #include "libqnapi.h"
+#include "parser/aifallbackargparser.h"
 #include "parser/backuplangargparser.h"
 #include "parser/cliargparser.h"
 #include "parser/cliargparsersexecutor.h"
@@ -28,6 +29,7 @@
 #include "parser/downloadsubtitlesargparser.h"
 #include "parser/extensionargparser.h"
 #include "parser/formatargparser.h"
+#include "parser/jobsargparser.h"
 #include "parser/langsuffixargparser.h"
 #include "parser/langargparser.h"
 #include "parser/quietbatchargparser.h"
@@ -63,6 +65,8 @@ int main(int argc, char **argv) {
       QSharedPointer<CliArgParser>(new FormatArgParser()),
       QSharedPointer<CliArgParser>(new ExtensionArgParser()),
       QSharedPointer<CliArgParser>(new LangSuffixArgParser()),
+      QSharedPointer<CliArgParser>(new JobsArgParser()),
+      QSharedPointer<CliArgParser>(new AiFallbackArgParser()),
       QSharedPointer<CliArgParser>(new ShowOptionsArgParser()),
       QSharedPointer<CliArgParser>(new ScanDirectoryArgParser()),
       QSharedPointer<CliArgParser>(new DownloadSubtitlesArgParser())};
