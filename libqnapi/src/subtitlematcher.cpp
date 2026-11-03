@@ -67,8 +67,13 @@ QString SubtitleMatcher::selectTargetExtension(
 
   if (isPostProcessingEnabled) {
     if (!ppSubFormat.isEmpty() && ppSubExtension.isEmpty()) {
-      targetExtension =
-          subtitleFormatsRegistry->select(ppSubFormat)->defaultExtension();
+      // an unrecognised format name yields a null pointer from select();
+      // keep the downloaded file's own extension rather than crashing
+      QSharedPointer<const SubtitleFormat> format =
+          subtitleFormatsRegistry->select(ppSubFormat);
+      if (!format.isNull()) {
+        targetExtension = format->defaultExtension();
+      }
     } else if (!ppSubExtension.isEmpty()) {
       targetExtension = ppSubExtension;
     }

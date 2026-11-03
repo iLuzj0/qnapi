@@ -84,6 +84,10 @@ bool SubtitleConverter::convertSubtitles(QString subtitleFile,
   QSharedPointer<const SubtitleFormat> targetFormat =
       subtitleFormatsRegistry->select(targetFormatName);
 
+  // an unrecognised format name (e.g. from a hand-edited config) yields a
+  // null pointer from select() - refuse the conversion instead of crashing
+  if (inputFormat.isNull() || targetFormat.isNull()) return false;
+
   SubFile sf = inputFormat->decode(subtitleLines);
   double frameRate = 0.0;
 
