@@ -179,12 +179,15 @@ bool OpenSubtitlesDownloadEngine::download(QUuid id) {
   if (file.exists()) file.remove();
   if (!file.open(QIODevice::WriteOnly)) return false;
 
-  int r = file.write(subtitleContent);
+  // write() returns -1 on error, and (bool)-1 is true
+  const qint64 written = file.write(subtitleContent);
   file.close();
+
+  if (written != subtitleContent.size()) return false;
 
   updateSubtitleInfo(s);
 
-  return (bool)r;
+  return true;
 }
 
 bool OpenSubtitlesDownloadEngine::unpack(QUuid id) {
@@ -201,8 +204,13 @@ bool OpenSubtitlesDownloadEngine::unpack(QUuid id) {
       tmpPath + QDir::separator() + QFileInfo(archivePath).completeBaseName();
   subtitlesTmp = tmpPath + QDir::separator() + subFileName;
 
-  QFile::copy(unpackedTmp, subtitlesTmp);
+  // QFile::copy() refuses to overwrite, so clear any stale target first
+  if (QFile::exists(subtitlesTmp)) QFile::remove(subtitlesTmp);
+
+  const bool copied = QFile::copy(unpackedTmp, subtitlesTmp);
   QFile::remove(unpackedTmp);
+
+  if (!copied || !QFile::exists(subtitlesTmp)) return false;
 
   return true;
 }
