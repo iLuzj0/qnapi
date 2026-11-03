@@ -53,8 +53,11 @@ SubFile TMPlayerSubtitleFormat::decode(const QStringList &lines) const {
     long plus5s = sf.entries[i].frameStart + 5000L;
     sf.entries[i].frameStop = plus5s;
     if (i < sf.entries.size() - 1) {
-      sf.entries[i].frameStop =
-          std::min(plus5s, sf.entries[i + 1].frameStart - 1);
+      // TMPlayer files may repeat a timestamp on consecutive lines; clamp so
+      // that an entry never ends before it starts
+      sf.entries[i].frameStop = std::max(
+          sf.entries[i].frameStart,
+          std::min(plus5s, sf.entries[i + 1].frameStart - 1));
     }
   }
 
