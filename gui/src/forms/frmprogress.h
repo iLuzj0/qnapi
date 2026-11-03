@@ -16,6 +16,7 @@
 #define __FRMPROGRESS__H__
 
 #include <QMutex>
+#include <QSemaphore>
 
 #include "ui_frmprogress.h"
 
@@ -32,6 +33,8 @@
 
 class GetThread : public QNapiThread {
   Q_OBJECT
+
+  friend class GuiBatchListener;
 
  public:
   GetThread();
@@ -53,15 +56,29 @@ class GetThread : public QNapiThread {
   void setConfig(const QNapiConfig &configuration) { config = configuration; }
 
   void run();
+  bool abortRequested() const { return abort; }
 
-  QStringList queue;
+  // Files may arrive from a second launch while a batch is running; they are
+  // processed as a follow-up batch.
+  void enqueue(const QString &filePath);
+  int queueSize() const;
+  QStringList takeQueue();
+
   Maybe<QString> specificEngine;
   QList<SubtitleInfo> subStatusList;
-  int napiSuccess, napiFail;
   QString criticalMessage;
-  QMutex waitForDlg;
-  int selIdx;
   QNapiConfig config;
+
+ private:
+  QStringList queue;
+  // files of the current run handed to the downloader so far
+  int dispatched = 0;
+  mutable QMutex queueMutex;
+
+  // One subtitle list at a time even when several workers want to ask.
+  QMutex selectionMutex;
+  QSemaphore selectionDone;
+  int selIdx = -1;
 };
 
 class frmProgress : public QWidget {

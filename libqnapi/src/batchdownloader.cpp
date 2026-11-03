@@ -255,7 +255,9 @@ class BatchDownloadWorker : public QThread {
       }
 
       // a rate-limited file is reported once it has run out of rounds
-      if (outcome.result != DownloadResult::RateLimited)
+      if (outcome.result == DownloadResult::RateLimited)
+        listener.fileDeferred(i);
+      else
         listener.fileFinished(i, outcome);
     }
   }

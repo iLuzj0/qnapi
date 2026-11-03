@@ -92,6 +92,9 @@ class BatchDownloadListener {
     Q_UNUSED(index)
     Q_UNUSED(outcome)
   }
+  // Rate-limited in parallel mode; it is retried after the wait and
+  // fileFinished() follows once it succeeds or runs out of rounds.
+  virtual void fileDeferred(int index) { Q_UNUSED(index) }
   virtual void waitingForRateLimit(int fileCount, int msecs) {
     Q_UNUSED(fileCount)
     Q_UNUSED(msecs)

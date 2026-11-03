@@ -23,7 +23,9 @@
 #include <QSystemTrayIcon>
 #include "libqnapi.h"
 
+#include <QMutexLocker>
 #include <QThread>
+#include "batchdownloader.h"
 #include "qnapiapp.h"
 
 frmProgress::frmProgress(QWidget *parent, Qt::WindowFlags f)
@@ -62,13 +64,10 @@ void frmProgress::receiveRequest(const QString &request) {
 }
 
 void frmProgress::enqueueFile(const QString &filePath) {
-  static QMutex locker;
-  locker.lock();
   if (QFile::exists(filePath)) {
-    getThread.queue << filePath;
-    updateProgress(-1, getThread.queue.size(), -1);
+    getThread.enqueue(filePath);
+    updateProgress(-1, getThread.queueSize(), -1);
   }
-  locker.unlock();
 }
 
 void frmProgress::enqueueFiles(const QStringList &fileList) {
@@ -98,7 +97,7 @@ bool frmProgress::download(const QNapiConfig &config) {
     return false;
   }
 
-  if (getThread.queue.isEmpty()) {
+  if (getThread.queueSize() == 0) {
     QMessageBox::warning(
         0, tr("No files!"),
         tr("Can't download subtitles as no movie files specified!"));
@@ -164,8 +163,7 @@ void frmProgress::selectSubtitles(QString fileName,
 void frmProgress::downloadFinished() {
   hide();
 
-  QStringList queue = getThread.queue;
-  getThread.queue.clear();
+  const QStringList queue = getThread.takeQueue();
 
   mutex.lock();
   if (showSummary) {
@@ -181,6 +179,13 @@ void frmProgress::downloadFinished() {
   if (closeRequested) close();
 
   mutex.unlock();
+
+  // a file sent just as the thread was finishing would otherwise be dropped
+  if (!closeRequested && getThread.queueSize() > 0) {
+    download(LibQNapi::loadConfig());
+    return;
+  }
+
   if (batchMode) qApp->quit();
 }
 
@@ -234,202 +239,244 @@ GetThread::GetThread() : config(LibQNapi::loadConfig()) {
 
 void GetThread::subtitlesSelected(int idx) {
   selIdx = idx;
-  waitForDlg.unlock();
+  selectionDone.release();
 }
 
-#define ABORT_POINT \
-  {                 \
-    if (abort) {    \
-      return;       \
-    }               \
+void GetThread::enqueue(const QString &filePath) {
+  QMutexLocker locker(&queueMutex);
+  queue << filePath;
+}
+
+int GetThread::queueSize() const {
+  QMutexLocker locker(&queueMutex);
+  return queue.size();
+}
+
+QStringList GetThread::takeQueue() {
+  QMutexLocker locker(&queueMutex);
+  const QStringList taken = queue.mid(0, dispatched);
+  queue = queue.mid(dispatched);
+  dispatched = 0;
+  return taken;
+}
+
+// Turns the downloader's callbacks, which arrive from worker threads in
+// parallel mode, into the thread's signals; Qt queues them to the GUI.
+class GuiBatchListener : public BatchDownloadListener {
+ public:
+  GuiBatchListener(GetThread &thread, const QStringList &paths, int offset)
+      : t(thread), paths(paths), offset(offset) {}
+
+  void batchStarted(int fileCount, int jobs) override {
+    parallel = jobs > 1;
+    if (parallel) {
+      emit t.fileNameChange(QString());
+      emit t.actionChange(
+          GetThread::tr("Processing %n file(s), %1 at a time...", "",
+                        fileCount)
+              .arg(jobs));
+    }
+    emit t.progressChange(offset, t.queueSize(), 0.0f);
   }
+
+  void fileStarted(int index) override {
+    QMutexLocker locker(&mutex);
+    if (parallel) {
+      inFlight << index;
+      showParallelState();
+    } else {
+      emit t.fileNameChange(name(index));
+    }
+  }
+
+  void fileStep(int index, DownloadStep step,
+                const DownloadStepInfo &info) override {
+    if (parallel) return;
+
+    QString action;
+    float stage = 0.0f;
+    switch (step) {
+      case DownloadStep::CheckingPermissions:
+        action = GetThread::tr("Checking permissions of the video directory...");
+        stage = 0.1f;
+        break;
+      case DownloadStep::Checksum:
+        action = GetThread::tr("Calculating checksum of the file...");
+        stage = 0.3f;
+        break;
+      case DownloadStep::Searching:
+        action = GetThread::tr("Searching for subtitles [%1] (%2)...")
+                     .arg(info.language, info.engine);
+        stage = 0.4f;
+        break;
+      case DownloadStep::SearchingBackup:
+        action =
+            GetThread::tr(
+                "Searching for subtitles in alternative language [%1] (%2)...")
+                .arg(info.language, info.engine);
+        stage = 0.45f;
+        break;
+      case DownloadStep::WaitingToRetry:
+        action = GetThread::tr("Nothing found, retrying in %1 s (%2/%3)...")
+                     .arg(info.delayMsecs / 1000)
+                     .arg(info.attempt)
+                     .arg(info.maxAttempts);
+        stage = 0.45f;
+        break;
+      case DownloadStep::Downloading:
+        action = GetThread::tr("Downloading subtitles file...");
+        stage = 0.5f;
+        break;
+      case DownloadStep::Unpacking:
+        action = GetThread::tr("Unpacking subtitles file...");
+        stage = 0.65f;
+        break;
+      case DownloadStep::PostProcessing:
+        action = GetThread::tr("Post-processing subtitles...");
+        stage = 0.8f;
+        break;
+      case DownloadStep::Matching:
+        action = GetThread::tr("Adjusting subtitles...");
+        stage = 0.9f;
+        break;
+    }
+    emit t.actionChange(action);
+    emit t.progressChange(offset + index, t.queueSize(), stage);
+  }
+
+  void fileDeferred(int index) override {
+    QMutexLocker locker(&mutex);
+    inFlight.removeAll(index);
+    showParallelState();
+  }
+
+  void fileFinished(int index, const DownloadOutcome &outcome) override {
+    Q_UNUSED(outcome)
+    QMutexLocker locker(&mutex);
+    ++done;
+    if (parallel) {
+      inFlight.removeAll(index);
+      showParallelState();
+    } else {
+      emit t.progressChange(offset + index, t.queueSize(), 1.0f);
+    }
+  }
+
+  void waitingForRateLimit(int fileCount, int msecs) override {
+    emit t.fileNameChange(QString());
+    emit t.actionChange(
+        GetThread::tr(
+            "%n file(s) were rate-limited; waiting %1 s before retrying...", "",
+            fileCount)
+            .arg(msecs / 1000));
+  }
+
+  bool canSelectSubtitles() const override { return true; }
+  bool canSelectSubtitlesConcurrently() const override { return true; }
+
+  Maybe<int> selectSubtitles(int index, const SubtitleInfoList &list) override {
+    QMutexLocker locker(&t.selectionMutex);
+    if (t.abortRequested()) return nothing();
+
+    emit t.selectSubtitles(name(index), list);
+    t.selectionDone.acquire();
+
+    if (t.selIdx < 0) return nothing();
+    return just(t.selIdx);
+  }
+
+  bool abortRequested() const override { return t.abortRequested(); }
+
+ private:
+  QString name(int index) const { return QFileInfo(paths[index]).fileName(); }
+
+  // called with the mutex held
+  void showParallelState() {
+    QString files;
+    if (!inFlight.isEmpty()) {
+      files = name(inFlight.last());
+      if (inFlight.size() > 1)
+        files += GetThread::tr(" (+%n more)", "", inFlight.size() - 1);
+    }
+    const int total = t.queueSize();
+    emit t.fileNameChange(files);
+    emit t.actionChange(
+        GetThread::tr("%1 of %2 files done, %3 in progress")
+            .arg(offset + done)
+            .arg(total)
+            .arg(inFlight.size()));
+    // the window shows "current + 1"; a finished file is a whole step
+    emit t.progressChange(qMax(0, offset + done - 1), total,
+                          offset + done > 0 ? 1.0f : 0.0f);
+  }
+
+  GetThread &t;
+  const QStringList paths;
+  const int offset;
+  bool parallel = false;
+  int done = 0;
+  QList<int> inFlight;
+  QMutex mutex;
+};
+
+namespace {
+
+SubtitleInfo summaryEntry(const QString &moviePath, const DownloadOutcome &o) {
+  switch (o.result) {
+    case DownloadResult::Saved:
+      return o.subtitle;
+    case DownloadResult::Declined:
+    case DownloadResult::Aborted:
+      return SubtitleInfo::fromFailed(moviePath);
+    case DownloadResult::NoWritePermission:
+      return SubtitleInfo::fromFailed(
+          moviePath, GetThread::tr("No permission to write to the directory "
+                                   "'%1'!")
+                         .arg(QFileInfo(moviePath).path()));
+    case DownloadResult::RateLimited:
+      return SubtitleInfo::fromFailed(
+          moviePath, GetThread::tr("still rate-limited, try again later"));
+    case DownloadResult::MatchFailed:
+      return SubtitleInfo::fromFailed(
+          moviePath, GetThread::tr("Could not adjust subtitles!"));
+    case DownloadResult::NotFound:
+    case DownloadResult::DownloadFailed:
+    case DownloadResult::UnpackFailed:
+      break;
+  }
+  return SubtitleInfo::fromFailed(moviePath, o.error);
+}
+
+}  // namespace
 
 void GetThread::run() {
   abort = false;
   criticalMessage.clear();
-  if (queue.size() <= 0) return;
-
-  napiSuccess = napiFail = 0;
   subStatusList.clear();
 
-  QNapi napi(config, specificEngine);
+  const auto downloader = LibQNapi::batchDownloader(config, specificEngine);
 
-  emit progressChange(0, queue.size(), 0.0f);
+  QStringList paths;
+  QVector<DownloadOutcome> outcomes;
 
-  QString language = config.generalConfig().language();
-  QString languageBackup = config.generalConfig().backupLanguage();
-
-  for (int i = 0; i < queue.size(); i++) {
-    ABORT_POINT
-
-    QFileInfo fi(queue[i]);
-    emit fileNameChange(fi.fileName());
-
-    napi.setMoviePath(queue[i]);
-
-    emit progressChange(i, queue.size(), 0.1f);
-    emit actionChange(tr("Checking permissions of the video directory..."));
-
-    if (!napi.checkWritePermissions()) {
-      emit criticalError(tr("No permission to write to the directory '%1'!")
-                             .arg(QFileInfo(queue[i]).path()));
-      return;
+  for (;;) {
+    QStringList batch;
+    {
+      QMutexLocker locker(&queueMutex);
+      batch = queue.mid(dispatched);
+      dispatched = queue.size();
     }
+    if (batch.isEmpty()) break;
 
-    napi.clearSubtitlesList();
+    GuiBatchListener listener(*this, batch, paths.size());
+    outcomes += downloader->run(batch, listener);
+    paths += batch;
 
-    emit progressChange(i, queue.size(), 0.3f);
-    emit actionChange(tr("Calculating checksum of the file..."));
-
-    napi.checksum();
-
-    ABORT_POINT
-
-    bool found = false;
-    SearchPolicy sp = config.generalConfig().searchPolicy();
-
-    // The services throttle bursts of requests and answer them as "no
-    // subtitles", so a whole-season batch used to report almost every file as
-    // missing while running the same files again found them. Retry after a
-    // pause instead of making the user do it by hand.
-    for (int attempt = 0; attempt <= QNapi::maxSearchRetries && !found;
-         ++attempt) {
-      if (attempt > 0) {
-        if (!napi.lastSearchFailedTransiently()) break;
-
-        emit actionChange(
-            tr("Nothing found, retrying in %1 s (%2/%3)...")
-                .arg(QNapi::searchRetryDelayMsecs / 1000)
-                .arg(attempt)
-                .arg(QNapi::maxSearchRetries));
-
-        QThread::msleep(QNapi::searchRetryDelayMsecs);
-
-        ABORT_POINT
-
-        napi.clearSubtitlesList();
-      }
-
-    if (sp == SP_SEARCH_ALL_WITH_BACKUP_LANG) {
-      foreach (QString e, napi.listLoadedEngines()) {
-        emit progressChange(i, queue.size(), 0.4f);
-        emit actionChange(
-            tr("Searching for subtitles [%1] (%2)...").arg(language, e));
-        found = napi.lookForSubtitles(language, e) || found;
-
-        ABORT_POINT
-
-        emit actionChange(
-            tr("Searching for subtitles in alternative language [%1] (%2)...")
-                .arg(languageBackup, e));
-        found = napi.lookForSubtitles(languageBackup, e) || found;
-
-        ABORT_POINT
-      }
-    } else {
-      foreach (QString e, napi.listLoadedEngines()) {
-        emit progressChange(i, queue.size(), 0.4f);
-        emit actionChange(
-            tr("Searching for subtitles [%1] (%2)...").arg(language, e));
-        found = napi.lookForSubtitles(language, e) || found;
-
-        if (sp == SP_BREAK_IF_FOUND && found) {
-          break;
-        }
-
-        ABORT_POINT
-      }
-
-      if (!found && !languageBackup.isEmpty()) {
-        foreach (QString e, napi.listLoadedEngines()) {
-          emit progressChange(i, queue.size(), 0.45f);
-          emit actionChange(
-              tr("Searching for subtitles in alternative language [%1] (%2)...")
-                  .arg(languageBackup, e));
-          found = napi.lookForSubtitles(languageBackup, e) || found;
-
-          if (sp == SP_BREAK_IF_FOUND && found) break;
-
-          ABORT_POINT
-        }
-      }
-    }
-    }
-
-    if (!found) {
-      ++napiFail;
-      subStatusList << SubtitleInfo::fromFailed(queue[i], napi.error());
-      continue;
-    }
-
-    // jesli mozna i potrzeba, listujemy dostepne napisy
-    if (napi.needToShowList()) {
-      emit selectSubtitles(QFileInfo(queue[i]).fileName(),
-                           napi.listSubtitles());
-
-      waitForDlg.lock();
-      waitForDlg.lock();
-      waitForDlg.unlock();
-    } else {
-      selIdx = napi.bestIdx();
-    }
-
-    ABORT_POINT
-
-    if (selIdx == -1) {
-      ++napiFail;
-      subStatusList << SubtitleInfo::fromFailed(queue[i]);
-      continue;
-    }
-
-    emit progressChange(i, queue.size(), 0.5);
-    emit actionChange(tr("Downloading subtitles file..."));
-
-    if (!napi.download(selIdx)) {
-      ABORT_POINT
-
-      ++napiFail;
-      subStatusList << SubtitleInfo::fromFailed(queue[i], napi.error());
-      continue;
-    }
-
-    ABORT_POINT
-
-    emit progressChange(i, queue.size(), 0.65f);
-    emit actionChange(tr("Unpacking subtitles file..."));
-
-    if (!napi.unpack(selIdx)) {
-      ++napiFail;
-      subStatusList << SubtitleInfo::fromFailed(queue[i], napi.error());
-      continue;
-    }
-
-    if (napi.ppEnabled()) {
-      emit progressChange(i, queue.size(), 0.8f);
-      emit actionChange(tr("Post-processing subtitles..."));
-      napi.postProcessSubtitles();
-    }
-
-    emit progressChange(i, queue.size(), 0.9f);
-    emit actionChange(tr("Adjusting subtitles..."));
-
-    if (!napi.matchSubtitles()) {
-      ABORT_POINT
-
-      ++napiFail;
-      subStatusList << SubtitleInfo::fromFailed(queue[i]);
-
-      emit criticalError(tr("Could not adjust subtitles!"));
-      return;
-    }
-
-    ++napiSuccess;
-    subStatusList << napi.listSubtitles().at(selIdx);
-
-    napi.cleanup();
-
-    emit progressChange(i, queue.size(), 1.0f);
+    if (abort) return;
   }
 
-  emit progressChange(queue.size() - 1, queue.size(), 1);
+  for (int i = 0; i < paths.size(); ++i) {
+    if (outcomes[i].processed)
+      subStatusList << summaryEntry(paths[i], outcomes[i]);
+  }
 }

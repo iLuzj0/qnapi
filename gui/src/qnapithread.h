@@ -16,6 +16,7 @@
 #define __QNAPITHREAD__H__
 
 #include <QThread>
+#include <atomic>
 
 class QNapiThread : public QThread {
   Q_OBJECT
@@ -24,7 +25,8 @@ class QNapiThread : public QThread {
   void requestAbort() { abort = true; }
 
  protected:
-  bool abort;
+  // set from the GUI thread, read by the worker and its helper threads
+  std::atomic<bool> abort;
 };
 
 #endif
