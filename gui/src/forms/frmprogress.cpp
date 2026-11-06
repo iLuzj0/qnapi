@@ -484,6 +484,14 @@ class GuiAiListener : public AiGenerationListener {
     failure = error + "\n" + QDir::toNativeSeparators(logPath);
   }
 
+  void modelRestarting(int index, const QString &error) override {
+    Q_UNUSED(error)
+    emit t.actionChange(
+        GetThread::tr("Reloading the translation model (%1/%2)...")
+            .arg(index + 1)
+            .arg(count));
+  }
+
   void translationStarted(int index) override {
     emit t.fileNameChange(name(index));
     emit t.actionChange(

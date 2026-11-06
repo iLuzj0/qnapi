@@ -291,18 +291,45 @@ int AiSubtitleGenerator::generate(const QStringList& movieFilePaths,
 
     AiFileResult result;
 
-    auto translation = translator->translate(
-        transcriptions[i], titleFor(movie),
-        [&](int done, int count) { l.translationProgress(i, done, count); },
-        cancelled);
+    // llama.cpp's CUDA backend occasionally dies mid-batch (illegal memory
+    // access); a fresh server translates the same chunks fine.
+    auto translate = [&]() {
+      return translator->translate(
+          transcriptions[i], titleFor(movie),
+          [&](int done, int count) { l.translationProgress(i, done, count); },
+          cancelled);
+    };
+    auto translation = translate();
+    for (int restart = 0;
+         restart < maxServerRestartsPerFile && translation.is1st() &&
+         !translation.as1st().cancelled && !llm->isRunning();
+         ++restart) {
+      l.modelRestarting(i, translation.as1st().message);
+      auto restarted = llm->start(cancelled);
+      if (restarted.is1st()) {
+        translation = restarted.as1st();
+        break;
+      }
+      translation = translate();
+    }
 
     if (translation.is1st()) {
       if (translation.as1st().cancelled) break;
       result.error = translation.as1st().message;
       result.msecs = timer.elapsed();
       l.translationFinished(i, result);
-      // without the server the remaining files cannot be translated either
-      if (!llm->isRunning()) break;
+
+      // A file that keeps crashing the server should not cost the others
+      // their subtitles; one that cannot be started again ends the batch.
+      if (!llm->isRunning()) {
+        auto restarted = llm->start(cancelled);
+        if (restarted.is1st()) {
+          if (!restarted.as1st().cancelled) {
+            l.modelFailed(restarted.as1st().message, llamaLog);
+          }
+          break;
+        }
+      }
       continue;
     }
 

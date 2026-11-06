@@ -94,6 +94,15 @@ class ConsoleListener : public AiGenerationListener {
         tr("Server log: %1").arg(QDir::toNativeSeparators(logPath)));
   }
 
+  void modelRestarting(int index, const QString& error) override {
+    c.printLine();
+    c.printLineWarning(prefix(index) +
+                       tr("llama-server stopped (%1)").arg(error));
+    c.printLineOrdinary(tr("Reloading the translation model and translating "
+                           "%1 again...")
+                            .arg(name(index)));
+  }
+
   void translationProgress(int index, int done, int count) override {
     c.printOrdinary(
         QString("%1... %2/%3\r")

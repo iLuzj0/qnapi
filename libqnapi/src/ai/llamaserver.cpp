@@ -31,6 +31,7 @@ LlamaServer::LlamaServer(const QString& serverPath, const QString& modelPath,
       model(modelPath),
       logPath(logPath),
       extraArgs(extraArgs),
+      logOpened(false),
       process(nullptr) {}
 
 LlamaServer::~LlamaServer() { stop(); }
@@ -83,7 +84,10 @@ Either<AiError, QString> LlamaServer::start(const AiCancelCheck& cancelled) {
 
   process = new QProcess();
   process->setProcessChannelMode(QProcess::MergedChannels);
-  process->setStandardOutputFile(logPath, QIODevice::Truncate);
+  // a restart keeps the log of the crash that made it necessary
+  process->setStandardOutputFile(
+      logPath, logOpened ? QIODevice::Append : QIODevice::Truncate);
+  logOpened = true;
   process->start(server, args);
 
   if (!process->waitForStarted()) {
@@ -162,6 +166,10 @@ Either<AiError, QString> LlamaServer::chat(const QJsonArray& messages,
   const QByteArray data = reply->readAll();
   const QString networkError = reply->errorString();
   reply->deleteLater();
+
+  // A crashed server drops the connection a moment before its process is
+  // reaped; callers rely on isRunning() to tell a crash from a bad answer.
+  if (status == 0 && !http.timedOut()) process->waitForFinished(3000);
 
   if (http.timedOut()) {
     return AiError{QObject::tr("llama-server did not answer in time")};

@@ -61,6 +61,12 @@ class AiGenerationListener {
     Q_UNUSED(error)
     Q_UNUSED(logPath)
   }
+  // The server died while translating the given file, which is translated
+  // again once the model is reloaded.
+  virtual void modelRestarting(int index, const QString& error) {
+    Q_UNUSED(index)
+    Q_UNUSED(error)
+  }
 
   virtual void translationStarted(int index) { Q_UNUSED(index) }
   virtual void translationProgress(int index, int done, int count) {
@@ -124,6 +130,8 @@ class AiSubtitleGenerator {
                                    const QString& targetLanguage);
 
  private:
+  static const int maxServerRestartsPerFile = 2;
+
   static QString sourceLanguageName(const QString& sourceLanguage);
 
  public:

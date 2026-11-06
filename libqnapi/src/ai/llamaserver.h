@@ -62,6 +62,7 @@ class LlamaServer {
   QString logPath;
   QString extraArgs;
   QString baseUrl;
+  bool logOpened;
   QProcess* process;
 };
 
