@@ -89,6 +89,14 @@ set CMAKE_COMMON=-G Ninja -DCMAKE_BUILD_TYPE=Release ^
     -DBUILD_SHARED_LIBS=OFF -DGGML_CUDA=ON -DGGML_NATIVE=ON
 
 rem --- whisper.cpp ----------------------------------------------------------
+rem Fixes not yet upstream, from scripts\patches; skipped once applied.
+for %%P in ("%ROOT%\scripts\patches\whisper.cpp-*.patch") do (
+    git -C "%ROOT%\deps\whisper.cpp" apply --reverse --check "%%~fP" >nul 2>&1 || (
+        echo build-ai-tools: applying %%~nxP
+        git -C "%ROOT%\deps\whisper.cpp" apply "%%~fP" || exit /b 1
+    )
+)
+
 echo build-ai-tools: configuring whisper.cpp
 cmake -S "%ROOT%\deps\whisper.cpp" -B "%BUILD%\whisper.cpp" %CMAKE_COMMON% ^
     -DWHISPER_BUILD_TESTS=OFF -DWHISPER_BUILD_SERVER=OFF -DWHISPER_SDL2=OFF ^

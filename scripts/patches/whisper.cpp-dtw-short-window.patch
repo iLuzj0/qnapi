@@ -1,0 +1,18 @@
+diff --git a/src/whisper.cpp b/src/whisper.cpp
+index be0b865..9e09a6a 100644
+--- a/src/whisper.cpp
++++ b/src/whisper.cpp
+@@ -9202,6 +9202,13 @@ static void whisper_exp_compute_token_level_timestamps_dtw(
+     WHISPER_ASSERT(n_frames <= n_audio_ctx * 2);
+     WHISPER_ASSERT(ctx->params.dtw_aheads_preset != WHISPER_AHEADS_NONE);
+ 
++    // A window that advanced less than two audio tokens leaves nothing to
++    // align, and the tensors below would lose a dimension; its tokens keep
++    // t_dtw = -1.
++    if (n_frames < 4) {
++        return;
++    }
++
+     // FIXME: Allocating mem everytime we call this func
+     // Our ggml buffer should be pre-allocated somewhere during init and reused
+     // when we call this function
